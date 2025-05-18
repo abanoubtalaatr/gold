@@ -19,7 +19,9 @@ use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
 use App\Http\Controllers\Api\V1\FavoriteController;
 
-
+Route::group([
+    'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath' ]
+], function () {
 Route::get('settings', [SettingsApiController::class, 'index'])->name('settings');
 
 Route::get('faqs', [FaqController::class, 'index'])->name('faqs');
@@ -108,4 +110,5 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/my-requests', [OrderController::class, 'myRequests']);
+});
 });
