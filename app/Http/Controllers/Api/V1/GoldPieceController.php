@@ -21,6 +21,7 @@ use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use App\Models\Address;
+use App\Filters\GoldPieceFilter;
 
 class GoldPieceController extends Controller
 {
@@ -28,53 +29,12 @@ class GoldPieceController extends Controller
     
     public function index(Request $request)
     {
-        $query = GoldPiece::query()->whereHas('orderRentals', function($query) {
-            $query->where('status', 'approved');
-        })->orWhereHas('orderSales', function($query) {
-            $query->where('status', 'approved');
-        })
-          ->when($request->filled(['from_carat', 'to_carat']), function($q) use ($request) {
-                $q->whereBetween('carat', [$request->from_carat, $request->to_carat]);
-            })
-            ->when($request->carat, fn($q) => $q->where('carat', $request->carat))
+        $query = GoldPiece::query();
+        $filter = new GoldPieceFilter($request);
+        $filteredQuery = $filter->apply($query)->with('user');
 
-            // Weight range filter
-            ->when($request->filled(['from_weight', 'to_weight']), function($q) use ($request) {
-                $q->whereBetween('weight', [$request->from_weight, $request->to_weight]);
-            })
-            ->when($request->weight, fn($q) => $q->where('weight', $request->weight))
-
-            // Price range filter for rental items
-            ->when($request->filled(['from_rental_price', 'to_rental_price']), function($q) use ($request) {
-                $q->where('type', 'for_rent')
-                  ->whereBetween('rental_price_per_day', [$request->from_rental_price, $request->to_rental_price]);
-            })
-
-            // Price range filter for sale items
-            ->when($request->filled(['from_sale_price', 'to_sale_price']), function($q) use ($request) {
-                $q->where('type', 'for_sale')
-                  ->whereBetween('sale_price', [$request->from_sale_price, $request->to_sale_price]);
-            })
-
-            // Type filter
-            ->when($request->type, fn($q) => $q->where('type', $request->type))
-            
-            // Status filter
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-
-            // Search by name
-            ->when($request->search, fn($q) => $q->where('name', 'like', "%{$request->search}%"))
-
-            // Sort by price
-            ->when($request->price_sort, function($q) use ($request) {
-                $column = $request->type === 'for_rent' ? 'rental_price_per_day' : 'sale_price';
-                $q->orderBy($column, $request->price_sort);
-            })
-
-            ->with('user');
-
-        $perPage = $request->per_page ?? 15; // Default 15 items per page
-        $goldPieces = $query->paginate($perPage);
+        $perPage = $request->per_page ?? 15;
+        $goldPieces = $filteredQuery->paginate($perPage);
 
         return $this->successResponse(
             GoldPieceResource::collection($goldPieces)->response()->getData(true),

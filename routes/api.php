@@ -35,10 +35,6 @@ Route::group(["prefix" => "auth"], function () {
     Route::post('social_login', [LoginController::class, 'social_login']);
 });
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 //Mockup 
 Route::get('countries', [CountryController::class, 'index']);
 Route::get('countries/{country}/states', [CountryController::class, 'states']);
@@ -48,8 +44,6 @@ Route::get('pages/{slug}', [PageApiController::class, 'show']);
 Route::get('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'show'])->name('gold_pieces.show');
 Route::post('/contact-us', [ContactUsController::class, 'store'])->name('contact-us');
 Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], function () {
-
-    // Route::post('broadcasting/auth', [LoginController::class,'broadcast_auth'] );
 
     // insert device token Routes
     Route::get('logout', [LoginController::class, 'logout']);
