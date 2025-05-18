@@ -266,4 +266,9 @@ return [
     "rating_deleted_success" => "Rating deleted successfully",
     "already_rated" => "You have already rated this gold piece",
     "unauthorized" => "Unauthorized action",
+
+    'liquidation_request' => [
+        'created' => 'Liquidation request created successfully.',
+        'deleted' => 'Liquidation request deleted successfully.',
+    ],
 ];

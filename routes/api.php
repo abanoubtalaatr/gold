@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
 use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\RatingController;
+use App\Http\Controllers\Api\V1\LiquidationRequestController;
 
 
 Route::get('settings', [SettingsApiController::class, 'index'])->name('settings');
@@ -134,5 +135,14 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::post('gold-pieces/{goldPiece}/ratings', [RatingController::class, 'store'])->name('ratings.store');
     Route::put('ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
     Route::delete('ratings/{rating}', [RatingController::class, 'destroy'])->name('ratings.destroy');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Liquidation-requests.... 
+    |--------------------------------------------------------------------------
+    */
+    Route::apiResource('liquidation-requests', LiquidationRequestController::class)->except(['update']);
 });
+
 
