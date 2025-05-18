@@ -30,16 +30,7 @@ class ProfileController extends Controller
                 return $this->unauthorizedResponse('User not authenticated');
             }
 
-            $profileData = [
-                'profile' => new UserResource($user),
-                'verification_status' => $user->is_verified ? 'Verified' : 'Pending Verification',
-                'email_status' => $user->email ? $user->email : 'No email available yet'
-            ];
-
-            return $this->successResponse(
-                $profileData,
-                'Profile retrieved successfully'
-            );
+            return $this->successResponse(new UserResource($user),'Profile retrieved successfully');
         } catch (\Exception $e) {
             return $this->errorResponse(
                 'Error retrieving profile',
@@ -73,10 +64,7 @@ class ProfileController extends Controller
 
             $user->update($data);
 
-            return $this->successResponse(
-                new UserResource($user),
-                'Profile updated successfully'
-            );
+            return $this->successResponse(new UserResource($user),'Profile updated successfully');
         } catch (\Exception $e) {
             return $this->errorResponse(
                 'Error updating profile',
