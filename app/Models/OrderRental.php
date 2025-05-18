@@ -20,6 +20,17 @@ class OrderRental extends Model
         'status'
     ];
 
+    /**
+     * Order Types Constants
+     * معني RENT_TYPE - المستخدم يضيف قطعة ذهبية لتأجيرها للمحل
+     */
+    const RENT_TYPE = 'rent';
+
+    /**
+     * معني LEASE_TYPE - المستخدم يطلب تأجير قطعة من المحل
+     */
+    const LEASE_TYPE = 'lease';
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

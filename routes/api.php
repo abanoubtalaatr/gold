@@ -85,7 +85,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     */
 
     Route::get('/gold-pieces', [GoldPieceController::class, 'index']);
-    Route::post('/gold-pieces', [GoldPieceController::class, 'store']); // إضافة قطعة من المستخدم
+    Route::post('/gold-pieces', [GoldPieceController::class, 'store']);
     Route::delete('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'destroy']);
     Route::post('/gold-pieces/{goldPiece}/update', [GoldPieceController::class, 'update']);
 
@@ -97,7 +97,6 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
 
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/gold-pieces/{goldPiece}/favorite', [FavoriteController::class, 'toggle']);
-    Route::get('/gold-pieces/{goldPiece}/favorite', [FavoriteController::class, 'check']);
 
     /*
     |--------------------------------------------------------------------------

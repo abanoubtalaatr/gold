@@ -126,6 +126,7 @@ class GoldPieceController extends Controller
                         'branch_id' => $branch->id,
                         'status' => 'pending',
                         'total_price' => $goldPiece->rental_price_per_day,
+                        'type' => OrderRental::RENT_TYPE,
                     ]);
                 } else {
                     OrderSale::create([
