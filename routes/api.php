@@ -18,6 +18,9 @@ use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
 use App\Http\Controllers\Api\V1\FavoriteController;
+use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\RatingController;
+use App\Http\Controllers\Api\V1\LiquidationRequestController;
 
 
 Route::get('settings', [SettingsApiController::class, 'index'])->name('settings');
@@ -35,10 +38,6 @@ Route::group(["prefix" => "auth"], function () {
     Route::post('social_login', [LoginController::class, 'social_login']);
 });
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 //Mockup 
 Route::get('countries', [CountryController::class, 'index']);
 Route::get('countries/{country}/states', [CountryController::class, 'states']);
@@ -48,8 +47,6 @@ Route::get('pages/{slug}', [PageApiController::class, 'show']);
 Route::get('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'show'])->name('gold_pieces.show');
 Route::post('/contact-us', [ContactUsController::class, 'store'])->name('contact-us');
 Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], function () {
-
-    // Route::post('broadcasting/auth', [LoginController::class,'broadcast_auth'] );
 
     // insert device token Routes
     Route::get('logout', [LoginController::class, 'logout']);
@@ -91,7 +88,8 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     */
 
     Route::get('/gold-pieces', [GoldPieceController::class, 'index']);
-    Route::post('/gold-pieces', [GoldPieceController::class, 'store']); // إضافة قطعة من المستخدم
+    Route::get('/my-gold-pieces', [GoldPieceController::class, 'myGoldPieces']);
+    Route::post('/gold-pieces', [GoldPieceController::class, 'store']);
     Route::delete('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'destroy']);
     Route::post('/gold-pieces/{goldPiece}/update', [GoldPieceController::class, 'update']);
 
@@ -103,7 +101,6 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
 
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/gold-pieces/{goldPiece}/favorite', [FavoriteController::class, 'toggle']);
-    Route::get('/gold-pieces/{goldPiece}/favorite', [FavoriteController::class, 'check']);
 
     /*
     |--------------------------------------------------------------------------
@@ -113,5 +110,39 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
 
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders', [OrderController::class, 'index']);
-    Route::get('/orders/my-requests', [OrderController::class, 'myRequests']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications.... 
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::get('notifications/unread/count', [NotificationController::class, 'unreadCount']);
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::delete('notifications/{id}', [NotificationController::class, 'destroy']);
+    Route::delete('notifications', [NotificationController::class, 'destroyAll']);
+
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Ratings.... 
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('gold-pieces/{goldPiece}/ratings', [RatingController::class, 'index'])->name('ratings.index');
+    Route::post('ratings', [RatingController::class, 'store'])->name('ratings.store');
+    Route::post('ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
+    Route::delete('ratings/{rating}', [RatingController::class, 'destroy'])->name('ratings.destroy');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Liquidation-requests.... 
+    |--------------------------------------------------------------------------
+    */
+    Route::apiResource('liquidation-requests', LiquidationRequestController::class)->except(['update']);
 });
+
+

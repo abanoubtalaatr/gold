@@ -4,13 +4,12 @@ namespace App\Http\Resources\Api;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class GoldPieceResource extends JsonResource
 {
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
-        $user = Auth::user();
-        
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -21,18 +20,27 @@ class GoldPieceResource extends JsonResource
             'deposit_amount' => $this->deposit_amount,
             'type' => $this->type,
             'status' => $this->status,
-            'qr_code' => $this->qr_code,
             'description' => $this->description,
+            'qr_code' => $this->qr_code,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'user' => [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+            ],
             'images' => $this->getMedia('images')->map(function ($media) {
                 return [
                     'id' => $media->id,
-                    'original' => $media->getUrl(),
-                    'thumb' => $media->getUrl('thumb'),
+                    'url' => $media->getUrl(),
+                    'thumbnail' => $media->getUrl('thumb'),
                     'medium' => $media->getUrl('medium'),
                 ];
             }),
-            'user' => new UserResource($this->whenLoaded('user')),
-            'is_favorited' => $user ? $user->favorites()->where('gold_piece_id', $this->id)->exists() : false,
+            'rating' => [
+                'average' => $this->average_rating,
+                'count' => $this->rating_count,
+            ],
+            'is_favorited' => $request->user() ? $this->favoritedBy()->where('user_id', $request->user()->id)->exists() : false,
             // 'branch' => new BranchResource($this->whenLoaded('branch')),
         ];
     }

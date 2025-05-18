@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::dropIfExists('favorites');
-
         Schema::create('favorites', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('gold_piece_id')->constrained()->onDelete('cascade');
             $table->timestamps();
 
-            // Ensure a user can't favorite the same gold piece twice
+            // Ensure a user can't favorite the same gold piece multiple times
             $table->unique(['user_id', 'gold_piece_id']);
         });
     }

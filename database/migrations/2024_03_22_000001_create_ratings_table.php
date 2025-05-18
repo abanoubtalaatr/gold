@@ -6,29 +6,30 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::dropIfExists('favorites');
+        //drop the table if it exists
+        Schema::dropIfExists('ratings');
 
-        Schema::create('favorites', function (Blueprint $table) {
+        Schema::create('ratings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('gold_piece_id')->constrained()->onDelete('cascade');
+            $table->integer('rating')->comment('Rating value from 1 to 5');
+            $table->text('comment')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
-            // Ensure a user can't favorite the same gold piece twice
+            // Ensure a user can only rate a gold piece once
             $table->unique(['user_id', 'gold_piece_id']);
+
+            // Add indexes for frequently accessed columns
+            $table->index('rating');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('favorites');
+        Schema::dropIfExists('ratings');
     }
-};
+}; 

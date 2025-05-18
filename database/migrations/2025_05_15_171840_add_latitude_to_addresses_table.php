@@ -18,7 +18,7 @@ return new class extends Migration
             }
             $table->decimal('latitude', 10, 8)->nullable()->after('city_id');
             $table->decimal('longitude', 11, 8)->nullable()->after('latitude');
-            
+
         });
     }
 

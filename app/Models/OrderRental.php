@@ -20,6 +20,53 @@ class OrderRental extends Model
         'status'
     ];
 
+    
+    /**
+     * Order Types Constants
+     * معني RENT_TYPE - المستخدم يضيف قطعة ذهبية لتأجيرها للمحل
+     */
+    const RENT_TYPE = 'rent';
+
+    /**
+     * معني LEASE_TYPE - المستخدم يطلب تأجير قطعة من المحل
+     */
+    const LEASE_TYPE = 'lease';
+
+    /**
+     * Order Status Constants
+     * حالات الطلب
+     */
+    
+    /**
+     * Pending store approval
+     * في انتظار قبول المتجر
+     */
+    const STATUS_PENDING_APPROVAL = 'pending_approval';
+
+    /**
+     * Approved by store
+     * تم القبول من المتجر
+     */
+    const STATUS_APPROVED = 'approved';
+
+    /**
+     * Piece sent to store
+     * تم ارسال القطعة للمتجر
+     */
+    const STATUS_PIECE_SENT = 'piece_sent';
+
+    /**
+     * Available for rent
+     * متاحة للتأجير
+     */
+    const STATUS_AVAILABLE = 'available';
+
+    /**
+     * Currently rented
+     * مؤجرة
+     */
+    const STATUS_RENTED = 'rented';
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

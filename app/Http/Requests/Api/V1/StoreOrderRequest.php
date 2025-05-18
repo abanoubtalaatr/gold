@@ -9,22 +9,31 @@ class StoreOrderRequest extends FormRequest
 {
     public function authorize()
     {
-        return auth()->user()->nafath_verified;
+        return true;
     }
 
-    public function rules()
+    public function rules(): array
     {
-        $goldPiece = \App\Models\GoldPiece::find($this->gold_piece_id);
-
-        $rules = [
-            'gold_piece_id' => 'required|exists:gold_pieces,id',
+        return [
+            'gold_piece_id' => [
+                'required',
+                'exists:gold_pieces,id'
+            ],
+            'start_date' => [
+                'required',
+                'date',
+                'after_or_equal:today'
+            ],
+            'end_date' => [
+                'required', 
+                'date',
+                'after:start_date'
+            ],
+            'total_price' => [
+                'required',
+                'numeric',
+                'min:0'
+            ]
         ];
-
-        if ($goldPiece && $goldPiece->type === 'for_rent') {
-            $rules['start_date'] = 'required|date|after_or_equal:today';
-            $rules['end_date'] = 'required|date|after:start_date';
-        }
-
-        return $rules;
     }
 }

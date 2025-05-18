@@ -21,6 +21,7 @@ class ContactResource extends JsonResource
             'subject' => $this->subject,
             'email' => $this->email,
             'reply' => $this->reply,
+            'status' => $this->status,
             'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s'),
             'updated_at' => Carbon::parse($this->updated_at)->format('Y-m-d H:i:s'),
         ];
