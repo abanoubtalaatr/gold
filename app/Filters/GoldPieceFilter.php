@@ -37,9 +37,9 @@ class GoldPieceFilter
     protected function approvedOrders(): self
     {
         $this->query->whereHas('orderRentals', function($query) {
-            $query->where('status', 'approved');
+            $query->where('status', 'accepted');
         })->orWhereHas('orderSales', function($query) {
-            $query->where('status', 'approved');
+            $query->where('status', 'accepted');
         });
 
         return $this;
