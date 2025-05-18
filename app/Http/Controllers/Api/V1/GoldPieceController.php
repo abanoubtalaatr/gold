@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Models\GoldPiece;
+use App\Models\User;
+use App\Models\Branch;
+use App\Models\OrderRental;
+use App\Models\OrderSale;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
@@ -11,8 +15,12 @@ use App\Http\Resources\Api\GoldPieceResource;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Requests\Api\V1\StoreGoldPieceRequest;
 use App\Http\Requests\Api\V1\UpdateGoldPieceRequest;
+use App\Notifications\NewGoldPieceNotification;
+use App\Events\NewGoldPieceEvent;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
+use App\Models\Address;
 
 class GoldPieceController extends Controller
 {
@@ -74,13 +82,52 @@ class GoldPieceController extends Controller
     public function store(StoreGoldPieceRequest $request)
     {
         try {
+            // Get user's default address or first address
+            $user = User::with('addresses')->find(Auth::id());
+            if (!$user) {
+                return $this->errorResponse('User not found', [], 404);
+            }
+
+            $address = $user->addresses()
+                ->where('is_default', true)
+                ->orWhere(function($query) use ($user) {
+                    $query->where('user_id', $user->id)
+                          ->orderBy('created_at', 'asc');
+                })
+                ->first();
+
+            if (!$address) {
+                return $this->errorResponse(
+                    'User must have at least one address to create a gold piece', 
+                    [], 
+                    422
+                );
+            }
+
+            // Get active branches in the same city as the user's address
+            $branches = Branch::query()
+                ->where('city_id', $address->city_id)
+                ->where('is_active', true)
+                ->whereHas('vendor', function($query) {
+                    $query->where('is_active', true);
+                })
+                ->get();
+
+            if ($branches->isEmpty()) {
+                return $this->errorResponse(
+                    'No active branches found in your city', 
+                    [], 
+                    422
+                );
+            }
+
             DB::beginTransaction();
 
             $goldPiece = GoldPiece::create([
                 'name' => $request->name,
                 'weight' => $request->weight,
                 'carat' => $request->carat,
-                'user_id' => Auth::id(),
+                'user_id' => $user->id,
                 'type' => $request->type,
                 'status' => 'pending',
                 'description' => $request->description,
@@ -109,6 +156,33 @@ class GoldPieceController extends Controller
             $goldPiece->update([
                 'qr_code' => $qrCode
             ]);
+
+            // Create orders for each branch
+            foreach ($branches as $branch) {
+                if ($request->type === 'for_rent') {
+                    OrderRental::create([
+                        'user_id' => $user->id,
+                        'gold_piece_id' => $goldPiece->id,
+                        'branch_id' => $branch->id,
+                        'status' => 'pending',
+                        'total_price' => $goldPiece->rental_price_per_day,
+                    ]);
+                } else {
+                    OrderSale::create([
+                        'user_id' => $user->id,
+                        'gold_piece_id' => $goldPiece->id,
+                        'branch_id' => $branch->id,
+                        'status' => 'pending',
+                        'total_price' => $goldPiece->sale_price,
+                    ]);
+                }
+
+                // Send database notification
+                $branch->notify(new NewGoldPieceNotification($goldPiece));
+
+                // Broadcast event
+                broadcast(new NewGoldPieceEvent($goldPiece, $branch->id))->toOthers();
+            }
 
             DB::commit();
 

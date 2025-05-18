@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
+use App\Models\Branch;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,4 +13,9 @@ use Illuminate\Support\Facades\Broadcast;
 | used to check if an authenticated user can listen to the channel.
 |
 */
+
+Broadcast::channel('branch.{branchId}', function ($user, $branchId) {
+    $branch = Branch::find($branchId);
+    return $branch && $user->id === $branch->vendor_id;
+});
 
