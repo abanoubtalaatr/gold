@@ -22,6 +22,11 @@ class GoldPiece extends Model implements HasMedia
         return $this->belongsTo(User::class);
     }
 
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     public function orderRentals()
     {
         return $this->hasMany(OrderRental::class);

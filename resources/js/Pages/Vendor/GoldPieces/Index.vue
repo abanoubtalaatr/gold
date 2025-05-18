@@ -1,10 +1,10 @@
 <template>
-  <Head title="Manage Branches" />
+  <Head title="Manage Gold Pieces" />
 
   <AuthenticatedLayout>
     <template #header>
       <h2 class="text-xl font-semibold leading-tight text-gray-800">
-        {{ $t('Manage Branches') }}
+        {{ $t('Manage Gold Pieces') }}
       </h2>
     </template>
 
@@ -19,34 +19,35 @@
                   v-model="form.search"
                   type="text"
                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  :placeholder="$t('Search branches...')"
+                  :placeholder="$t('Search gold pieces...')"
                   @input="debouncedSearch"
                 />
               </div>
               <Link
-                :href="route('vendor.branches.create')"
+                :href="route('vendor.gold-pieces.create')"
                 class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 <PlusIcon class="w-5 h-5 mr-2" />
-                {{ $t('Add New Branch') }}
+                {{ $t('Add New Gold Piece') }}
               </Link>
             </div>
 
-            <!-- Debug Output -->
-            <div class="mb-4 text-xs text-gray-500">
-              Debug: {{ branches?.data?.length ? `Found ${branches.data.length} branches` : 'No branches' }}
-            </div>
-
-            <!-- Branches List -->
-            <div v-if="branches?.data?.length > 0" class="overflow-x-auto">
+            <!-- Gold Pieces List -->
+            <div v-if="goldPieces?.data?.length > 0" class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {{ $t('Branch') }}
+                      {{ $t('Gold Piece') }}
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {{ $t('City') }}
+                      {{ $t('Weight') }}
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {{ $t('Carat') }}
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {{ $t('Type') }}
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {{ $t('Status') }}
@@ -57,38 +58,56 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="branch in branches.data" :key="branch.id">
+                  <tr v-for="piece in goldPieces.data" :key="piece.id">
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center">
                         <div class="flex-shrink-0 h-10 w-10">
                           <img
-                            v-if="branch.images?.length > 0"
-                            :src="'/storage/' + branch.images[0].path"
+                            v-if="piece.images?.length > 0"
+                            :src="'/storage/' + piece.images[0].path"
                             class="h-10 w-10 rounded-full object-cover"
-                            alt="Branch image"
+                            alt="Gold piece image"
                           />
                           <div v-else class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                            <BuildingOfficeIcon class="h-5 w-5 text-gray-400" />
+                            <CubeIcon class="h-5 w-5 text-gray-400" />
                           </div>
                         </div>
                         <div class="ml-4">
-                          <div class="text-sm font-medium text-gray-900">{{ branch.name }}</div>
+                          <div class="text-sm font-medium text-gray-900">{{ piece.name }}</div>
+                          <div class="text-sm text-gray-500">{{ piece.description }}</div>
                         </div>
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {{ branch.city?.name || 'N/A' }}
+                      {{ piece.weight }}g
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {{ piece.carat }}K
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span
+                        :class="[
+                          'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                          piece.type === 'for_rent' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                        ]"
+                      >
+                        {{ piece.type === 'for_rent' ? $t('For Rent') : $t('For Sale') }}
+                      </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span
                         :class="[
                           'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                          branch.is_active
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800',
+                          {
+                            'bg-yellow-100 text-yellow-800': piece.status === 'pending',
+                            'bg-green-100 text-green-800': piece.status === 'available',
+                            'bg-blue-100 text-blue-800': piece.status === 'rented',
+                            'bg-purple-100 text-purple-800': piece.status === 'sold',
+                            'bg-gray-100 text-gray-800': piece.status === 'accepted'
+                          }
                         ]"
                       >
-                        {{ branch.is_active ? $t('Active') : $t('Inactive') }}
+                        {{ $t(piece.status.charAt(0).toUpperCase() + piece.status.slice(1)) }}
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -96,7 +115,7 @@
                         <div>
                           <button
                             type="button"
-                            @click.stop="toggleDropdown(branch.id)"
+                            @click.stop="toggleDropdown(piece.id)"
                             class="inline-flex justify-center items-center w-full rounded-md border border-gray-300 px-3 py-1.5 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             id="menu-button"
                             aria-expanded="true"
@@ -115,7 +134,7 @@
                           leave-to-class="transform opacity-0 scale-95"
                         >
                           <div
-                            v-if="activeDropdown === branch.id"
+                            v-if="activeDropdown === piece.id"
                             ref="dropdown"
                             class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none z-10"
                             role="menu"
@@ -125,7 +144,7 @@
                           >
                             <div class="py-1" role="none">
                               <Link
-                                :href="route('vendor.branches.edit', branch.id)"
+                                :href="route('vendor.gold-pieces.edit', piece.id)"
                                 class="flex items-center w-full px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-t-md transition-all duration-200"
                                 role="menuitem"
                                 tabindex="-1"
@@ -134,19 +153,19 @@
                                 {{ $t('Edit') }}
                               </Link>
                               <button
-                                @click="toggleStatus(branch)"
+                                @click="toggleStatus(piece)"
                                 class="flex items-center w-full px-4 py-2 text-sm font-semibold text-white"
-                                :class="branch.is_active ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'"
+                                :class="piece.status === 'available' ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'"
                                 role="menuitem"
                                 tabindex="-1"
                               >
                                 <ArrowPathIcon class="mr-3 h-4 w-4" />
-                                {{ branch.is_active ? $t('Deactivate') : $t('Activate') }}
+                                {{ piece.status === 'available' ? $t('Mark as Unavailable') : $t('Mark as Available') }}
                               </button>
                             </div>
                             <div class="py-1" role="none">
                               <button
-                                @click="confirmDelete(branch)"
+                                @click="confirmDelete(piece)"
                                 class="flex items-center w-full px-4 py-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-b-md transition-all duration-200"
                                 role="menuitem"
                                 tabindex="-1"
@@ -169,25 +188,25 @@
               v-else
               class="flex flex-col items-center justify-center py-12 text-gray-500"
             >
-              <BuildingOfficeIcon class="w-16 h-16 mb-4 text-gray-400" />
+              <CubeIcon class="w-16 h-16 mb-4 text-gray-400" />
               <p class="mb-2 text-xl font-semibold">
-                {{ $t('No branches registered yet.') }}
+                {{ $t('No gold pieces registered yet.') }}
               </p>
               <p class="mb-4">
-                {{ $t('Start by adding your first branch.') }}
+                {{ $t('Start by adding your first gold piece.') }}
               </p>
               <Link
-                :href="route('vendor.branches.create')"
+                :href="route('vendor.gold-pieces.create')"
                 class="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
-                {{ $t('Add New Branch') }}
+                {{ $t('Add New Gold Piece') }}
               </Link>
             </div>
 
             <!-- Pagination -->
             <Pagination
-              v-if="branches?.data?.length > 0"
-              :links="branches?.links || []"
+              v-if="goldPieces?.data?.length > 0"
+              :links="goldPieces?.links || []"
               class="mt-6"
             />
           </div>
@@ -199,7 +218,7 @@
     <Modal :show="confirmingDeletion" @close="closeModal">
       <div class="p-6">
         <h2 class="text-lg font-medium text-gray-900">
-          {{ $t('Are you sure you want to delete this branch?') }}
+          {{ $t('Are you sure you want to delete this gold piece?') }}
         </h2>
         <p class="mt-1 text-sm text-gray-600">
           {{ $t('This action cannot be undone.') }}
@@ -215,9 +234,9 @@
           <button
             type="button"
             class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200"
-            @click="deleteBranch"
+            @click="deletePiece"
           >
-            {{ $t('Delete Branch') }}
+            {{ $t('Delete Gold Piece') }}
           </button>
         </div>
       </div>
@@ -234,7 +253,7 @@ import Modal from '@/Components/Modal.vue';
 import {
   PlusIcon,
   ChevronDownIcon,
-  BuildingOfficeIcon,
+  CubeIcon,
   PencilIcon,
   ArrowPathIcon,
   TrashIcon,
@@ -242,7 +261,7 @@ import {
 import debounce from 'lodash/debounce';
 
 const props = defineProps({
-  branches: {
+  goldPieces: {
     type: Object,
     default: () => ({ data: [], links: [] }),
   },
@@ -258,17 +277,17 @@ const form = useForm({
 
 const activeDropdown = ref(null);
 const confirmingDeletion = ref(false);
-const branchToDelete = ref(null);
+const pieceToDelete = ref(null);
 const dropdown = ref(null);
 
-const toggleDropdown = (branchId) => {
-  console.log('Toggling dropdown for branch:', branchId);
-  activeDropdown.value = activeDropdown.value === branchId ? null : branchId;
+const toggleDropdown = (pieceId) => {
+  console.log('Toggling dropdown for piece:', pieceId);
+  activeDropdown.value = activeDropdown.value === pieceId ? null : pieceId;
 };
 
-const confirmDelete = (branch) => {
-  console.log('Confirm delete triggered for branch:', branch.id);
-  branchToDelete.value = branch;
+const confirmDelete = (piece) => {
+  console.log('Confirm delete triggered for piece:', piece.id);
+  pieceToDelete.value = piece;
   confirmingDeletion.value = true;
   activeDropdown.value = null;
 };
@@ -276,17 +295,17 @@ const confirmDelete = (branch) => {
 const closeModal = () => {
   console.log('Closing modal');
   confirmingDeletion.value = false;
-  branchToDelete.value = null;
+  pieceToDelete.value = null;
 };
 
-const deleteBranch = () => {
-  if (branchToDelete.value) {
-    console.log('Deleting branch:', branchToDelete.value.id);
-    form.delete(route('vendor.branches.destroy', branchToDelete.value.id), {
+const deletePiece = () => {
+  if (pieceToDelete.value) {
+    console.log('Deleting piece:', pieceToDelete.value.id);
+    form.delete(route('vendor.gold-pieces.destroy', pieceToDelete.value.id), {
       preserveScroll: true,
       preserveState: true,
       onSuccess: () => {
-        console.log('Branch deleted successfully');
+        console.log('Gold piece deleted successfully');
         closeModal();
       },
       onError: (errors) => {
@@ -297,16 +316,16 @@ const deleteBranch = () => {
   }
 };
 
-const toggleStatus = (branch) => {
-  console.log('Toggling status for branch:', branch.id);
-  form.patch(route('vendor.branches.toggle-status', branch.id), {
+const toggleStatus = (piece) => {
+  console.log('Toggling status for piece:', piece.id);
+  form.patch(route('vendor.gold-pieces.toggle-status', piece.id), {
     preserveScroll: true,
     preserveState: true,
     onSuccess: () => {
       console.log('Status toggled successfully');
       activeDropdown.value = null;
-      // Refresh the branches list
-      form.get(route('vendor.branches.index'), {
+      // Refresh the gold pieces list
+      form.get(route('vendor.gold-pieces.index'), {
         preserveState: true,
         preserveScroll: true,
       });
@@ -336,13 +355,13 @@ onUnmounted(() => {
 });
 
 const debouncedSearch = debounce(() => {
-  form.get(route('vendor.branches.index'), {
+  form.get(route('vendor.gold-pieces.index'), {
     preserveState: true,
     preserveScroll: true,
   });
 }, 300);
 
-// Debug modal and branches
+// Debug modal and gold pieces
 watch(
   () => confirmingDeletion.value,
   (newValue) => {
@@ -350,10 +369,10 @@ watch(
   }
 );
 watch(
-  () => props.branches,
-  (newBranches) => {
-    console.log('Branches:', newBranches);
+  () => props.goldPieces,
+  (newPieces) => {
+    console.log('Gold Pieces:', newPieces);
   },
   { immediate: true }
 );
-</script>
+</script> 

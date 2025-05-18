@@ -14,6 +14,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\Vendor\Auth\RegisterController;
 use App\Http\Controllers\Vendor\BranchController;
 use App\Http\Controllers\Vendor\ServiceController;
+use App\Http\Controllers\Vendor\GoldPieceController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -149,6 +150,10 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::resource('services', ServiceController::class);
     Route::patch('services/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])
         ->name('services.toggle-status');
+    Route::resource('gold-pieces', GoldPieceController::class)
+        ->names('gold-pieces');
+    Route::patch('gold-pieces/{goldPiece}/toggle-status', [GoldPieceController::class, 'toggleStatus'])
+        ->name('gold-pieces.toggle-status');
 });
 
 require __DIR__ . '/auth.php';

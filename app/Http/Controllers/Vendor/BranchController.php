@@ -6,11 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Vendor\BranchRequest;
 use App\Models\Branch;
 use App\Models\City;
-use App\Models\Service;
 use App\Services\BranchService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class BranchController extends Controller
 {
@@ -20,7 +19,8 @@ class BranchController extends Controller
 
     public function index(Request $request)
     {
-        $filters = $request->only(['search', 'services', 'working_days']);
+        $filters = $request->only(['search']);
+        
         $branches = $this->branchService->list($request->user()->id, $filters);
 
         return Inertia::render('Vendor/Branches/Index', [
@@ -29,117 +29,57 @@ class BranchController extends Controller
         ]);
     }
 
-public function create()
-{
-    $services = Service::where('vendor_id', auth()->id())
-        ->get(['id as value', 'name as label'])
-        ->toArray();
+    public function create()
+    {
+        $cities = City::select(['id as value', 'name as label'])->limit(10)->get()->toArray();
 
-    $cities = City::get(['id as value', 'name as label'])
-        ->toArray();
-
-    return Inertia::render('Vendor/Branches/Create', [
-        'services' => $services,
-        'cities' => $cities
-    ]);
-}
-
-    // public function store(branchRequest $request)
-    // {
-    //     $this->branchService->store($request->validated(), $request->user()->id);
-
-    //     return redirect()->route('vendor.branches.index')
-    //         ->with('success', __('Branch added successfully.'));
-    // }
-
-// public function store(BranchRequest $request)
-// {
-//     try {
-//         $validated = $request->validated();
-//         // Convert working_days and services to proper arrays
-//         $validated['working_days'] = array_map('intval', $validated['working_days']);
-//         $validated['services'] = array_map('intval', $validated['services']);
-
-//         // Process working_hours to maintain structure
-//         $workingHours = [];
-//         foreach ($validated['working_days'] as $day) {
-//             if (isset($validated['working_hours'][$day])) {
-//                 $workingHours[$day] = [
-//                     'open' => $validated['working_hours'][$day]['open'],
-//                     'close' => $validated['working_hours'][$day]['close']
-//                 ];
-//             }
-//         }
-//         $validated['working_hours'] = $workingHours;
-
-//         // Create branch with processed data
-//         $branch = $this->branchService->create(
-//             array_merge($validated, ['vendor_id' => $request->user()->id]),
-//             $request->file('images', [])
-//         );
-
-//         return redirect()->route('vendor.branches.index')
-//             ->with('success', __('Branch created successfully'));
-
-//     } catch (\Exception $e) {
-//         return back()->withInput()
-//             ->with('error', __('Failed to create branch: ') . $e->getMessage());
-//     }
-// }
-
-public function store(BranchRequest $request)
-{
-    try {
-        // Manually decode JSON fields
-        $data = $request->all();
-
-        $jsonFields = ['working_days', 'working_hours', 'services'];
-        foreach ($jsonFields as $field) {
-            if (isset($data[$field])) {
-                $data[$field] = is_string($data[$field])
-                    ? json_decode($data[$field], true)
-                    : $data[$field];
-            }
-        }
-
-        // Create branch with processed data
-        $branch = Branch::create([
-            'vendor_id' => $request->user()->id,
-            'name' => $data['name'],
-            'city_id' => $data['city_id'],
-            'working_days' => $data['working_days'],
-            'working_hours' => $data['working_hours'],
-            'services' => $data['services']
+        return Inertia::render('Vendor/Branches/Create', [
+            'cities' => $cities,
         ]);
-return $data;
-
-        // Handle image uploads
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('branches', 'public');
-                $branch->images()->create([
-                    'path' => $path,
-                    'name' => $image->getClientOriginalName(),
-                    'type' => $image->getMimeType(),
-                    'size' => $image->getSize(),
-                ]);
-            }
-        }
-
-        return redirect()->route('vendor.branches.index')
-            ->with('success', __('Branch created successfully'));
-
-    } catch (\Exception $e) {
-        return back()->withInput()
-            ->with('error', __('Failed to create branch: ') . $e->getMessage());
     }
-}
+
+    public function store(BranchRequest $request)
+    {
+        // try {
+            $validated = $request->validated();
+
+            // Ensure working_days is an array of integers
+            $validated['working_days'] = array_map('intval', $validated['working_days']);
+
+            // Create branch
+            $branch = Branch::create([
+                'vendor_id' => $request->user()->id,
+                'name' => $validated['name'],
+                'city_id' => $validated['city_id'],
+                'working_days' => $validated['working_days'],
+                'working_hours' => $validated['working_hours'],
+                'address' => 'address',
+                'is_active' => true,
+            ]);
+
+            // Log branch creation
+            Log::info('Branch created', ['branch_id' => $branch->id, 'vendor_id' => $request->user()->id]);
+
+            // Handle image uploads
+            
+
+            return redirect()->route('vendor.branches.index')
+                ->with('success', __('Branch created successfully'));
+
+        // } catch (\Exception $e) {
+        //     Log::error('Failed to create branch', ['error' => $e->getMessage()]);
+        //     return back()->withInput()
+        //         ->with('error', __('Failed to create branch: ') . $e->getMessage());
+        // }
+    }
+
     public function edit(Branch $branch)
     {
         $this->authorize('update', $branch);
 
         return Inertia::render('Vendor/Branches/Edit', [
-            'branch' => $branch->load('images'),
+            'branch' => $branch,
+            'cities' => City::select(['id as value', 'name as label'])->get()->toArray(),
         ]);
     }
 
@@ -147,10 +87,41 @@ return $data;
     {
         $this->authorize('update', $branch);
 
-        $this->branchService->update($branch, $request->validated());
+        try {
+            $validated = $request->validated();
+            $validated['working_days'] = array_map('intval', $validated['working_days']);
 
-        return redirect()->route('vendor.branches.index')
-            ->with('success', __('Branch details updated successfully.'));
+            $branch->update([
+                'name' => $validated['name'],
+                'city_id' => $validated['city_id'],
+                'working_days' => $validated['working_days'],
+                'working_hours' => $validated['working_hours'],
+            ]);
+
+            // Handle image uploads
+            if ($request->hasFile('images')) {
+                foreach ($branch->images as $image) {
+                    \Storage::disk('public')->delete($image->path);
+                    $image->delete();
+                }
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('branches', 'public');
+                    $branch->images()->create([
+                        'path' => $path,
+                        'name' => $image->getClientOriginalName(),
+                        'type' => $image->getMimeType(),
+                        'size' => $image->getSize(),
+                    ]);
+                }
+            }
+
+            return redirect()->route('vendor.branches.index')
+                ->with('success', __('Branch updated successfully'));
+
+        } catch (\Exception $e) {
+            return back()->withInput()
+                ->with('error', __('Failed to update branch: ') . $e->getMessage());
+        }
     }
 
     public function destroy(Branch $branch)
@@ -161,17 +132,22 @@ return $data;
             return back()->with('error', __('This branch cannot be deleted due to active appointments.'));
         }
 
-        $this->branchService->delete($branch);
+        foreach ($branch->images as $image) {
+            \Storage::disk('public')->delete($image->path);
+            $image->delete();
+        }
 
-        return back()->with('success', __('Branch deleted successfully.'));
+        $branch->delete();
+
+        return back()->with('success', __('Branch deleted successfully'));
     }
 
     public function toggleStatus(Branch $branch)
     {
         $this->authorize('update', $branch);
 
-        $this->branchService->toggleStatus($branch);
+        $branch->update(['is_active' => !$branch->is_active]);
 
-        return back()->with('success', __('Branch status updated successfully.'));
+        return back()->with('success', __('Branch status updated successfully'));
     }
 }

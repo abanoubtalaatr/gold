@@ -21,6 +21,7 @@ class Branch extends Model
         'working_hours',
         'services',
         'is_active',
+        'address',
     ];
 
     protected $casts = [
@@ -40,10 +41,6 @@ class Branch extends Model
         return $this->belongsTo(City::class);
     }
 
-    public function images(): MorphMany
-    {
-        return $this->morphMany(Image::class, 'imageable');
-    }
 
     public function scopeActive($query)
     {

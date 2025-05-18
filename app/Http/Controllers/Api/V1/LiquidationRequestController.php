@@ -10,10 +10,11 @@ use Google\Cloud\Core\ApiHelperTrait;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\V1\LiquidationRequestResource;
 use App\Http\Requests\Api\V1\LiquidationRequest\StoreLiquidationRequest;
+use App\Traits\ApiResponseTrait;
 
 class LiquidationRequestController extends Controller
 {
-    use ApiHelperTrait;
+    use ApiResponseTrait;
     /**
      * Display a listing of the resource.
      */
@@ -41,8 +42,8 @@ class LiquidationRequestController extends Controller
         ]);
 
         return $this->successResponse(
-            'Liquidation request created successfully',
-            new LiquidationRequestResource($liquidationRequest)
+            new LiquidationRequestResource($liquidationRequest),
+            'Liquidation request created successfully'
         );
     }
 
@@ -54,8 +55,8 @@ class LiquidationRequestController extends Controller
         $this->authorize('view', $liquidationRequest);
 
         return $this->successResponse(
-            'Liquidation request fetched successfully',
-            new LiquidationRequestResource($liquidationRequest)
+            new LiquidationRequestResource($liquidationRequest),
+            'Liquidation request fetched successfully'
         );
     }
 
@@ -69,8 +70,8 @@ class LiquidationRequestController extends Controller
         $liquidationRequest->delete();
 
         return $this->successResponse(
-            'Liquidation request deleted successfully',
-            new LiquidationRequestResource($liquidationRequest)
+            new LiquidationRequestResource($liquidationRequest),
+            'Liquidation request deleted successfully'
         );
     }
 } 

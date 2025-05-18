@@ -19,8 +19,7 @@ public function rules(): array
         'working_days' => ['required', 'array'],
         'working_days.*' => ['required', 'integer', 'between:0,6'],
         'working_hours' => ['required', 'array'],
-        'services' => ['required', 'array', 'min:1'],
-        'services.*' => ['required', 'integer', 'exists:services,id'],
+
         'images' => ['nullable', 'array', 'max:5'],
         'images.*' => ['image', 'mimes:jpg,png', 'max:5120'],
     ];
