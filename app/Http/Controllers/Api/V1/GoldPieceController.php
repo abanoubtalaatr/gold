@@ -36,10 +36,7 @@ class GoldPieceController extends Controller
         $perPage = $request->per_page ?? 15;
         $goldPieces = $filteredQuery->paginate($perPage);
 
-        return $this->successResponse(
-            GoldPieceResource::collection($goldPieces)->response()->getData(true),
-            'Gold pieces fetched successfully'
-        );
+        return $this->successResponse(GoldPieceResource::collection($goldPieces)->response()->getData(true),__("mobile.fetch_gold_pieces_success"));
     }
 
     public function store(StoreGoldPieceRequest $request)
