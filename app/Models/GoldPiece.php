@@ -49,6 +49,27 @@ class GoldPiece extends Model implements HasMedia
         return $this->hasMany(Favorite::class);
     }
 
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    /**
+     * Get the average rating for this gold piece.
+     */
+    public function getAverageRatingAttribute(): float
+    {
+        return $this->ratings()->avg('rating') ?? 0.0;
+    }
+
+    /**
+     * Get the total number of ratings for this gold piece.
+     */
+    public function getRatingCountAttribute(): int
+    {
+        return $this->ratings()->count();
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('images')

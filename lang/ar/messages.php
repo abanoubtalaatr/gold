@@ -261,4 +261,12 @@ return [
     'expired' => 'منتهي الصلاحية',
     'cancelled' => 'ملغي',
     'unknown' => 'غير معلق',
+
+    // Rating messages
+    "fetch_ratings_success" => "تم جلب التقييمات بنجاح",
+    "rating_created_success" => "تم إضافة التقييم بنجاح",
+    "rating_updated_success" => "تم تحديث التقييم بنجاح",
+    "rating_deleted_success" => "تم حذف التقييم بنجاح",
+    "already_rated" => "لقد قمت بتقييم هذه القطعة الذهبية مسبقاً",
+    "unauthorized" => "غير مصرح به",
 ];

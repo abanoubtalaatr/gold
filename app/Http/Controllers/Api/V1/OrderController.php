@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Models\GoldPiece;
 use App\Models\OrderSale;
 use App\Models\OrderRental;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponseTrait;
 use App\Http\Controllers\Controller;
@@ -20,7 +21,7 @@ class OrderController extends Controller
     use ApiResponseTrait;
     public function index(Request $request)
     {
-        $query = OrderRental::where('user_id', Auth::id())
+        $query = OrderRental::where('user_id', Auth::id())->where('type', OrderRental::LEASE_TYPE)
             ->with('goldPiece');
 
         // Get sort parameters from request with defaults
@@ -52,17 +53,23 @@ class OrderController extends Controller
                 return $this->errorResponse(__("mobile.gold_piece_already_rented"), [], 422);
             }
 
-            // Get the branch that has an accepted rental order for this gold piece
-            $branch = OrderRental::where('gold_piece_id', $goldPiece->id)
+            // Get the rental order that has this gold piece
+            $rentalOrder = OrderRental::where('gold_piece_id', $goldPiece->id)
                 ->where('type', OrderRental::RENT_TYPE)
                 ->where('status', 'accepted')
                 ->first();
 
-            if (!$branch) {
+            if (!$rentalOrder) {
                 return $this->errorResponse(__("mobile.no_available_branch"), [], 422);
             }
 
-            Log::info('Found branch for notification:', ['branch_id' => $branch->id]);
+            // Get the actual Branch model
+            $branch = Branch::findOrFail($rentalOrder->branch_id);
+
+            Log::info('Found branch for notification:', [
+                'branch_id' => $branch->id,
+                'branch_name' => $branch->name
+            ]);
 
             // Create the order rental
             $orderRental = OrderRental::create([

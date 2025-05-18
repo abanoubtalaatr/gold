@@ -258,4 +258,12 @@ return [
     'otp_invalid' => 'The verification code is invalid.',
     'otp_verified' => 'Verification code verified successfully.',
     'otp_failed' => 'Failed to send verification code. Please try again.',
+
+    // Rating messages
+    "fetch_ratings_success" => "Ratings fetched successfully",
+    "rating_created_success" => "Rating submitted successfully",
+    "rating_updated_success" => "Rating updated successfully",
+    "rating_deleted_success" => "Rating deleted successfully",
+    "already_rated" => "You have already rated this gold piece",
+    "unauthorized" => "Unauthorized action",
 ];
