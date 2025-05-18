@@ -16,18 +16,18 @@ return new class extends Migration
             $table->string('name')->nullable()->change();
             $table->string('email')->nullable()->change();
             // Add 'reply' column only if it doesn't exist
-        if (!Schema::hasColumn('contacts', 'reply')) {
-            Schema::table('contacts', function (Blueprint $table) {
-                $table->text('reply')->nullable();
-            });
-        }
+            if (! Schema::hasColumn('contacts', 'reply')) {
+                Schema::table('contacts', function (Blueprint $table) {
+                    $table->text('reply')->nullable();
+                });
+            }
 
-        // Add 'user_id' column only if it doesn't exist
-        if (!Schema::hasColumn('contacts', 'user_id')) {
-            Schema::table('contacts', function (Blueprint $table) {
-                $table->foreignId('user_id')->nullable()->constrained('users');
-            });
-        }
+            // Add 'user_id' column only if it doesn't exist
+            if (! Schema::hasColumn('contacts', 'user_id')) {
+                Schema::table('contacts', function (Blueprint $table) {
+                    $table->foreignId('user_id')->nullable()->constrained('users');
+                });
+            }
         });
     }
 

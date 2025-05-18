@@ -28,9 +28,12 @@ class GoldPieceController extends Controller
     
     public function index(Request $request)
     {
-        $query = GoldPiece::query()
-            // Carat range filter
-            ->when($request->filled(['from_carat', 'to_carat']), function($q) use ($request) {
+        $query = GoldPiece::query()->whereHas('orderRentals', function($query) {
+            $query->where('status', 'approved');
+        })->orWhereHas('orderSales', function($query) {
+            $query->where('status', 'approved');
+        })
+          ->when($request->filled(['from_carat', 'to_carat']), function($q) use ($request) {
                 $q->whereBetween('carat', [$request->from_carat, $request->to_carat]);
             })
             ->when($request->carat, fn($q) => $q->where('carat', $request->carat))
