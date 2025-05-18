@@ -14,7 +14,6 @@ class ContactUsRequest extends FormRequest
             'phone' => ['nullable',  'max:255'],
             'message' => ['required', 'max:500'],
             'subject' => ['required', 'max:500'],
-
         ];
     }
 

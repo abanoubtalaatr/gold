@@ -149,13 +149,13 @@ class GoldPieceController extends Controller
             }
 
             // Generate QR code
-            $qrCode = QrCode::format('png')
-                ->size(200)
-                ->generate(route('gold-pieces.show', $goldPiece->id));
+            // $qrCode = QrCode::format('png')
+            //     ->size(200)
+            //     ->generate(route('api.v1.gold_pieces.show', $goldPiece->id));
 
-            $goldPiece->update([
-                'qr_code' => $qrCode
-            ]);
+            // $goldPiece->update([
+            //     'qr_code' => $qrCode
+            // ]);
 
             // Create orders for each branch
             foreach ($branches as $branch) {
