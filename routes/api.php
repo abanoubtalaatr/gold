@@ -132,8 +132,8 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     */
 
     Route::get('gold-pieces/{goldPiece}/ratings', [RatingController::class, 'index'])->name('ratings.index');
-    Route::post('gold-pieces/{goldPiece}/ratings', [RatingController::class, 'store'])->name('ratings.store');
-    Route::put('ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
+    Route::post('ratings', [RatingController::class, 'store'])->name('ratings.store');
+    Route::post('ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
     Route::delete('ratings/{rating}', [RatingController::class, 'destroy'])->name('ratings.destroy');
 
 

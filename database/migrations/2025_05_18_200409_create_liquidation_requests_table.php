@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->string('status');
-            $table->decimal('amount', 10, 2);
-            $table->string('bank_account_name');
-            $table->string('bank_account_number');
-            $table->string('bank_account_swift');
-            $table->string('bank_account_iban');
-            $table->string('bank_account_holder_name');
+            $table->decimal('amount', 10, 2)->nullable();
+            $table->string('bank_account_name')->nullable();
+            $table->string('bank_account_number')->nullable();
+            $table->string('bank_account_swift')->nullable();
+            $table->string('bank_account_iban')->nullable();
+            $table->string('bank_account_holder_name')->nullable();
             $table->timestamps();
         });
     }

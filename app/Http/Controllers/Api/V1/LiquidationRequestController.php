@@ -2,25 +2,31 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\LiquidationRequest\StoreLiquidationRequest;
-use App\Models\LiquidationRequest;
 use Illuminate\Http\JsonResponse;
+use App\Models\LiquidationRequest;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Google\Cloud\Core\ApiHelperTrait;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use App\Http\Resources\Api\V1\LiquidationRequestResource;
+use App\Http\Requests\Api\V1\LiquidationRequest\StoreLiquidationRequest;
 
 class LiquidationRequestController extends Controller
 {
+    use ApiHelperTrait;
     /**
      * Display a listing of the resource.
      */
-    public function index(): ResourceCollection
+    public function index()
     {
-        $liquidationRequests = LiquidationRequest::where('user_id', auth()->id())
+        $liquidationRequests = LiquidationRequest::where('user_id', Auth::id())
             ->latest()
             ->paginate();
 
-        return JsonResource::collection($liquidationRequests);
+        return $this->successResponse(
+            'Liquidation requests fetched successfully',
+            LiquidationRequestResource::collection($liquidationRequests)->response()->getData(true)
+        );
     }
 
     /**
@@ -29,15 +35,15 @@ class LiquidationRequestController extends Controller
     public function store(StoreLiquidationRequest $request): JsonResponse
     {
         $liquidationRequest = LiquidationRequest::create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'status' => 'pending',
             ...$request->validated(),
         ]);
 
-        return response()->json([
-            'message' => __('messages.liquidation_request.created'),
-            'data' => new JsonResource($liquidationRequest),
-        ], 201);
+        return $this->successResponse(
+            'Liquidation request created successfully',
+            new LiquidationRequestResource($liquidationRequest)
+        );
     }
 
     /**
@@ -47,9 +53,10 @@ class LiquidationRequestController extends Controller
     {
         $this->authorize('view', $liquidationRequest);
 
-        return response()->json([
-            'data' => new JsonResource($liquidationRequest),
-        ]);
+        return $this->successResponse(
+            'Liquidation request fetched successfully',
+            new LiquidationRequestResource($liquidationRequest)
+        );
     }
 
     /**
@@ -61,8 +68,9 @@ class LiquidationRequestController extends Controller
 
         $liquidationRequest->delete();
 
-        return response()->json([
-            'message' => __('messages.liquidation_request.deleted'),
-        ]);
+        return $this->successResponse(
+            'Liquidation request deleted successfully',
+            new LiquidationRequestResource($liquidationRequest)
+        );
     }
 } 
