@@ -1,0 +1,133 @@
+/* rtl direction */
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap");
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+a,
+p,
+input,
+button,
+Link,
+ul,
+li,
+label,
+.alert,
+.text-red-600,
+th,
+td {
+    font-family: "Cairo" !important;
+    text-align: right !important;
+    direction: rtl;
+}
+
+option,
+select,
+.swal2-title {
+    font-family: "Cairo" !important;
+    text-align: center;
+}
+
+table,
+.row {
+    direction: rtl;
+}
+
+.roles_permissions {
+    direction: rtl;
+}
+
+.swal2-html-container,
+.swal2-title {
+    font-family: "Cairo" !important;
+    text-align: center !important;
+}
+
+.header-nav .profile .dropdown-item i {
+    margin-left: 10px !important;
+}
+
+@media (min-width: 1200px) {
+    #main,
+    #footer {
+        margin-right: 300px;
+    }
+}
+
+.sidebar-nav .nav-link i {
+    margin-left: 10px !important;
+}
+
+/* .sidebar-nav .nav-link { */
+    /* flex-direction: row-reverse; */
+/* } */
+
+.sidebar-nav .nav-link .bi-chevron-down {
+    position: absolute;
+    right: 20px;
+}
+
+body {
+    direction: rtl;
+}
+header {
+    display: flex !important;
+    justify-content: space-between;
+}
+header .ms-auto {
+    margin-left: 0 !important;
+    margin-right: 15px !important;
+}
+.dropdown-toggle {
+    margin-right: 15px;
+}
+
+.card-title {
+    text-align: right;
+}
+
+.dashboard .info-card h6 {
+    margin-right: 15px;
+}
+
+.sidebar-nav .nav-content a,
+.sidebar-nav .nav-link {
+    flex-direction: row !important;
+}
+
+.sidebar-nav .nav-content a i {
+    margin-left: 8px !important;
+}
+
+@media (max-width: 1199px) {
+    .toggle-sidebar .sidebar {
+        left: initial !important;
+        right: 0px !important;
+    }
+}
+
+@media (max-width: 1199px) {
+    .sidebar {
+        right: -300px !important;
+        left: initial !important;
+    }
+}
+/* @media (max-width: 992px) {
+    .col-md-3 .btn,
+    .col-md-2 .btn { */
+        /* margin-right: 135px !important; */
+        /* margin-right: 65px !important; */
+    /* }
+} */
+
+/* .pagetitle nav ol {
+    direction: ltr;
+} */
+
+.breadcrumb-item + .breadcrumb-item::before {
+    float: right;
+    padding-left: var(--bs-breadcrumb-item-padding-x);
+}

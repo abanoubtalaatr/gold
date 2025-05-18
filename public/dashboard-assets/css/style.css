@@ -1,0 +1,1761 @@
+/**
+* Template Name: NiceAdmin
+* Updated: Apr 20 2024 with Bootstrap v5.3.3
+* Author: BootstrapMade.com & Updated by Your Name
+*/
+
+/*--------------------------------------------------------------
+# Root Variables
+--------------------------------------------------------------*/
+:root {
+    /* Base Colors */
+    --primary-color: #D4AF37;
+    --primary-color-light: #F9F3E1;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9ff;
+    --text-primary: #000000;
+    --text-secondary3: #aa882b;
+    --text-secondary2: #726f6f;
+    --text-secondary: #a5a0a0;
+    --border-color: #e4e4e4;
+    --shadow-color:rgba(136, 102, 9, 0.1);
+    --error-color: #ff3b3b;
+    --success-color: #00b087;
+
+    /* Component Radius */
+    --card-radius: 20px;
+    --button-radius: 12px;
+    --input-radius: 12px;
+    --input-radius-s: 4px;
+
+    /* Transition */
+    --transition: all 0.3s ease;
+
+    /* Layout */
+    --header-height: 60px;
+    --sidebar-width: 300px;
+
+    /* Fonts */
+    --font-primary: "Open Sans", sans-serif;
+    --font-secondary: "Nunito", sans-serif;
+    --font-size-base: 13px;
+    --font-size-sm: 12px;
+    --font-size-lg: 14px;
+}
+
+/*--------------------------------------------------------------
+# General
+--------------------------------------------------------------*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-primary);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-secondary);
+    color: var(--text-primary);
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+a:hover {
+    color: var(--primary-color-light);
+    text-decoration: none;
+}
+
+/*--------------------------------------------------------------
+# Main Layout
+--------------------------------------------------------------*/
+#main {
+    margin-top: var(--header-height);
+    padding: 20px 30px;
+    transition: var(--transition);
+}
+
+/* @media (min-width: 1200px) {
+    #main {
+        margin-left: var(--sidebar-width);
+    }
+}
+
+@media (max-width: 1199px) {
+    #main {
+        padding: 20px;
+    }
+} */
+
+#main {
+    margin-top: 60px;
+    padding: 20px 30px;
+    transition: all 0.3s;
+}
+
+@media (max-width: 1199px) {
+    #main {
+        padding: 20px;
+    }
+}
+
+.pagetitle {
+    margin-bottom: 10px;
+}
+
+.pagetitle h1 {
+    font-size: 24px;
+    margin-bottom: 0;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/*--------------------------------------------------------------
+# Components
+--------------------------------------------------------------*/
+/* Buttons */
+.btn {
+    transition: var(--transition);
+    border-radius: var(--button-radius);
+    padding: 8px 16px;
+    text-align: center !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--bg-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--primary-color-light);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+/* Cards */
+.card {
+    margin-bottom: 30px;
+    border: none;
+    border-radius: var(--card-radius);
+    box-shadow: 0px 0 30px var(--shadow-color);
+}
+.shadow, .el-card{
+    box-shadow: 0px 0 30px var(--shadow-color) !important;
+}
+
+.card-header,
+.card-footer {
+    border-color: var(--border-color);
+    background-color: transparent;
+    padding: 15px;
+    border: 0px;
+}
+
+.card-title {
+    padding: 20px 0 15px 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 25px;
+}
+
+.card-body {
+    padding: 0 20px 20px 20px;
+}
+/*--------------------------------------------------------------
+# Forms & Inputs
+--------------------------------------------------------------*/
+.form-control {
+    padding: 0.375rem 0.75rem;
+    font-size: var(--font-size-base);
+    border-radius: var(--input-radius);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-primary);
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem var(--shadow-color);
+}
+
+.form-control:disabled {
+    background-color: var(--bg-secondary);
+    opacity: 0.8;
+}
+
+.form-select {
+    border-radius: var(--input-radius);
+    border: 1px solid var(--border-color);
+}
+
+.form-floating > label {
+    padding: 1rem 0.75rem;
+    color: var(--text-secondary);
+}
+
+/*--------------------------------------------------------------
+# Header
+--------------------------------------------------------------*/
+.header {
+    transition: var(--transition);
+    z-index: 997;
+    height: var(--header-height);
+    box-shadow: 0px 2px 20px var(--shadow-color);
+    background-color: var(--bg-primary);
+    padding-left: 20px;
+}
+
+.header .toggle-sidebar-btn {
+    font-size: 32px;
+    padding-left: 10px;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.header .search-bar {
+    min-width: 360px;
+    padding: 0 20px;
+}
+
+.logo {
+    line-height: 1;
+}
+
+@media (min-width: 1200px) {
+    .logo {
+        width: 280px;
+    }
+}
+
+.logo img {
+    max-height: 40px;
+    margin: 0 auto;
+}
+
+.logo span {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: var(--font-secondary);
+}
+
+/*--------------------------------------------------------------
+# Header Nav
+--------------------------------------------------------------*/
+.header-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.header-nav .nav-icon {
+    font-size: 22px;
+    color: var(--text-primary);
+    margin-right: 25px;
+    position: relative;
+}
+
+.header-nav .nav-profile {
+    color: var(--text-primary);
+}
+
+.header-nav .nav-profile img {
+    width: 24px;
+    height: 24px;
+}
+
+.header-nav .nav-profile span {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+}
+
+.header-nav .badge-number {
+    position: absolute;
+    inset: -2px -5px auto auto;
+    font-weight: normal;
+    font-size: 12px;
+    padding: 3px 6px;
+}
+
+/*--------------------------------------------------------------
+# Sidebar
+--------------------------------------------------------------*/
+.sidebar {
+    position: fixed;
+    top: var(--header-height);
+    bottom: 0;
+    width: var(--sidebar-width);
+    z-index: 996;
+    transition: var(--transition);
+    padding: 20px;
+    overflow-y: auto;
+    box-shadow: 0px 0px 20px var(--shadow-color);
+    background-color: var(--bg-primary);
+}
+
+.sidebar-nav {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.sidebar-nav .nav-item {
+    margin-bottom: 5px;
+}
+
+.sidebar-nav .nav-link {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary-color);
+    background: var(--bg-secondary);
+    padding: 10px 15px;
+    border-radius: var(--input-radius);
+    transition: var(--transition);
+}
+
+.sidebar-nav .nav-link.collapsed {
+    color: var(--text-primary);
+    background: var(--bg-primary);
+}
+
+.sidebar-nav .nav-link:hover {
+    color: var(--primary-color);
+    background: var(--bg-secondary);
+}
+
+.sidebar-nav .nav-link i {
+    font-size: 16px;
+    color: var(--primary-color);
+}
+
+@media (max-width: 1199px) {
+    .sidebar {
+        left: -300px;
+    }
+
+    .toggle-sidebar .sidebar {
+        left: 0;
+    }
+}
+
+/*--------------------------------------------------------------
+# Dashboard Cards
+--------------------------------------------------------------*/
+.dashboard .info-card {
+    padding-bottom: 10px;
+}
+
+.dashboard .info-card h6 {
+    font-size: 28px;
+    color: var(--text-primary);
+    font-weight: 700;
+    margin: 0;
+    padding: 0;
+}
+
+.dashboard .card-icon {
+    font-size: 32px;
+    line-height: 0;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    border-radius: var(--card-radius);
+}
+/*--------------------------------------------------------------
+# Utilities & Helper Classes
+--------------------------------------------------------------*/
+/* Backgrounds */
+.bg-primary-light {
+    background-color: var(--primary-color-light);
+}
+
+.bg-secondary-light {
+    background-color: var(--bg-secondary);
+}
+
+.bg-success-light {
+    background-color: #d1e7dd;
+}
+
+.bg-danger-light {
+    background-color: #f8d7da;
+}
+
+.bg-warning-light {
+    background-color: #fff3cd;
+}
+
+/* Text Utilities */
+.fs-13 {
+    font-size: 13px !important;
+}
+
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Layout Utilities */
+.min-h-screen {
+    min-height: 100vh !important;
+}
+
+/* Dropdowns */
+.dropdown-menu {
+    border-radius: var(--input-radius);
+    padding: 10px 0;
+    animation: dropdown-animate 0.2s;
+    border: 0;
+    box-shadow: 0 5px 30px var(--shadow-color);
+}
+
+.dropdown-menu .dropdown-header,
+.dropdown-menu .dropdown-footer {
+    text-align: center;
+    font-size: 15px;
+    padding: 10px 25px;
+}
+
+.dropdown-menu .dropdown-item {
+    font-size: var(--font-size-base);
+    padding: 10px 15px;
+    transition: var(--transition);
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: var(--bg-secondary);
+}
+
+/* Alerts */
+.alert {
+    border-radius: var(--input-radius);
+}
+
+.alert-heading {
+    font-weight: 500;
+    font-size: 20px;
+}
+
+/* Tables */
+.table {
+    margin-top: 15px !important;
+}
+
+.table thead th {
+    border-bottom: 2px solid var(--border-color);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+    font-size: var(--font-size-base);
+    font-family: var(--font-secondary);
+    color: var(--text-secondary);
+}
+
+.breadcrumb a {
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.breadcrumb a:hover {
+    color: var(--primary-color);
+}
+
+.breadcrumb .active {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/*--------------------------------------------------------------
+# Animations
+--------------------------------------------------------------*/
+@keyframes dropdown-animate {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/*--------------------------------------------------------------
+# Responsive Design
+--------------------------------------------------------------*/
+@media (max-width: 1199px) {
+    .header .search-bar {
+        position: fixed;
+        top: 50px;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        box-shadow: 0px 0px 15px var(--shadow-color);
+        background: var(--bg-primary);
+        z-index: 9999;
+        transition: var(--transition);
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    .header .search-bar-show {
+        top: 60px;
+        visibility: visible;
+        opacity: 1;
+    }
+}
+
+@media (max-width: 992px) {
+    .col-md-3,
+    .col-md-2 {
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-title {
+        padding: 15px 0 10px 0;
+    }
+
+    .dashboard .info-card h6 {
+        font-size: 24px;
+    }
+}
+
+/*--------------------------------------------------------------
+# Error Page
+--------------------------------------------------------------*/
+.error-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 80vh;
+}
+
+.error-page img {
+    max-height: 450px;
+    margin-bottom: 30px;
+}
+
+.error-page h1 {
+    font-size: 35px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.error-page p {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+}
+
+/*--------------------------------------------------------------
+# Footer
+--------------------------------------------------------------*/
+.footer {
+    padding: 20px 0;
+    font-size: var(--font-size-sm);
+    transition: var(--transition);
+    border-top: 1px solid var(--border-color);
+}
+
+.footer .copyright {
+    text-align: center;
+    color: var(--text-primary);
+}
+
+.footer .credits {
+    padding-top: 5px;
+    text-align: center;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/*--------------------------------------------------------------
+# Back to top button
+--------------------------------------------------------------*/
+.back-to-top {
+    position: fixed;
+    visibility: hidden;
+    opacity: 0;
+    right: 15px;
+    bottom: 15px;
+    z-index: 99999;
+    background: var(--primary-color);
+    width: 40px;
+    height: 40px;
+    border-radius: var(--input-radius);
+    transition: var(--transition);
+}
+
+.back-to-top i {
+    font-size: 24px;
+    color: var(--bg-primary);
+    line-height: 0;
+}
+
+.back-to-top:hover {
+    background: var(--primary-color-light);
+}
+
+.back-to-top.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+/*--------------------------------------------------------------
+# Tables
+--------------------------------------------------------------*/
+.table {
+    width: 100%;
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-primary);
+    vertical-align: middle;
+    border-color: var(--border-color);
+}
+
+/* Table Header */
+.table thead {
+    background-color: var(--bg-secondary);
+}
+
+.table thead th {
+    padding: 15px;
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    border-bottom: 2px solid var(--border-color);
+    color: var(--text-primary);
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+/* Table Body */
+.table tbody tr {
+    transition: var(--transition);
+}
+
+.table tbody tr:hover {
+    background-color: var(--bg-secondary);
+}
+
+.table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+}
+
+/* Table Variants */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--bg-secondary);
+}
+
+.table-bordered {
+    border: 1px solid var(--border-color);
+}
+
+.table-bordered td,
+.table-bordered th {
+    border: 1px solid var(--border-color);
+}
+
+/* Responsive Table */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--card-radius);
+    box-shadow: 0px 0 30px var(--shadow-color);
+    background: var(--bg-primary);
+    padding: 15px;
+}
+
+/* Table Actions */
+.table .action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.table .action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--input-radius-s);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+.table .action-btn:hover {
+    background: var(--primary-color);
+    color: var(--bg-primary);
+}
+
+/* Table Status Badges */
+.table .status-badge {
+    padding: 5px 12px;
+    border-radius: var(--input-radius-s);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+}
+
+.table .status-active {
+    background: var(--success-color);
+    color: var(--bg-primary);
+}
+
+.table .status-pending {
+    background: var(--primary-color-light);
+    color: var(--primary-color);
+}
+
+.table .status-inactive {
+    background: var(--error-color);
+    color: var(--bg-primary);
+}
+
+/* Small Tables */
+.table-sm td,
+.table-sm th {
+    padding: 8px 12px;
+}
+
+/* Table Card Integration */
+.card .table {
+    margin-bottom: 0;
+}
+
+.card .table thead th {
+    border-top: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .table thead {
+        display: none; /* Hide headers on mobile */
+    }
+
+    .table tbody td {
+        display: block;
+        padding: 8px 15px;
+        text-align: right;
+        border-bottom: none;
+    }
+
+    .table tbody td::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .table tbody tr {
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table .action-buttons {
+        justify-content: flex-start;
+    }
+}
+
+/*--------------------------------------------------------------
+# Pagination
+--------------------------------------------------------------*/
+.pagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+    margin: 20px 0;
+    gap: 5px;
+}
+
+.pagination .page-item {
+    margin: 0;
+}
+
+.pagination .page-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 15px;
+    font-size: var(--font-size-base);
+    min-width: 40px;
+    min-height: 40px;
+    color: var(--primary-color);
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--input-radius-s);
+    transition: var(--transition);
+}
+
+/* Active State */
+.pagination .page-item.active .page-link {
+    z-index: 3;
+    color: var(--bg-primary);
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Hover State */
+.pagination .page-link:hover {
+    z-index: 2;
+    color: var(--primary-color);
+    background-color: var(--bg-secondary);
+    border-color: var(--primary-color);
+}
+
+/* Disabled State */
+.pagination .page-item.disabled .page-link {
+    color: var(--text-secondary);
+    pointer-events: none;
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+}
+
+/* Focus State */
+.pagination .page-link:focus {
+    z-index: 3;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem var(--shadow-color);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+    .pagination {
+        gap: 3px;
+    }
+
+    .pagination .page-link {
+        padding: 6px 12px;
+        min-width: 35px;
+        min-height: 35px;
+        font-size: var(--font-size-sm);
+    }
+}
+
+/* Remove border from last row */
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* If using table-bordered variant, also add this */
+.table-bordered tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* For responsive tables, ensure the last row's border is removed */
+@media (max-width: 768px) {
+    .table tbody tr:last-child {
+        border-bottom: none;
+    }
+}
+/*8888 */
+.sidebar {
+    position: fixed;
+    top: 60px;
+    /* left: 0; */
+    bottom: 0;
+    width: 300px;
+    z-index: 996;
+    transition: all 0.3s;
+    padding: 20px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #aab7cf transparent;
+    box-shadow: 0px 0px 20px rgba(1, 41, 112, 0.1);
+    background-color: #fff;
+}
+
+@media (max-width: 1199px) {
+    .sidebar {
+        left: -300px;
+    }
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+    height: 8px;
+    background-color: #fff;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: #aab7cf;
+}
+
+/* @media (min-width: 1200px) {
+    #main,
+    #footer { */
+        /* margin-left: 300px; */
+    /* }
+} */
+
+@media (max-width: 1199px) {
+    .toggle-sidebar .sidebar {
+        left: 0 !important;
+    }
+}
+
+@media (min-width: 1200px) {
+    .toggle-sidebar #main,
+    .toggle-sidebar #footer {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .toggle-sidebar .sidebar {
+        left: -300px !important;
+    }
+}
+
+.sidebar-nav {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.sidebar-nav li {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.sidebar-nav .nav-item {
+    margin-bottom: 5px;
+}
+
+.sidebar-nav .nav-heading {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #899bbd;
+    font-weight: 600;
+    margin: 10px 0 5px 15px;
+}
+
+.sidebar-nav .nav-link {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.3;
+    padding: 10px 15px;
+}
+
+.sidebar-nav .nav-link i {
+    font-size: 16px;
+    /* margin-right: 10px; */
+    color: var(--text-secondary3);
+}
+
+.sidebar-nav .nav-link.collapsed {
+    color: var(--text-primary);
+    background: var(--bg-primary);
+}
+
+.sidebar-nav .nav-link.collapsed i {
+    color: var(--text-secondary3);
+}
+
+.sidebar-nav .nav-link:hover {
+    color: var(--text-secondary3);
+    background: #f6f9ff;
+}
+
+.sidebar-nav .nav-link:hover i {
+    color: var(--text-secondary3);
+}
+
+.sidebar-nav .nav-link .bi-chevron-down {
+    /* margin-right: 0; */
+    transition: transform 0.2s ease-in-out;
+}
+
+.sidebar-nav .nav-link:not(.collapsed) .bi-chevron-down {
+    transform: rotate(180deg);
+}
+
+.sidebar-nav .nav-content {
+    padding: 5px 0 0 0;
+    margin: 0;
+    list-style: none;
+}
+
+.sidebar-nav .nav-content a {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: 0.3;
+    padding: 10px 0 10px 40px;
+    transition: 0.3s;
+}
+
+.sidebar-nav .nav-content a i {
+    font-size: 6px;
+    margin-right: 8px;
+    line-height: 0;
+    border-radius: 50%;
+}
+
+.sidebar-nav .nav-content a:hover,
+.sidebar-nav .nav-content a.active {
+    color: var(--primary-color);
+}
+
+.sidebar-nav .nav-content a.active i {
+    background-color: var(--primary-color);
+}
+
+/*--------------------------------------------------------------
+# Element Plus Overrides
+--------------------------------------------------------------*/
+/* Input Wrapper */
+.el-input__wrapper {
+    background-color: var(--bg-primary) !important;
+    border-radius: var(--input-radius) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: none !important;
+    transition: var(--transition) !important;
+}
+
+.el-input__wrapper:hover {
+    border-color: var(--primary-color) !important;
+}
+
+.el-input__wrapper.is-focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 1px var(--primary-color) !important;
+}
+
+/* Input Inner */
+.el-input__inner {
+    color: var(--text-primary) !important;
+    font-size: var(--font-size-base) !important;
+    height: 40px !important;
+}
+
+.el-input__inner::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+/* Select */
+.el-select .el-input__wrapper {
+    padding-right: 30px !important;
+}
+
+/* Disabled State */
+.el-input.is-disabled .el-input__wrapper {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.el-input.is-disabled .el-input__inner {
+    color: var(--text-secondary) !important;
+}
+
+/* Error State */
+.el-form-item.is-error .el-input__wrapper {
+    border-color: var(--error-color) !important;
+}
+
+/* Success State */
+.el-form-item.is-success .el-input__wrapper {
+    border-color: var(--success-color) !important;
+}
+
+/* Prefix and Suffix Icons */
+.el-input__prefix,
+.el-input__suffix {
+    color: var(--text-secondary) !important;
+}
+
+.el-input__prefix-inner,
+.el-input__suffix-inner {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+/* RTL Support */
+[dir="rtl"] .el-input__wrapper {
+    padding-right: 15px !important;
+    padding-left: 30px !important;
+}
+
+/* Select Dropdown */
+.el-select-dropdown {
+    border-radius: var(--input-radius) !important;
+    border: none !important;
+    box-shadow: 0 5px 30px var(--shadow-color) !important;
+}
+
+.el-select-dropdown__item {
+    color: var(--text-primary) !important;
+}
+
+.el-select-dropdown__item.hover,
+.el-select-dropdown__item:hover {
+    background-color: var(--bg-secondary) !important;
+}
+
+.el-select-dropdown__item.selected {
+    color: var(--primary-color) !important;
+    background-color: var(--primary-color-light) !important;
+}
+
+/* Form Validation Message */
+.el-form-item__error {
+    color: var(--error-color) !important;
+    font-size: var(--font-size-sm) !important;
+    margin-top: 4px !important;
+}
+.el-form-item {
+    display: block !important;
+}
+
+/*--------------------------------------------------------------
+# Element Plus Upload
+--------------------------------------------------------------*/
+/* Upload Container */
+.el-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Upload Button */
+.el-upload .el-button {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--bg-primary) !important;
+    border-radius: var(--button-radius) !important;
+    padding: 8px 16px !important;
+    transition: var(--transition) !important;
+}
+
+.el-upload .el-button:hover {
+    background-color: var(--primary-color-light) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+}
+
+/* Upload Tip */
+.el-upload__tip {
+    color: var(--text-secondary) !important;
+    font-size: var(--font-size-sm) !important;
+    margin-top: 5px !important;
+}
+
+/* Upload List */
+.el-upload-list {
+    margin: 10px 0 0 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+.el-upload-list--picture {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Upload List Item */
+.el-upload-list__item {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--input-radius) !important;
+    padding: 8px !important;
+    transition: var(--transition) !important;
+}
+
+/* Upload Preview */
+.el-upload-list__item-thumbnail {
+    border-radius: var(--input-radius-s) !important;
+    object-fit: cover !important;
+}
+
+/* Form Item Label */
+.el-form-item__label {
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+    font-size: var(--font-size-base) !important;
+    margin-bottom: 8px !important;
+}
+
+/* Required Asterisk */
+.asterisk-left .el-form-item__label::before {
+    content: "*" !important;
+    color: var(--error-color) !important;
+    margin-right: 4px !important;
+}
+
+/* Upload Drag Area */
+.el-upload-dragger {
+    background-color: var(--bg-secondary) !important;
+    border: 2px dashed var(--border-color) !important;
+    border-radius: var(--input-radius) !important;
+    padding: 20px !important;
+    transition: var(--transition) !important;
+}
+
+.el-upload-dragger:hover {
+    border-color: var(--primary-color) !important;
+    background-color: var(--primary-color-light) !important;
+}
+
+/* Upload Progress */
+.el-upload-list__item-status-label {
+    color: var(--success-color) !important;
+}
+
+.el-progress-bar__outer {
+    background-color: var(--bg-secondary) !important;
+}
+
+.el-progress-bar__inner {
+    background-color: var(--primary-color) !important;
+}
+
+/* Upload Error State */
+.el-upload-list__item.is-error {
+    border-color: var(--error-color) !important;
+}
+
+.el-upload-list__item-status-label.is-error {
+    color: var(--error-color) !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .el-upload-list--picture {
+        gap: 8px;
+    }
+
+    .el-upload-dragger {
+        padding: 15px !important;
+    }
+}
+
+/* RTL Support */
+[dir="rtl"] .asterisk-left .el-form-item__label::before {
+    margin-right: 0 !important;
+    margin-left: 4px !important;
+}
+/* Element Plus Select & Tags */
+.el-select {
+    width: 100% !important;
+}
+
+.el-select__wrapper {
+    width: 100% !important;
+    background-color: var(--bg-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--input-radius) !important;
+    transition: var(--transition) !important;
+    min-height: 40px !important;
+    padding: 4px 8px !important;
+}
+[dir="rtl"] .el-select__wrapper {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+.el-select__wrapper:hover {
+    border-color: var(--primary-color) !important;
+}
+
+.el-select__wrapper.is-focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 1px var(--primary-color) !important;
+}
+
+/* Selection Area */
+.el-select__selection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 2px;
+    width: 100% !important;
+}
+
+
+/*
+.el-tag.el-tag--info {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.el-tag .el-tag__close {
+    color: var(--text-secondary) !important;
+    font-size: 12px !important;
+    margin-left: 4px !important;
+}
+
+.el-tag .el-tag__close:hover {
+    color: var(--text-primary) !important;
+    background-color: transparent !important;
+} */
+
+/* Input */
+.el-select__input {
+    color: var(--text-primary) !important;
+    font-size: var(--font-size-base) !important;
+    margin: 2px !important;
+    padding: 0 4px !important;
+}
+
+/* Dropdown Icon */
+.el-select__caret {
+    color: var(--text-secondary) !important;
+    transition: var(--transition) !important;
+}
+
+.el-select__caret.is-reverse {
+    transform: rotate(180deg) !important;
+}
+
+/* Dropdown Menu */
+.el-select-dropdown {
+    background-color: var(--bg-primary) !important;
+    border: none !important;
+    box-shadow: 0 2px 12px 0 var(--shadow-color) !important;
+    border-radius: var(--input-radius) !important;
+}
+
+.el-select-dropdown__item {
+    color: var(--text-primary) !important;
+    padding: 8px 12px !important;
+}
+
+.el-select-dropdown__item.hover,
+.el-select-dropdown__item:hover {
+    background-color: var(--bg-secondary) !important;
+}
+
+.el-select-dropdown__item.selected {
+    color: var(--primary-color) !important;
+    font-weight: 600 !important;
+    background-color: var(--primary-color-light) !important;
+}
+
+/* RTL Support */
+/* [dir="rtl"] .el-tag .el-tag__close {
+    margin-left: 0 !important;
+    margin-right: 4px !important;
+} */
+
+/* Responsive */
+@media (max-width: 768px) {
+    .el-select__wrapper {
+        min-height: 36px !important;
+    }
+
+    /* .el-tag {
+        height: 22px !important;
+        line-height: 20px !important;
+        font-size: var(--font-size-sm) !important;
+    } */
+}
+
+/* Form Item Integration */
+.el-form-item {
+    display: block !important;
+}
+
+.el-form-item.is-error .el-select__wrapper {
+    border-color: var(--error-color) !important;
+}
+
+/*--------------------------------------------------------------
+# Element Plus Date Picker
+--------------------------------------------------------------*/
+/* Date Input Container */
+.el-date-editor {
+    width: 100% !important;
+}
+
+/* Input Wrapper */
+.el-date-editor .el-input__wrapper {
+    background-color: var(--bg-primary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--input-radius) !important;
+    box-shadow: none !important;
+    transition: var(--transition) !important;
+    padding: 0 12px !important;
+    height: 40px !important;
+}
+
+/* Hover State */
+.el-date-editor:not(.is-disabled) .el-input__wrapper:hover {
+    border-color: var(--primary-color) !important;
+}
+
+/* Focus State */
+.el-date-editor .el-input__wrapper.is-focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 1px var(--primary-color) !important;
+}
+
+/* Input Field */
+.el-date-editor .el-input__inner {
+    color: var(--text-primary) !important;
+    font-size: var(--font-size-base) !important;
+    height: 100% !important;
+}
+
+.el-date-editor .el-input__inner::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+/* Calendar Icon */
+.el-date-editor .el-input__prefix-inner i {
+    color: var(--text-secondary) !important;
+    font-size: 16px !important;
+}
+
+/* Disabled State */
+.el-date-editor.is-disabled .el-input__wrapper {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.el-date-editor.is-disabled .el-input__inner {
+    color: var(--text-secondary) !important;
+    -webkit-text-fill-color: var(--text-secondary) !important;
+}
+
+.el-date-editor.is-disabled .el-input__prefix-inner i {
+    color: var(--text-secondary) !important;
+    opacity: 0.6;
+}
+
+/* Date Picker Dropdown */
+.el-picker__popper {
+    background: var(--bg-primary) !important;
+    border: none !important;
+    box-shadow: 0 2px 12px 0 var(--shadow-color) !important;
+    border-radius: var(--input-radius) !important;
+}
+
+/* Calendar Header */
+.el-picker-panel__header {
+    color: var(--text-primary) !important;
+}
+
+.el-picker-panel__icon-btn {
+    color: var(--text-secondary) !important;
+}
+
+.el-picker-panel__icon-btn:hover {
+    color: var(--primary-color) !important;
+}
+
+/* Calendar Body */
+.el-date-table th {
+    color: var(--text-secondary) !important;
+    font-weight: 600 !important;
+}
+
+.el-date-table td.current:not(.disabled) .el-date-table-cell__text {
+    background-color: var(--primary-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.el-date-table td.today .el-date-table-cell__text {
+    color: var(--primary-color) !important;
+    font-weight: bold !important;
+}
+
+.el-date-table td.available:hover {
+    color: var(--primary-color) !important;
+}
+
+/* RTL Support */
+[dir="rtl"] .el-date-editor .el-input__prefix {
+    left: auto !important;
+    right: 8px !important;
+}
+
+[dir="rtl"] .el-date-editor .el-input__suffix {
+    right: auto !important;
+    left: 8px !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .el-date-editor .el-input__wrapper {
+        height: 36px !important;
+    }
+
+    .el-date-editor .el-input__inner {
+        font-size: var(--font-size-sm) !important;
+    }
+}
+
+/* Form Integration */
+.el-form-item.is-error .el-date-editor .el-input__wrapper {
+    border-color: var(--error-color) !important;
+}
+/*--------------------------------------------------------------
+# Element Plus Buttons
+--------------------------------------------------------------*/
+/* Base Button */
+.el-button {
+    height: 40px !important;
+    padding: 0 24px !important;
+    border-radius: var(--button-radius) !important;
+    font-weight: 600 !important;
+    font-size: var(--font-size-base) !important;
+    transition: var(--transition) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    border: none !important;
+}
+
+/* Primary Button */
+.el-button--primary {
+    background-color: var(--primary-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.el-button--primary:hover {
+    background-color: var(--primary-color-light) !important;
+    color: var(--primary-color) !important;
+}
+
+/* Secondary Button */
+.el-button--default {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.el-button--default:hover {
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+    background-color: var(--bg-primary) !important;
+}
+
+/* Danger Button */
+.el-button--danger {
+    background-color: var(--error-color) !important;
+    color: var(--bg-primary) !important;
+}
+
+.el-button--danger:hover {
+    opacity: 0.9 !important;
+}
+
+/* Button Sizes */
+.el-button--large {
+    height: 48px !important;
+    padding: 0 32px !important;
+    font-size: calc(var(--font-size-base) + 2px) !important;
+}
+.text-left .el-input__inner {
+    text-align: left !important; /* جعل النص يبدأ من اليسار */
+    direction: ltr !important;   /* تحديد اتجاه النص من اليسار إلى اليمين */
+}
+
+.el-button--small {
+    height: 32px !important;
+    padding: 0 16px !important;
+    font-size: calc(var(--font-size-base) - 2px) !important;
+}
+
+/* Disabled State */
+.el-button.is-disabled,
+.el-button.is-disabled:hover {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-secondary) !important;
+    cursor: not-allowed !important;
+    opacity: 0.7 !important;
+}
+
+/* Button with Icon */
+.el-button [class*="el-icon"] + span {
+    margin-left: 6px !important;
+}
+
+/* Loading State */
+.el-button.is-loading {
+    position: relative !important;
+    pointer-events: none !important;
+}
+
+.el-button.is-loading:before {
+    pointer-events: none !important;
+    content: "" !important;
+    position: absolute !important;
+    left: -1px !important;
+    top: -1px !important;
+    right: -1px !important;
+    bottom: -1px !important;
+    border-radius: inherit !important;
+    background-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* RTL Support */
+[dir="rtl"] .el-button [class*="el-icon"] + span {
+    margin-left: 0 !important;
+    margin-right: 6px !important;
+}
+
+/* Button Group */
+.el-button-group {
+    display: inline-flex !important;
+}
+
+.el-button-group .el-button {
+    border-radius: 0 !important;
+}
+
+.el-button-group .el-button:first-child {
+    border-top-left-radius: var(--button-radius) !important;
+    border-bottom-left-radius: var(--button-radius) !important;
+}
+
+.el-button-group .el-button:last-child {
+    border-top-right-radius: var(--button-radius) !important;
+    border-bottom-right-radius: var(--button-radius) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .el-button {
+        height: 36px !important;
+        padding: 0 20px !important;
+    }
+
+    .el-button--large {
+        height: 44px !important;
+        padding: 0 28px !important;
+    }
+
+    .el-button--small {
+        height: 28px !important;
+        padding: 0 12px !important;
+    }
+}
+
+/* Dropdown Multiple Select Checkmark */
+.el-select-dropdown.is-multiple .el-select-dropdown__item.is-selected:after {
+    content: "" !important;
+    position: absolute !important;
+    right: 20px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 12px !important;
+    height: 12px !important;
+    background-color: var(--primary-color) !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cpath fill='currentColor' d='M406.656 706.944L195.84 496.256a32 32 0 10-45.248 45.248l256 256 512-512a32 32 0 00-45.248-45.248L406.592 706.944z'%3E%3C/path%3E%3C/svg%3E")
+        no-repeat !important;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cpath fill='currentColor' d='M406.656 706.944L195.84 496.256a32 32 0 10-45.248 45.248l256 256 512-512a32 32 0 00-45.248-45.248L406.592 706.944z'%3E%3C/path%3E%3C/svg%3E")
+        no-repeat !important;
+    -webkit-mask-size: 100% 100% !important;
+    mask-size: 100% 100% !important;
+}
+
+/* RTL Support */
+[dir="rtl"]
+    .el-select-dropdown.is-multiple
+    .el-select-dropdown__item.is-selected:after {
+    right: auto !important;
+    left: 20px !important;
+}
+
+/* Hover State */
+.el-select-dropdown.is-multiple
+    .el-select-dropdown__item.is-selected:hover:after {
+    background-color: var(--bg-primary) !important;
+}
+
+.nav-content.collapse.show,
+.accordion-collapse.collapse.show {
+    visibility: visible !important;
+}
+
+.el-form-item__error {
+    text-align: start !important; /* يظهر النص بناءً على اتجاه اللغة */
+}
+html[lang="ar"] .el-form-item__error {
+    text-align: right !important;
+}
+html[lang="en"] .el-form-item__error {
+    text-align: left !important;
+}
+
+.nav-link {
+    display: flex;
+}
+
+.el-input__wrapper {
+
+    direction: ltr !important;
+}
+.el-input__prefix-inner>:first-child, .el-input__prefix-inner>:first-child.el-input__icon {
+        direction: ltr !important;
+
+}
+
+.el-input__prefix {
+    color: #606266; /* لون النص */
+    margin-right: 0.5rem; /* مسافة صغيرة بين الكود والنص */
+    font-weight: bold; /* جعل الكود بارزًا */
+}
+
+.phone-input input {
+    text-align: left !important; /* النص المدخل يبدأ من اليسار */
+    direction: ltr !important;   /* اتجاه النص من اليسار لليمين */
+}
+
+.phone-input ::placeholder {
+    text-align: right !important; /* البليس هولدر يبقى على اليمين */
+    direction: rtl !important;   /* اتجاه البليس هولدر من اليمين لليسار */
+}
+.error-message {
+  color: var(--el-color-danger);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+
+
+
+

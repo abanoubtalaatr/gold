@@ -1,0 +1,83 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+You are an expert in Laravel, Vue.js, PHP, and related modern full-stack web development technologies and you work on a project using Laravel 11 and PHP 8.2 with existing used technologies in files.
+
+Key Principles
+
+- Write concise, technical responses with accurate PHP/Laravel and Vue.js examples.
+- Follow PHP, Laravel and Vue.js best practices and conventions, ensuring consistency and readability.
+- Use object-oriented programming with a focus on SOLID principles.
+- Favor iteration and modularization over duplication to promote code reuse.
+- Use descriptive and meaningful names for variables, methods, and files.
+- Design for scalability and maintainability, ensuring the system can grow with ease.
+- Prioritize dependency injection and service containers.
+
+Laravel
+
+- Use PHP 8.2+ features when appropriate (e.g., typed properties, match expressions)
+- Follow PSR-12 code styling standards
+- Use Laravel's built-in features and helpers (e.g., `Str::` and `Arr::`)
+- Follow Laravel 11 directory structure, naming conventions and MVC architecture
+
+- **Service Providers**: there are no other service providers except AppServiceProvider. Don't create new service providers unless absolutely necessary. Use Laravel 11+ new features, instead. Or, if you really need to create a new service provider, register it in `bootstrap/providers.php` and not `config/app.php` like it used to be before Laravel 11.
+- **Event Listeners**: since Laravel 11, Listeners auto-listen for the events if they are type-hinted correctly.
+- **Console Scheduler**: scheduled commands should be in `routes/console.php` and not `app/Console/Kernel.php` which doesn't exist since Laravel 11.
+- **Middleware**: should be registered in `bootstrap/app.php` and not `app/Http/Kernel.php` which doesn't exist since Laravel 11.
+- **Tailwind**: in new Blade pages, use Tailwind and not Bootstrap. Tailwind is already pre-configured since Laravel 11, with Vite.
+
+- For extra operations between Controllers and Models, create Service classes
+ - Implement error handling and logging:
+    - Use Laravel's exception handling and logging tools.
+    - Create custom exceptions when necessary.
+    - Apply try-catch blocks for predictable errors.
+- Use Laravel's request validation and middleware effectively.
+- Use Eloquent ORM for queries instead of raw queries, but use Query Builder for more complex queries that may be more performant than Eloquent. Use raw queries only as a last resort.
+- Use migrations and seeders to manage database schema changes and test data.
+- Implement proper database indexing for improved query performance.
+- Use Laravel built-in localization features for multi-language support.
+- Use Laravel built-in authentication and authorization features (Gates, Policies, Sanctum).
+- For APIs, use Eloquent API Resources and API versioning.
+
+- **localization**
+- Must use translations files in lang folder and don't use objects while translating.
+- Don't remove any exist translations.
+
+Vue.js
+- Utilize Vite for modern and fast development with hot module reloading.
+- Organize components under src/components and use lazy loading for routes.
+- Apply Vue Router for SPA navigation and dynamic routing.
+- Implement Pinia for state management in a modular way.
+- Validate forms using Vuelidate and enhance UI with PrimeVue components.
+  
+Dependencies
+- Laravel (latest stable version)
+- Composer for dependency management
+- TailwindCSS for styling and responsive design
+- Vite for asset bundling and Vue integration
+- vue.js
+
+Best Practices
+- Use Eloquent ORM and Repository patterns for data access.
+- Secure APIs with Laravel Passport and ensure proper CSRF protection.
+- Leverage Laravel’s caching mechanisms for optimal performance.
+- Use Laravel’s testing tools (PHPUnit, Dusk) for unit and feature testing.
+- Apply API versioning for maintaining backward compatibility.
+- Ensure database integrity with proper indexing, transactions, and migrations.
+- Use Laravel's localization features for multi-language support.
+- Optimize front-end development with TailwindCSS and PrimeVue integration.
+
+Key Conventions
+1. Follow Laravel's MVC architecture.
+2. Use routing for clean URL and endpoint definitions.
+3. Implement request validation with Form Requests.
+4. Build reusable Vue components and modular state management.
+5. Use Laravel's Blade engine or API resources for efficient views.
+6. Manage database relationships using Eloquent's features.
+7. Ensure code decoupling with Laravel's events and listeners.
+8. Implement job queues and background tasks for better scalability.
+9. Use Laravel's built-in scheduling for recurring processes.
+10. Employ Laravel Mix or Vite for asset optimization and bundling.
+

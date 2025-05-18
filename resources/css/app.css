@@ -1,0 +1,8 @@
+/* @tailwind base;
+@tailwind components; */
+@tailwind utilities;
+/* تغيير اتجاه رسائل الخطأ بناءً على اللغة */
+.el-form-item__error {
+  text-align: start;
+  direction: var(--direction, ltr);
+}
