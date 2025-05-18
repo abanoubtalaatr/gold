@@ -22,6 +22,7 @@ class Branch extends Model
         'working_hours',
         'services',
         'is_active',
+        'city_id',
     ];
 
     protected $casts = [
@@ -35,7 +36,7 @@ class Branch extends Model
 
     public function vendor(): BelongsTo
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(User::class,'vendor_id');
     }
 
     public function images(): MorphMany
@@ -51,5 +52,10 @@ class Branch extends Model
     public function scopeForVendor($query, $vendorId)
     {
         return $query->where('vendor_id', $vendorId);
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
     }
 } 
