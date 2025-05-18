@@ -33,7 +33,7 @@ class PhoneVerificationController extends Controller
 
             // Generate OTP (6 digits)
             $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-            $otp = 123456;
+            $otp = 1234;
             $expiresAt = Carbon::now()->addMinutes(15);
 
             // Delete any existing verification attempts
@@ -118,7 +118,7 @@ class PhoneVerificationController extends Controller
         try {
             $user = Auth::user();
             $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-            $otp = 123456;
+            $otp = 1234;
 
             $validator = Validator::make($request->all(), [
                 'phone_number' => 'required|string|max:20|unique:users,mobile,' . $user->id,
