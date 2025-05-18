@@ -232,4 +232,4 @@ const debouncedSearch = debounce(() => {
     preserveScroll: true,
   })
 }, 300)
-</script> 
+</script>

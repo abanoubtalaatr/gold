@@ -16,14 +16,11 @@ class Branch extends Model
     protected $fillable = [
         'vendor_id',
         'name',
-        'latitude',
-        'longitude',
-        'address',
+        'city_id',
         'working_days',
         'working_hours',
         'services',
         'is_active',
-        'city_id',
     ];
 
     protected $casts = [
@@ -31,13 +28,16 @@ class Branch extends Model
         'working_hours' => 'array',
         'services' => 'array',
         'is_active' => 'boolean',
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8',
     ];
 
     public function vendor(): BelongsTo
     {
-        return $this->belongsTo(User::class,'vendor_id');
+        return $this->belongsTo(User::class, 'vendor_id');
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
     }
 
     public function images(): MorphMany
@@ -54,9 +54,4 @@ class Branch extends Model
     {
         return $query->where('vendor_id', $vendorId);
     }
-
-    public function city(): BelongsTo
-    {
-        return $this->belongsTo(City::class);
-    }
-} 
+}

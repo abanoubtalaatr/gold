@@ -17,24 +17,28 @@ class BranchService
             ->get();
     }
 
-    public function create(array $data, array $images = []): Branch
-    {
-        return DB::transaction(function () use ($data, $images) {
-            $branch = Branch::create($data);
-            
-            if (!empty($images)) {
-                $this->handleImages($branch, $images);
-            }
+public function create(array $data, array $images = []): Branch
+{
+    // return DB::transaction(function () use ($data, $images) {
+    //     // Ensure proper data types
+    //     $data['working_days'] = array_map('intval', $data['working_days'] ?? []);
+    //     $data['services'] = array_map('intval', $data['services'] ?? []);
 
-            return $branch->load('images');
-        });
-    }
+        $branch = Branch::create($data);
+        return $branch;
+        if (!empty($images)) {
+            $this->handleImages($branch, $images);
+        }
+
+        return $branch->load('images');
+    // });
+}
 
     public function update(Branch $branch, array $data, array $images = []): Branch
     {
         return DB::transaction(function () use ($branch, $data, $images) {
             $branch->update($data);
-            
+
             if (!empty($images)) {
                 $this->handleImages($branch, $images);
             }
@@ -83,4 +87,4 @@ class BranchService
         // For now, returning true as appointment functionality is not implemented
         return true;
     }
-} 
+}

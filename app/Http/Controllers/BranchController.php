@@ -71,9 +71,9 @@ class BranchController extends Controller
     public function toggleStatus(Branch $branch): RedirectResponse
     {
         $this->authorize('update', $branch);
-        
+
         $this->branchService->toggleStatus($branch);
 
         return back()->with('success', __('branches.messages.status_updated'));
     }
-} 
+}

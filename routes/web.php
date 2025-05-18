@@ -1,20 +1,22 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Banners\BannerController;
+use App\Http\Controllers\Contacts\ContactController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LangController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\ExportController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PageWebController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\Banners\BannerController;
-use App\Http\Controllers\Contacts\ContactController;
-use Inertia\Inertia;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\Vendor\Auth\RegisterController;
 use App\Http\Controllers\Vendor\BranchController;
 use App\Http\Controllers\Vendor\ServiceController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
 
 
 Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
@@ -98,6 +100,13 @@ Route::get('/export-users', [ExportController::class, 'export'])->name('export.u
 
 Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::middleware('guest')->group(function () {
+        Route::get('create-account', [RegisterController::class, 'create'])
+    ->name('register');  // Fixed typo in name
+
+Route::post('create-account', [RegisterController::class, 'store'])
+    ->name('vendor.register');  // This matches your form submission
+
+
         Route::get('login', [App\Http\Controllers\Vendor\Auth\LoginController::class, 'create'])
             ->name('login');
         Route::post('login', [App\Http\Controllers\Vendor\Auth\LoginController::class, 'store']);
