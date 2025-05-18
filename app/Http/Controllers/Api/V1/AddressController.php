@@ -22,7 +22,7 @@ class AddressController extends Controller
             /** @var User $user */
             $user = Auth::user();
             $query = $user->addresses()
-                ->with(['country', 'state', 'city']);
+                ->with(['city']);
 
             // Add any filters here if needed
             $perPage = $request->per_page ?? 15; // Default 15 items per page

@@ -111,10 +111,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     |--------------------------------------------------------------------------
     */
 
-
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/my-requests', [OrderController::class, 'myRequests']);
 });
-Route::get('verify-email', [EmailVerificationController::class, 'verifyAndUpdate'])
-    ->name('verification.verify');
