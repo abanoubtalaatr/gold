@@ -86,7 +86,7 @@ class GoldPieceController extends Controller
                 'description' => $request->description,
                 'rental_price_per_day' => $request->type === 'for_rent' ? $request->rental_price_per_day : null,
                 'sale_price' => $request->type === 'for_sale' ? $request->sale_price : null,
-                'deposit_amount' => $request->type === 'for_rent' ? $this->calculateDeposit($request->weight, $request->carat) : null,
+                'deposit_amount' => $request->type === 'for_rent' ? $request->deposit_amount : null,
             ]);
 
             if ($request->hasFile('images')) {

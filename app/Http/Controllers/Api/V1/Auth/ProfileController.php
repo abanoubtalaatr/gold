@@ -32,10 +32,7 @@ class ProfileController extends Controller
 
             return $this->successResponse(new UserResource($user),'Profile retrieved successfully');
         } catch (\Exception $e) {
-            return $this->errorResponse(
-                'Error retrieving profile',
-                ['error' => $e->getMessage()]
-            );
+            return $this->errorResponse('Error retrieving profile',['error' => $e->getMessage()]);
         }
     }
 
@@ -109,15 +106,10 @@ class ProfileController extends Controller
      * @param DeleteAccountRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function deleteAccount(DeleteAccountRequest $request)
+    public function deleteAccount(Request $request)
     {
         try {
             $user = Auth::user();
-
-            // Verify password before deletion
-            if (!Hash::check($request->password, $user->password)) {
-                return $this->errorResponse('Invalid password', null, 422);
-            }
 
             // Begin transaction
             DB::beginTransaction();
