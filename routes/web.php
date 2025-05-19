@@ -13,10 +13,14 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\Vendor\Auth\RegisterController;
 use App\Http\Controllers\Vendor\BranchController;
-use App\Http\Controllers\Vendor\ServiceController;
 use App\Http\Controllers\Vendor\GoldPieceController;
+use App\Http\Controllers\Vendor\RoleController;
+use App\Http\Controllers\Vendor\ServiceController;
+use App\Http\Controllers\Vendor\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+
 
 
 
@@ -155,5 +159,19 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::patch('gold-pieces/{goldPiece}/toggle-status', [GoldPieceController::class, 'toggleStatus'])
         ->name('gold-pieces.toggle-status');
 });
+
+Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->group(function () {
+
+    Route::resource('roles', RoleController::class);
+    Route::get('roles/{roleId}/delete', [RoleController::class, 'destroy']);
+    Route::get('roles/{roleId}/give-permissions', [RoleController::class, 'addPermissionToRole']);
+    Route::put('roles/{roleId}/give-permissions', [RoleController::class, 'givePermissionToRole']);
+    Route::post('roles/{role}/activate', [RoleController::class, 'activate'])->name('roles.activate');
+
+    Route::resource('users', UserController::class);
+    Route::post('users/{user}/activate', [UserController::class, 'activate'])->name('activate');
+    Route::post('users/{user}', [UserController::class, 'update'])->name('users.update'); //  inertia does not support send files using put request
+});
+
 
 require __DIR__ . '/auth.php';

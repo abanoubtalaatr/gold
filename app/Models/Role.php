@@ -19,6 +19,7 @@ class Role extends SpatieRole implements TranslatableContract
         'description',
         'guard_name',
         'is_active',
+        'vendor_id',
     ];
 
     public function logs(): HasMany

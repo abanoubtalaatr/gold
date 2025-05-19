@@ -1,0 +1,96 @@
+<template>
+
+<AuthenticatedLayout>
+  
+      <!-- breadcrumb-->
+      <div class="pagetitle">
+        <h1>{{ $t('permissions') }}</h1>
+        <nav>
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <Link class="nav-link" :href="route('dashboard')">
+            {{$t('Home')}}
+              </Link>
+            </li>
+            <li class="breadcrumb-item active">{{ $t('edit') }}  </li>
+  
+          </ol>
+        </nav>
+      </div>
+      <!-- End breadcrumb-->
+  
+      <section class="section dashboard">
+        <div class="row">
+          <div class="col-lg-12">
+  
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title"> {{ $t('edit_permission') }} </h5>
+                <br>
+  
+                <!-- General Form Elements -->
+                <form @submit.prevent="update" class="row g-3">
+                  <div class="row mb-3">
+                    <label for="inputText" class="col-sm-2 col-form-label">{{ $t('name') }}  </label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" :placeholder="$t('name') " v-model="form.name">
+                      <InputError :message="form.errors.name" />
+                    </div>
+                </div>
+               
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary" v-bind:disabled="show_loader">{{ $t('update') }} &nbsp; <i class="bi bi-save"  v-if="!show_loader"></i>
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" v-if="show_loader"></span>
+                  </button>
+                </div>
+  
+  
+                </form>
+                <!--  From -->
+              </div>
+            </div>
+  
+          </div>
+  
+        </div>
+  
+  
+      </section>
+    </AuthenticatedLayout>
+  </template>
+  
+  
+  
+  <script setup>
+  import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+  import { useForm } from '@inertiajs/vue3'
+import InputError from '@/Components/InputError.vue';
+import { ref } from 'vue';
+const show_loader = ref(false);
+  
+
+  const props = defineProps({
+    permission: Object,
+  })
+  
+  const form = useForm({
+    name: props.permission.name,
+  })
+  
+  
+const update = () => {
+  show_loader.value = true; 
+  form.put(route('permissions.update',{ permission: props.permission.id }), {
+    onSuccess: () => {
+      show_loader.value = false; 
+    },
+    onError: () => {
+      show_loader.value = false; 
+    },
+  });
+};
+
+
+
+
+  </script>

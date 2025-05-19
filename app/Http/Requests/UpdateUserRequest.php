@@ -28,9 +28,9 @@ class UpdateUserRequest extends FormRequest
             'avatar' => 'nullable|image|mimes:webp,jpeg,png,jpg,gif|max:2048',
             'selectedRoles' => 'nullable|array',
             'selectedRoles.*' => 'exists:roles,name',
-            'translations' => 'required|array',
-            'translations.*' => 'required|array',
-            'translations.*.name' => 'required|string|max:255',
+            // 'translations' => 'required|array',
+            // 'translations.*' => 'required|array',
+            // 'translations.*.name' => 'required|string|max:255',
             
         ];
 
