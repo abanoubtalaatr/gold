@@ -1,26 +1,28 @@
 <?php
 
-use Inertia\Inertia;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Banners\BannerController;
+use App\Http\Controllers\Contacts\ContactController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LangController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\ExportController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PageWebController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\Vendor\OrderController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\Vendor\Auth\RegisterController;
 use App\Http\Controllers\Vendor\BranchController;
 use App\Http\Controllers\Vendor\GoldPieceController;
+use App\Http\Controllers\Vendor\OrderController;
+use App\Http\Controllers\Vendor\RentalRequestController;
 use App\Http\Controllers\Vendor\RoleController;
 use App\Http\Controllers\Vendor\ServiceController;
 use App\Http\Controllers\Vendor\UserController;
-use App\Http\Controllers\Banners\BannerController;
-use App\Http\Controllers\Contacts\ContactController;
-use App\Http\Controllers\Vendor\Auth\RegisterController;
-use App\Http\Controllers\Vendor\RentalRequestController;
+use App\Http\Controllers\Vendor\VerifyController;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
 
 
 
@@ -113,7 +115,9 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
 Route::post('create-account', [RegisterController::class, 'store'])
     ->name('vendor.register');  // This matches your form submission
 
-
+Route::get('verify', [VerifyController::class, 'show'])->name('verify');
+Route::post('verify', [VerifyController::class, 'verify'])->name('verify.submit');
+Route::post('verify/resend', [VerifyController::class, 'resend'])->name('verify.resend');
         Route::get('login', [App\Http\Controllers\Vendor\Auth\LoginController::class, 'create'])
             ->name('login');
         Route::post('login', [App\Http\Controllers\Vendor\Auth\LoginController::class, 'store']);
