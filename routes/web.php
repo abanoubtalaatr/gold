@@ -1,22 +1,24 @@
 <?php
 
-use App\Http\Controllers\Banners\BannerController;
-use App\Http\Controllers\Contacts\ContactController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExportController;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LangController;
-use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\PageWebController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\Vendor\Auth\RegisterController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Vendor\OrderController;
 use App\Http\Controllers\Vendor\BranchController;
+use App\Http\Controllers\Banners\BannerController;
 use App\Http\Controllers\Vendor\ServiceController;
+use App\Http\Controllers\Contacts\ContactController;
 use App\Http\Controllers\Vendor\GoldPieceController;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\Vendor\Auth\RegisterController;
+use App\Http\Controllers\Vendor\RentalRequestController;
 
 
 
@@ -150,10 +152,21 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::resource('services', ServiceController::class);
     Route::patch('services/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])
         ->name('services.toggle-status');
+  
     Route::resource('gold-pieces', GoldPieceController::class)
         ->names('gold-pieces');
+  
     Route::patch('gold-pieces/{goldPiece}/toggle-status', [GoldPieceController::class, 'toggleStatus'])
         ->name('gold-pieces.toggle-status');
+
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/{orderId}/accept', [OrderController::class, 'accept'])->name('orders.accept');
+    Route::post('/orders/{orderId}/reject', [OrderController::class, 'reject'])->name('orders.reject');
+    Route::patch('/orders/{orderId}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
+
+
+    Route::get('/rental-requests', [RentalRequestController::class, 'index'])->name('rental-requests.index');
 });
 
 require __DIR__ . '/auth.php';

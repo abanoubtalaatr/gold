@@ -200,4 +200,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(OrderSale::class);
     }
+
+    public function branches()
+    {
+        return $this->hasMany(Branch::class,'vendor_id');
+    }
 }

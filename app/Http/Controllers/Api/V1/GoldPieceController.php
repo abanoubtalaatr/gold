@@ -136,7 +136,7 @@ class GoldPieceController extends Controller
                         'user_id' => $user->id,
                         'gold_piece_id' => $goldPiece->id,
                         'branch_id' => $branch->id,
-                        'status' => 'pending',
+                        'status' => OrderRental::STATUS_PENDING_APPROVAL,
                         'total_price' => $goldPiece->rental_price_per_day,
                         'type' => OrderRental::RENT_TYPE,
                     ]);
@@ -145,7 +145,7 @@ class GoldPieceController extends Controller
                         'user_id' => $user->id,
                         'gold_piece_id' => $goldPiece->id,
                         'branch_id' => $branch->id,
-                        'status' => 'pending',
+                        'status' => OrderSale::STATUS_PENDING_APPROVAL,
                         'total_price' => $goldPiece->sale_price,
                     ]);
                 }

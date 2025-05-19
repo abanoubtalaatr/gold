@@ -35,38 +35,38 @@ class OrderRental extends Model
     /**
      * Order Status Constants
      * حالات الطلب
+     *
+     * Flow:
+     * - User adds piece for rent: pending_approval
+     * - Store approves: approved
+     * - Piece sent to store: piece_sent
+     * - Store approves rental: rented
+     * - After rental ends: available
      */
-    
-    /**
-     * Pending store approval
-     * في انتظار قبول المتجر
-     */
-    const STATUS_PENDING_APPROVAL = 'pending_approval';
+    const STATUS_PENDING_APPROVAL = 'pending_approval'; // في انتظار المتجر
+    const STATUS_APPROVED = 'approved'; // تم القبول من المتجر
+    const STATUS_PIECE_SENT = 'piece_sent'; // تم ارسال القطعة للمتجر
+    const STATUS_RENTED = 'rented'; // مؤجرة حاليا
+    const STATUS_AVAILABLE = 'available'; // متاحة للإيجار مرة أخرى
+    const STATUS_SOLD = 'sold'; // تم بيعها (if needed for rental orders)
+
 
     /**
-     * Approved by store
-     * تم القبول من المتجر
+     * Get all possible order statuses.
+     *
+     * @return array
      */
-    const STATUS_APPROVED = 'approved';
-
-    /**
-     * Piece sent to store
-     * تم ارسال القطعة للمتجر
-     */
-    const STATUS_PIECE_SENT = 'piece_sent';
-
-    /**
-     * Available for rent
-     * متاحة للتأجير
-     */
-    const STATUS_AVAILABLE = 'available';
-
-    /**
-     * Currently rented
-     * مؤجرة
-     */
-    const STATUS_RENTED = 'rented';
-
+    public static function statuses(): array
+    {
+        return [
+            self::STATUS_PENDING_APPROVAL,  // في انتظار المتجر
+            self::STATUS_APPROVED,          // تم القبول من المتجر
+            self::STATUS_PIECE_SENT,        // تم ارسال القطعة للمتجر
+            self::STATUS_RENTED,            // مؤجرة حاليا
+            self::STATUS_AVAILABLE,         // متاحة للإيجار مرة أخرى
+            self::STATUS_SOLD,              // تم بيعها
+        ];
+    }
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -81,4 +81,5 @@ class OrderRental extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
 }
