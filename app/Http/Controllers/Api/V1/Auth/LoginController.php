@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Api\AppBaseController;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
-
+use App\Traits\ApiResponseTrait;
 
 /**
  * Class LoginController.
@@ -25,6 +25,8 @@ use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 class LoginController extends AppBaseController
 {
 
+    use ApiResponseTrait;
+    
     protected $smsService;
 
     /**
@@ -108,12 +110,10 @@ class LoginController extends AppBaseController
             }
         } catch (Exception $e) {
 
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 200);
+            return $this->errorResponse($e->getMessage(), 200);
         }
-
-        return response()->json(['success' => false, 'message' => [
-            'identity' => [trans('auth.failed')]
-        ]], 422);
+        // return $this->errorResponse($e->getMessage(), 422);
+        return $this->errorResponse( trans('auth.failed'));
     }
 
     /**
@@ -145,7 +145,7 @@ class LoginController extends AppBaseController
         // Check to see if the users account is confirmed and active
         if (null !== $user->email && !$user->isVerified()) {
             $user->sendEmailVerificationNotification();
-            return response()->json(['success' => false, 'status' => 'not_verified', 'email' => $user->email, 'message' => __('We have sent a confirmation email.')], 200);
+            return $this->errorResponse('not_verified', ['email' => $user->email, 'message' => __('We have sent a confirmation email.')], 200);
         }
 
         if (!$user->isMobileVerified()) {
@@ -166,13 +166,13 @@ class LoginController extends AppBaseController
 
                 // $this->smsService->send_sms($mobile,$msg);
 
-                return response()->json(['success' => false, 'code' => $cnfrm_data['code'], 'status' => 'mobile_not_verified', 'message' => __('We have sent a confirmation SMS.')], 200);
+                return $this->errorResponse('mobile_not_verified', ['code' => $cnfrm_data['code']], 200);
             }
         }
 
 
         if (!$user->isActive()) {
-            return response()->json(['success' => false, 'status' => 'not_active', 'email' => $user->email, 'message' => __('your account has been deactivated.')], 200);
+            return $this->errorResponse('not_active', ['email' => $user->email, 'message' => __('your account has been deactivated.')], 200);
         }
 
         if (isset($request->device_token)) {
@@ -189,12 +189,11 @@ class LoginController extends AppBaseController
 
         event(new UserLoggedIn($user));
 
-
-        return response()->json(['data' => [
+        return $this->successResponse([
             'user' => $user,
             'token' => $token,
             'expires' => $expires
-        ], 'success' => true, 'message' => __('You have logged in successfully.')], 200);
+        ], __('You have logged in successfully.'));
     }
 
     /**
@@ -214,10 +213,10 @@ class LoginController extends AppBaseController
             $user->tokens()->delete();
 
             Auth::guard('api')->logout();
-            return response()->json(['message' => __('messages.logout_success')], 200);
+            return $this->successResponse([], __('messages.logout_success'));
         }
 
-        return response()->json(['message' => __('auth.unauthenticated')], 401);
+        return $this->errorResponse(__('auth.unauthenticated'), 401);
     }
 
     /**
@@ -254,7 +253,7 @@ class LoginController extends AppBaseController
         if (null !== $user->email && !$user->isVerified()) {
             //implements ShouldQueue
             $user->sendEmailVerificationNotification();
-            return response()->json(['success' => false, 'status' => 'not_verified', 'email' => $user->email, 'message' => __('We have sent a confirmation email.')], 200);
+            return $this->errorResponse('not_verified', ['email' => $user->email, 'message' => __('We have sent a confirmation email.')], 200);
         }
 
         if (!$user->isActive()) {

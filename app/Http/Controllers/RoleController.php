@@ -2,12 +2,13 @@
 
 namespace  App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Role;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
+use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
@@ -63,7 +64,7 @@ class RoleController extends Controller
 
 public function store(StoreRoleRequest $request)
 {
-    \Log::info('Store Request data:', $request->all());
+    Log::info('Store Request data:', $request->all());
 
     DB::beginTransaction();
     try {
@@ -90,7 +91,7 @@ public function store(StoreRoleRequest $request)
 
     } catch (\Exception $e) {
         DB::rollBack();
-        \Log::error('Store failed:', [
+        Log::error('Store failed:', [
             'message' => $e->getMessage(),
             'trace' => $e->getTraceAsString()
         ]);
@@ -125,8 +126,6 @@ public function store(StoreRoleRequest $request)
 
     public function update(UpdateRoleRequest $request, Role $role)
     {
-        \Log::info('Request data:', $request->all());
-
         DB::beginTransaction();
         try {
 
@@ -155,7 +154,7 @@ public function store(StoreRoleRequest $request)
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Update failed:', [
+            Log::error('Update failed:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -197,6 +196,10 @@ public function store(StoreRoleRequest $request)
 
         $role = Role::findOrFail($roleId);
         $role->syncPermissions($request->selectedPermissions);
+        if(auth()->user()->hasRole('vendor')){
+            return redirect()->route('vendor.roles.index')
+            ->with('success',  __('messages.role_permissions_updated_successfully'));
+        }
         return redirect()->route('roles.index')
             ->with('success',  __('messages.role_permissions_updated_successfully'));
     }

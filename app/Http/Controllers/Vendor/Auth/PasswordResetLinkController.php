@@ -91,6 +91,7 @@ class PasswordResetLinkController extends Controller
         if (!$user || !$user->hasRole('vendor')) {
             return back()->withErrors(['email' => __('auth.invalid_user_type')]);
         }
+    
 
         $response = $this->broker()->sendResetCode(
             $this->credentials($request),

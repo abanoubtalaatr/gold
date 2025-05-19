@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserRolePermissionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         // Reset cached roles and permissions
@@ -27,37 +24,43 @@ class UserRolePermissionSeeder extends Seeder
             'settings' => ['read', 'update'],
             'contacts' => ['read', 'update'],
             'static_pages' => ['read', 'update'],
+            'branches' => ['create', 'read', 'update', 'delete', 'view'],
+            // Vendor-prefixed permissions
+            'vendor roles' => ['vendor create', 'vendor read', 'vendor update', 'vendor delete', 'vendor view'],
+            'vendor permissions' => ['vendor create', 'vendor read', 'vendor update', 'vendor delete', 'vendor view'],
+            'vendor users' => ['vendor create', 'vendor read', 'vendor update', 'vendor delete', 'vendor view'],
+            'vendor branches' => ['vendor create', 'vendor read', 'vendor update', 'vendor delete', 'vendor view'],
         ];
 
         foreach ($permissions as $group => $actions) {
             foreach ($actions as $action) {
-                Permission::findOrCreate("$action $group");
+                Permission::findOrCreate("$action $group", 'web');
             }
         }
 
         // Roles
         $roles = [
+            'vendor' => [
+                'vendor create roles', 'vendor read roles', 'vendor view roles', 'vendor update roles', 'vendor delete roles',
+                'vendor create permissions', 'vendor read permissions', 'vendor view permissions', 'vendor update permissions', 'vendor delete permissions',
+                'vendor create users', 'vendor read users', 'vendor view users', 'vendor update users', 'vendor delete users',
+                'vendor create branches', 'vendor read branches', 'vendor view branches', 'vendor update branches', 'vendor delete branches',
+            ],
             'superadmin' => Permission::pluck('name')->toArray(),
             'admin' => [
-                'create roles', 'read roles', 'view roles', 'update roles',
-                'create permissions', 'read permissions', 'view permissions',
-                'create users', 'read users', 'view users', 'update users',
-            ],
-            'vendor' => [
-                'create roles', 'read roles', 'view roles', 'update roles',
-                'create permissions', 'read permissions', 'view permissions',
-                'create users', 'read users', 'view users', 'update users',
-
+                'create roles', 'read roles', 'view roles', 'update roles', 'delete roles',
+                'create permissions', 'read permissions', 'view permissions', 'update permissions', 'delete permissions',
+                'create users', 'read users', 'view users', 'update users', 'delete users',
             ],
         ];
 
         foreach ($roles as $roleName => $permissions) {
-            $role = Role::findOrCreate($roleName);
+            $role = Role::findOrCreate($roleName, 'web');
             $role->syncPermissions($permissions);
         }
 
         // Users
-        $users = [
+        $users =[
             [
                 'name' => 'Super Admin',
                 'email' => 'admin@admin.com',
@@ -75,7 +78,7 @@ class UserRolePermissionSeeder extends Seeder
                     'password' => Hash::make($userData['password']),
                 ]
             );
-            
+
             $user->syncRoles([$userData['role']]);
         }
     }

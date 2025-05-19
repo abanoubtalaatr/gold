@@ -170,6 +170,7 @@ public function store(StoreRoleRequest $request)
 
     public function addPermissionToRole($roleId)
     {
+        
         $permissions = Permission::get();
         $role = Role::findOrFail($roleId);
         $rolePermissions = DB::table('role_has_permissions')
@@ -179,7 +180,7 @@ public function store(StoreRoleRequest $request)
             ->all();
 
 
-        return Inertia('vendor/roles-permissions/Roles/Add-permissions', [
+        return Inertia('Vendor/roles-permissions/Roles/Add-permissions', [
             'role' => $role,
             'permissions' => $permissions,
             'rolePermissions' => $rolePermissions
