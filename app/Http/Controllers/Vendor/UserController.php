@@ -15,14 +15,12 @@ use Illuminate\Support\Facades\Storage;
 class UserController extends Controller
 {
 
-   
-
     public function __construct()
     {
-        $this->middleware('permission:read users', ['only' => ['index']]);
-        $this->middleware('permission:create users', ['only' => ['create']]);
-        $this->middleware('permission:update users', ['only' => ['update','edit']]);
-        $this->middleware('permission:delete users', ['only' => ['destroy']]);
+        $this->middleware('permission:vendor read users', ['only' => ['index']]);
+        $this->middleware('permission:vendor create users', ['only' => ['create']]);
+        $this->middleware('permission:vendor update users', ['only' => ['update','edit']]);
+        $this->middleware('permission:vendor delete users', ['only' => ['destroy']]);
     }
 
 

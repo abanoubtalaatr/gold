@@ -113,7 +113,7 @@ class LoginController extends AppBaseController
             return $this->errorResponse($e->getMessage(), 200);
         }
         // return $this->errorResponse($e->getMessage(), 422);
-        return $this->errorResponse( trans('auth.failed'));
+        return $this->errorResponse(trans('auth.failed'));
     }
 
     /**

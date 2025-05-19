@@ -36,7 +36,7 @@ class UsersController extends Controller
             'is_active' => $request->is_active,
         ];
 
-        $UsersQuery = User::with('roles')->latest();
+        $UsersQuery = User::with('roles')->where('vendor_id', auth()->user()->id)->latest();
 
 
         $UsersQuery->when($filters['name'], function ($query, $name) {
@@ -66,7 +66,7 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $roles = Role::pluck('name')->toArray();
+        $roles = Role::where('vendor_id', auth()->user()->id)->pluck('name')->toArray();
         return Inertia('Users/Create', ['roles' => $roles]);
     }
 
@@ -79,7 +79,8 @@ class UsersController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'avatar' => 'avatars/default_avatar.png' // القيمة الافتراضية
+            'avatar' => 'avatars/default_avatar.png', // القيمة الافتراضية
+            'vendor_id' => auth()->user()->id
         ];
 
         if ($request->hasFile('avatar')) {
@@ -112,7 +113,7 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
-        $roles = Role::pluck('name', 'name')->all();
+        $roles = Role::where('vendor_id', auth()->user()->id)->pluck('name', 'name')->all();
         $userRoles = $user->roles->pluck('name')->all();
         return Inertia('Users/Edit', [
             'user' => $user,

@@ -99,8 +99,54 @@
                 <span>{{ $t("users") }}</span>
                 </Link>
             </li>
+
+            <!-- Branches -->
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
+                <Link class="nav-link" :href="route('vendor.users.index')"
+                    :class="{ collapsed: !$page.url.startsWith('vendor/users') }">
+                <i class="bi bi-person"></i>
+                <span>{{ $t("vendor_admins") }}</span>
+                </Link>
+            </li>
+
+            <!-- Vendor orders -->
+
+            <li class="nav-item" v-if="hasPermission('vendor read orders')">
+                <Link class="nav-link" :href="route('vendor.orders.index')"
+                    :class="{ collapsed: !$page.url.startsWith('vendor/orders') }">
+                <i class="bi bi-cart"></i>
+                <span>{{ $t("orders") }}</span>
+                </Link>
+            </li>
+
+            <!-- Vendor rental requests -->
+
+            <li class="nav-item" v-if="hasPermission('vendor read rental-requests')">
+                <Link class="nav-link" :href="route('vendor.rental-requests.index')"
+                    :class="{ collapsed: !$page.url.startsWith('vendor/rental-requests') }">
+                <i class="bi bi-calendar-check"></i>
+                <span>{{ $t("rental_requests") }}</span>
+                </Link>
+            </li>
+
+            <li class="nav-item" v-if="hasPermission('vendor read roles')">
+                <Link class="nav-link" :href="route('vendor.roles.index')"
+                    :class="{ collapsed: !$page.url.startsWith('vendor/roles') }">
+                <i class="bi bi-person-badge"></i>
+                <span>{{ $t("roles") }}</span>
+                </Link>
+            </li>
+
+            <li class="nav-item" v-if="hasPermission('vendor read branches')">
+                <Link class="nav-link" :href="route('vendor.branches.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/branches') }">
+                <i class="bi bi-building"></i>
+                <span>{{ $t("branches") }}</span>
+                </Link>
+            </li>
+
             <!-- roles -->
-            <li class="nav-item" :hasPermission="['read roles', 'read permissions']">
+            <li class="nav-item" v-if="hasPermission('read roles') || hasPermission('read permissions')">
                 <a class="nav-link" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#" :class="{
                     collapsed:
                         !$page.url.startsWith('/roles') &&

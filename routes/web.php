@@ -153,7 +153,9 @@ Route::post('verify/resend', [VerifyController::class, 'resend'])->name('verify.
     });
 });
 
+
 Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->group(function () {
+
     Route::resource('branches', BranchController::class);
     Route::patch('branches/{branch}/toggle-status', [BranchController::class, 'toggleStatus'])
         ->name('branches.toggle-status');
@@ -175,15 +177,12 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
 
 
     Route::get('/rental-requests', [RentalRequestController::class, 'index'])->name('rental-requests.index');
-});
-
-Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->group(function () {
-
-    Route::resource('roles', RoleController::class);
-    Route::get('roles/{roleId}/delete', [RoleController::class, 'destroy']);
-    Route::get('roles/{roleId}/give-permissions', [RoleController::class, 'addPermissionToRole']);
-    Route::put('roles/{roleId}/give-permissions', [RoleController::class, 'givePermissionToRole']);
-    Route::post('roles/{role}/activate', [RoleController::class, 'activate'])->name('roles.activate');
+    
+    Route::resource('roles', \App\Http\Controllers\Vendor\RoleController::class);
+    Route::get('roles/{roleId}/delete', [\App\Http\Controllers\Vendor\RoleController::class, 'destroy']);
+    Route::get('roles/{roleId}/give-permissions', [\App\Http\Controllers\Vendor\RoleController::class, 'addPermissionToRole']);
+    Route::put('roles/{roleId}/give-permissions', [\App\Http\Controllers\Vendor\RoleController::class, 'givePermissionToRole']);
+    Route::post('roles/{role}/activate', [\App\Http\Controllers\Vendor\RoleController::class, 'activate'])->name('roles.activate');
 
     Route::resource('users', UserController::class);
     Route::post('users/{user}/activate', [UserController::class, 'activate'])->name('activate');

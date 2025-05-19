@@ -6,8 +6,19 @@
         <SwitchLang class="lang-switch"/>
         
         <h1 class="login-title">{{ $t('login_to_your_account') }}</h1>
-        
-       
+        <div class="register-link">
+            <p class="register-text">
+                {{ $t('dont_have_account') }}
+                <Link 
+                    :href="route('vendor.register')" 
+                    class="register-link-text"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                >
+                    {{ $t('create_account') }}
+                </Link>
+            </p>
+        </div>
 
         <form @submit.prevent="submit" class="login-form" novalidate>
           <!-- Email Field -->

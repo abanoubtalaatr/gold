@@ -2,66 +2,69 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Role;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
+use Spatie\Permission\Models\Permission;
+
 class RoleController extends Controller
 {
-        public function __construct()
+    public function __construct()
     {
-        $this->middleware('permission:read roles', ['only' => ['index']]);
-        $this->middleware('permission:create roles', ['only' => ['create', 'store']]);
-        $this->middleware('permission:update roles', ['only' => ['update', 'edit']]);
-        $this->middleware('permission:delete roles', ['only' => ['destroy']]);
+        $this->middleware('permission:vendor read roles', ['only' => ['index']]);
+        $this->middleware('permission:vendor create roles', ['only' => ['create', 'store']]);
+        $this->middleware('permission:vendor update roles', ['only' => ['update', 'edit']]);
+        $this->middleware('permission:vendor delete roles', ['only' => ['destroy']]);
     }
 
-   public function index(Request $request)
-{
-    // Get the current authenticated user (assuming it's a vendor)
-    $user = auth()->user();
+    public function index(Request $request)
+    {
+        // Get the current authenticated user (assuming it's a vendor)
+        $user = Auth::user();
 
-    $roles = Role::where('name', '!=', 'superadmin')
-                ->latest()
-                ->with('translations');
+        $roles = Role::where('name', '!=', 'superadmin')
+            ->latest()
+            ->with('translations');
 
-    // If the user is a vendor, only show roles associated with this vendor
-    if ($user && $user->hasRole('vendor')) {
-        $roles->where(function($query) use ($user) {
-            $query->where('vendor_id', $user->id);
-        });
-    }
+        // If the user is a vendor, only show roles associated with this vendor
+        if ($user && $user->hasRole('vendor')) {
+            $roles->where(function ($query) use ($user) {
+                $query->where('vendor_id', $user->id);
+            });
+        }
 
-    $filters = [
-        'name' => $request->name,
-        'is_active' => $request->is_active,
-    ];
-
-    $roles->when($filters['name'], function ($roles, $name) {
-        return $roles->whereTranslationLike('name', "%{$name}%");
-    });
-
-    if (isset($filters['is_active'])) {
-        $roles->where('is_active', $filters['is_active']);
-    }
-
-    $roles = $roles->paginate(10);
-    $roles->getCollection()->transform(function ($role) {
-        return [
-            'id' => $role->id,
-            'is_active' => $role->is_active,
-            'name' => $role->translate(app()->getLocale())?->name ?? $role->name,
-            'guard_name' => $role->guard_name,
+        $filters = [
+            'name' => $request->name,
+            'is_active' => $request->is_active,
         ];
-    });
 
-    return Inertia('Vendor/roles-permissions/Roles/index', [
-        'roles' => $roles,
-    ]);
-}
+        $roles->when($filters['name'], function ($roles, $name) {
+            return $roles->whereTranslationLike('name', "%{$name}%");
+        });
+
+        if (isset($filters['is_active'])) {
+            $roles->where('is_active', $filters['is_active']);
+        }
+
+        $roles = $roles->paginate(10);
+        $roles->getCollection()->transform(function ($role) {
+            return [
+                'id' => $role->id,
+                'is_active' => $role->is_active,
+                'name' => $role->translate(app()->getLocale())?->name ?? $role->name,
+                'guard_name' => $role->guard_name,
+            ];
+        });
+
+        return Inertia('Vendor/roles-permissions/Roles/index', [
+            'roles' => $roles,
+        ]);
+    }
 
 
 
@@ -71,59 +74,56 @@ class RoleController extends Controller
     }
 
 
-public function store(StoreRoleRequest $request)
-{
-    DB::beginTransaction();
-    try {
-        // First create the role
-        $roleId = DB::table('roles')->insertGetId([
-            'name' => $request->input('translations.en.name'),
-            'guard_name' => 'web',
-            'vendor_id' => auth()->id(),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        // Then add translations
-        foreach ($request->input('translations') as $locale => $translation) {
-            DB::table('role_translations')->insert([
-                'role_id' => $roleId,
-                'locale' => $locale,
-                'name' => $translation['name']
+    public function store(StoreRoleRequest $request)
+    {
+        DB::beginTransaction();
+        try {
+            // First create the role
+            $roleId = DB::table('roles')->insertGetId([
+                'name' => $request->input('translations.en.name'),
+                'guard_name' => 'web',
+                'vendor_id' => Auth::user()->id,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
+
+            // Then add translations
+            foreach ($request->input('translations') as $locale => $translation) {
+                DB::table('role_translations')->insert([
+                    'role_id' => $roleId,
+                    'locale' => $locale,
+                    'name' => $translation['name']
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('vendor.roles.index')
+                ->with('success', __('messages.data_created_successfully'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Role creation failed: ' . $e->getMessage());
+            return back()->with('error', 'Error creating role');
         }
-
-        DB::commit();
-
-        return redirect()->route('vendor.roles.index')
-            ->with('success', __('messages.data_created_successfully'));
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        \Log::error('Role creation failed: '.$e->getMessage());
-        return back()->with('error', 'Error creating role');
     }
-}
     public function edit(Role $role)
-{
-   $role->load('translations');
+    {
+        $role->load('translations');
 
 
-    return Inertia('Vendor/roles-permissions/Roles/Edit', [
-        'role' => [
-            'id' => $role->id,
-            'name' =>  $role->name,
-            'guard_name' => $role->guard_name,
-             'translations' => $role->translations,
-        ],
-    ]);
-}
+        return Inertia('Vendor/roles-permissions/Roles/Edit', [
+            'role' => [
+                'id' => $role->id,
+                'name' =>  $role->name,
+                'guard_name' => $role->guard_name,
+                'translations' => $role->translations,
+            ],
+        ]);
+    }
 
 
     public function update(UpdateRoleRequest $request, Role $role)
     {
-        \Log::info('Request data:', $request->all());
-
         DB::beginTransaction();
         try {
 
@@ -149,10 +149,9 @@ public function store(StoreRoleRequest $request)
 
             return redirect()->route('vendor.roles.index')
                 ->with('success', __('messages.data_updated_successfully'));
-
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Update failed:', [
+            Log::error('Update failed:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -170,8 +169,10 @@ public function store(StoreRoleRequest $request)
 
     public function addPermissionToRole($roleId)
     {
+        // i want to pluck the ids of permissions that are already assigned to the role
+        $role = Role::where('name', 'vendor')->first();
         
-        $permissions = Permission::get();
+        $permissions = Permission::whereIn('id', $role->permissions->pluck('id'))->get();
         $role = Role::findOrFail($roleId);
         $rolePermissions = DB::table('role_has_permissions')
             ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
@@ -189,6 +190,7 @@ public function store(StoreRoleRequest $request)
 
     public function givePermissionToRole(Request $request, $roleId)
     {
+        dd($roleId);
         $request->validate([
             'selectedPermissions' => 'required'
         ]);
@@ -200,7 +202,7 @@ public function store(StoreRoleRequest $request)
     }
 
 
-     public function activate(Role $role)
+    public function activate(Role $role)
     {
         $role->update(
             [

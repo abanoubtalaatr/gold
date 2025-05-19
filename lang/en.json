@@ -832,5 +832,18 @@
     "signed_copy": "Signed Copy",
     "paid": "Paid",
     "contract": "Contract",
-    "subscription": "Subscription"
+    "subscription": "Subscription",
+    "vendor_admins" : "Admins",
+    "branches" : "Branches",
+    "create_admin" : "Create Admin",
+    "edit_admin" : "Edit Admin",
+    "delete_admin" : "Delete Admin",
+    "view_admin" : "View Admin",
+    "create_branch" : "Create Branch",
+    "edit_branch" : "Edit Branch",
+    "delete_branch" : "Delete Branch",
+    "dont_have_account" : "Don't have an account?",
+    "create_account" : "Create Account as vendor",
+    "orders" : "Orders",
+    "rental_requests" : "Rental Requests"
 }

@@ -4,7 +4,7 @@
 
         <div class="pagetitle row">
             <BreadcrumbComponent :pageTitle="$t('Roles')" createRoute="vendor.roles.create"
-                createPermission="create roles" :homeLabel="$t('home')" :createButtonLabel="$t('create')" />
+                createPermission="vendor create roles" :homeLabel="$t('home')" :createButtonLabel="$t('create')" />
         </div>
         <!-- End breadcrumb-->
         <section class="section dashboard">
@@ -24,7 +24,7 @@
                         <DataTable :headers="headers" :data="roles.data" :pagination-links="roles.links"
                             @update:page="handlePageChange">
                             <template #permissions="{ data }">
-                                <Link v-if="hasPermission('update roles')" class="btn btn-dark btn-sm"
+                                <Link v-if="hasPermission('vendor update roles')" class="btn btn-dark btn-sm"
                                     :href="`roles/${data.id}/give-permissions`">
                                 <i class="bi bi-lock"></i>
                                 </Link>

@@ -15,6 +15,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class OrderController extends Controller
 {
+
     public function index(Request $request)
     {
         $vendorId = $request->user()->id;

@@ -4,7 +4,7 @@
       <el-card class="box-card">
         <template #header>
           <div class="card-header">
-            <h3>{{ $t('create_user') }}</h3>
+            <h3>{{ $t('create_admin') }}</h3>
           </div>
         </template>
 

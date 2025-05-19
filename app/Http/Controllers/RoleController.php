@@ -22,7 +22,7 @@ class RoleController extends Controller
 
     public function index(Request $request)
     {
-        $roles = Role::latest()->with('translations');
+        $roles = Role::where('vendor_id', auth()->user()->id)->latest()->with('translations');
 
         $filters = [
             'name' => $request->name,
@@ -64,7 +64,7 @@ class RoleController extends Controller
 
 public function store(StoreRoleRequest $request)
 {
-    Log::info('Store Request data:', $request->all());
+    \Log::info('Store Request data:', $request->all());
 
     DB::beginTransaction();
     try {
@@ -72,6 +72,7 @@ public function store(StoreRoleRequest $request)
             'key' => $request->input('translations.en.name'),
             'name' => $request->input('translations.en.name'),
             'guard_name' => 'web',
+            'vendor_id' => auth()->user()->id
         ]);
 
         foreach ($request->input('translations') as $locale => $translation) {

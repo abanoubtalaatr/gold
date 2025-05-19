@@ -32,10 +32,6 @@
               </Link>
             </div>
 
-            <!-- Debug Output -->
-            <div class="mb-4 text-xs text-gray-500">
-              Debug: {{ branches?.data?.length ? `Found ${branches.data.length} branches` : 'No branches' }}
-            </div>
 
             <!-- Branches List -->
             <div v-if="branches?.data?.length > 0" class="overflow-x-auto">

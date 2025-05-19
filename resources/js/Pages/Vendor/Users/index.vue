@@ -2,8 +2,8 @@
     <AuthenticatedLayout>
         <!-- breadcrumb-->
         <div class="pagetitle row">
-            <BreadcrumbComponent :pageTitle="$t('users')" createRoute="vendor.users.create"
-                createPermission="create users" :homeLabel="$t('home')" :createButtonLabel="$t('create')" />
+            <BreadcrumbComponent :pageTitle="$t('vendor_admins')" createRoute="vendor.users.create"
+                createPermission="vendor create users" :homeLabel="$t('home')" :createButtonLabel="$t('create')" />
         </div>
 
         <!-- End breadcrumb-->
@@ -28,106 +28,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <!-- <table class="table text-center">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">{{ $t("name") }}</th>
-                                    <th scope="col">{{ $t("avatar") }}</th>
-                                    <th scope="col">{{ $t("role") }}</th>
-                                    <th scope="col">{{ $t("email") }}</th>
-                                    <th scope="col">{{ $t("created_at") }}</th>
-                                    <th scope="col">{{ $t("status") }}</th>
-                                    <th
-                                        scope="col"
-                                        v-if="hasPermission('update users')"
-                                    >
-                                        {{ $t("edit") }}
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        v-if="hasPermission('delete users')"
-                                    >
-                                        {{ $t("delete") }}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-center">
-                                <tr
-                                    v-for="(user, index) in users.data"
-                                    :key="user.id"
-                                >
-                                    <th scope="row">{{ index + 1 }}</th>
-                                    <td>{{ user.name }}</td>
-                                    <td>
-                                        <img
-                                            :src="user.avatar"
-                                            alt="Avatar"
-                                            class="avatar"
-                                            width="45px"
-                                        />
-                                    </td>
-                                    <td>
-                                        <span
-                                            v-for="role in user.roles"
-                                            :key="role.id"
-                                            class="badge bg-secondary"
-                                        >
-                                            {{ role.name }}
-                                        </span>
-                                    </td>
-                                    <td>{{ user.email }}</td>
-                                    <td>{{ user.created_at }}</td>
-                                    <td>
-                                        <div>
-                                            <label
-                                                class="inline-flex items-center me-5 cursor-pointer"
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    class="sr-only peer"
-                                                    :checked="
-                                                        user.is_active == 1
-                                                    "
-                                                    @change="Activate(user.id)"
-                                                />
-                                                <div
-                                                    class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"
-                                                ></div>
-                                            </label>
-                                        </div>
-                                    </td>
-                                    <td v-if="hasPermission('update users')">
-                                        <a
-                                            class="btn btn-outline-secondary"
-                                            :href="
-                                                route('users.edit', {
-                                                    user: user.id,
-                                                })
-                                            "
-                                        >
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                    </td>
-                                    <td v-if="hasPermission('delete users')">
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-danger del-btn"
-                                            @click="Delete(user.id)"
-                                        >
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                    <tr v-if="users.data.length == 0">
-                                    <td colspan="8" class="text-center">
-                                        {{ $t("no_data_found") }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table> -->
-
-                        <!-- Table -->
+                        
 
                         <DataTable :headers="headers" :data="users.data" :pagination-links="users.links"
                             noDataMessage="No users found." @update:page="handlePageChange">
@@ -239,7 +140,7 @@ const filterFields = [
 
 const handleFilterUpdate = (updatedFilters) => {
     Object.assign(filterForm, updatedFilters);
-    router.get(route("users.index"), filterForm, {
+    router.get(route("vendor.users.index"), filterForm, {
         preserveState: true,
         preserveScroll: true,
     });
