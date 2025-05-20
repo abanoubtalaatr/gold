@@ -169,8 +169,9 @@ class RegisterController extends AppBaseController
                 $user->tokens()->delete();
                 $expires = Carbon::now()->addDays(2);
 
-                $token = $user->createToken($user->type . '_' . $user->email, ['*'], $expires)->plainTextToken;
+                // $token = $user->createToken($user->type . '_' . $user->email, ['*'], $expires)->plainTextToken;
                // event(new UserLoggedIn($user));
+               $token = Auth::guard('api')->login($user);
 
                 return $this->sendResponse(['user' => $user, 'token' => $token, 'expires' => $expires], __('Your mobile has been verified'));
             }
