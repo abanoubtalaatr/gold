@@ -38,8 +38,8 @@ Route::get('lang/change', [LangController::class, 'change'])->name('changeLang')
 Route::middleware(['auth'])->group(function () {
 
     Route::resource('notification', NotificationController::class)
-    ->middleware('auth')
-    ->only(['index']);
+        ->middleware('auth')
+        ->only(['index']);
 
     /************************************************************************ */
 
@@ -110,14 +110,14 @@ Route::get('/export-users', [ExportController::class, 'export'])->name('export.u
 Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('create-account', [RegisterController::class, 'create'])
-    ->name('register');  // Fixed typo in name
+            ->name('register');  // Fixed typo in name
 
-Route::post('create-account', [RegisterController::class, 'store'])
-    ->name('vendor.register');  // This matches your form submission
+        Route::post('create-account', [RegisterController::class, 'store'])
+            ->name('vendor.register');  // This matches your form submission
 
-Route::get('verify', [VerifyController::class, 'show'])->name('verify');
-Route::post('verify', [VerifyController::class, 'verify'])->name('verify.submit');
-Route::post('verify/resend', [VerifyController::class, 'resend'])->name('verify.resend');
+        Route::get('verify', [VerifyController::class, 'show'])->name('verify');
+        Route::post('verify', [VerifyController::class, 'verify'])->name('verify.submit');
+        Route::post('verify/resend', [VerifyController::class, 'resend'])->name('verify.resend');
         Route::get('login', [App\Http\Controllers\Vendor\Auth\LoginController::class, 'create'])
             ->name('login');
         Route::post('login', [App\Http\Controllers\Vendor\Auth\LoginController::class, 'store']);
@@ -162,10 +162,10 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::resource('services', ServiceController::class);
     Route::patch('services/{service}/toggle-status', [ServiceController::class, 'toggleStatus'])
         ->name('services.toggle-status');
-  
+
     Route::resource('gold-pieces', GoldPieceController::class)
         ->names('gold-pieces');
-  
+
     Route::patch('gold-pieces/{goldPiece}/toggle-status', [GoldPieceController::class, 'toggleStatus'])
         ->name('gold-pieces.toggle-status');
 
@@ -177,9 +177,9 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
 
 
     Route::get('/rental-requests', [RentalRequestController::class, 'index'])->name('rental-requests.index');
-    
+
     Route::resource('roles', \App\Http\Controllers\Vendor\RoleController::class);
-    Route::get('roles/{roleId}/delete', [\App\Http\Controllers\Vendor\RoleController::class, 'destroy']);
+    Route::get('roles/{role}/delete', [\App\Http\Controllers\Vendor\RoleController::class, 'destroy']);
     Route::get('roles/{roleId}/give-permissions', [\App\Http\Controllers\Vendor\RoleController::class, 'addPermissionToRole']);
     Route::put('roles/{roleId}/give-permissions', [\App\Http\Controllers\Vendor\RoleController::class, 'givePermissionToRole']);
     Route::post('roles/{role}/activate', [\App\Http\Controllers\Vendor\RoleController::class, 'activate'])->name('roles.activate');

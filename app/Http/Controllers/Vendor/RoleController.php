@@ -114,7 +114,7 @@ class RoleController extends Controller
         return Inertia('Vendor/roles-permissions/Roles/Edit', [
             'role' => [
                 'id' => $role->id,
-                'name' =>  $role->name,
+                'name' => $role->name,
                 'guard_name' => $role->guard_name,
                 'translations' => $role->translations,
             ],
@@ -159,19 +159,19 @@ class RoleController extends Controller
         }
     }
 
-    public function destroy($roleId)
+    public function destroy($role)
     {
-        $role = Role::find($roleId)->first();
+
         $role->delete();
         return redirect()->route('vendor.roles.index')
-            ->with('success',  __('messages.data_deleted_successfully'));
+        ->with('success', __('messages.data_deleted_successfully'));
     }
 
     public function addPermissionToRole($roleId)
     {
         // i want to pluck the ids of permissions that are already assigned to the role
         $role = Role::where('name', 'vendor')->first();
-        
+
         $permissions = Permission::whereIn('id', $role->permissions->pluck('id'))->get();
         $role = Role::findOrFail($roleId);
         $rolePermissions = DB::table('role_has_permissions')
@@ -198,7 +198,7 @@ class RoleController extends Controller
         $role = Role::findOrFail($roleId);
         $role->syncPermissions($request->selectedPermissions);
         return redirect()->route('vendor.roles.index')
-            ->with('success',  __('messages.role_permissions_updated_successfully'));
+            ->with('success', __('messages.role_permissions_updated_successfully'));
     }
 
 
