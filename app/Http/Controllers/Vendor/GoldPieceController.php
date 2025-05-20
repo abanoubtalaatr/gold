@@ -16,7 +16,7 @@ class GoldPieceController extends Controller
     public function index(Request $request)
     {
         $query = GoldPiece::query()
-            ->with([ 'branch'])
+            ->with(['branch'])
             ->latest();
 
         if ($request->has('search')) {
@@ -29,7 +29,7 @@ class GoldPieceController extends Controller
 
         $goldPieces = $query->paginate(10)
             ->withQueryString()
-            ->through(fn ($goldPiece) => [
+            ->through(fn($goldPiece) => [
                 'id' => $goldPiece->id,
                 'name' => $goldPiece->name,
                 'description' => $goldPiece->description,
@@ -52,7 +52,7 @@ class GoldPieceController extends Controller
 
     public function create()
     {
-        $branches = Branch::select('id', 'name')->get();
+        $branches = Branch::where('vendor_id', auth()->user()->id)->select('id', 'name')->get();
 
         return Inertia::render('Vendor/GoldPieces/Create', [
             'branches' => $branches,
@@ -76,7 +76,7 @@ class GoldPieceController extends Controller
 
     public function edit(GoldPiece $goldPiece)
     {
-        $branches = Branch::select('id', 'name')->get();
+        $branches = Branch::where('vendor_id', auth()->user()->id)->select('id', 'name')->get();
 
         return Inertia::render('Vendor/GoldPieces/Edit', [
             'goldPiece' => [
@@ -99,6 +99,7 @@ class GoldPieceController extends Controller
 
     public function update(UpdateGoldPieceRequest $request, GoldPiece $goldPiece)
     {
+        // return $request;
         $goldPiece->update($request->validated());
 
         // Handle image uploads
@@ -145,4 +146,4 @@ class GoldPieceController extends Controller
 
         return back()->with('success', 'Gold piece status updated successfully.');
     }
-} 
+}

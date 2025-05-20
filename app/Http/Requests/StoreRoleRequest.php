@@ -25,8 +25,8 @@ class StoreRoleRequest extends FormRequest
             // 'name' => 'required|string|max:255|unique:roles,name', // Validate name field
         ];
 
-            foreach (config('app.supported_languages') as $language) {
-            $rules ["translations.{$language}.name"] = 'required|string|max:255|unique:roles,name';
+        foreach (config('app.supported_languages') as $language) {
+            $rules["translations.{$language}.name"] = 'required|string|max:255';
         }
 
         return $rules;
@@ -35,9 +35,9 @@ class StoreRoleRequest extends FormRequest
 
     public function messages()
     {
-  
-     $messages = [];
-          foreach (config('app.supported_languages') as $language) {
+
+        $messages = [];
+        foreach (config('app.supported_languages') as $language) {
             $messages["translations.{$language}.name.required"] = __('rules.Role_name_is_required') . " ({$language})";
             $messages["translations.{$language}.name.unique"] = __('rules.This_role_name_has_already_been_taken') . " ({$language})";
             $messages["translations.{$language}.name.string"] = __('rules.Role_name_must_be_a_string') . " ({$language})";

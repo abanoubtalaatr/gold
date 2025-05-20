@@ -19,10 +19,10 @@ class StoreGoldPieceRequest extends FormRequest
             'carat' => 'required|in:18,21,24',
             'type' => 'required|in:for_rent,for_sale',
             'description' => 'nullable|string',
-            'rental_price_per_day' => 'required_if:type,for_rent|numeric|min:0',
+            'rental_price_per_day' => 'required_if:type,for_rent|nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
-            // 'images' => 'required|array|min:1|max:5',
-            // 'images.*' => 'required|image|mimes:jpeg,png|max:5120', // 5MB max
+            // // 'images' => 'required|array|min:1|max:5',
+            // // 'images.*' => 'required|image|mimes:jpeg,png|max:5120', // 5MB max
         ];
     }
 

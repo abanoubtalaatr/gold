@@ -33,10 +33,10 @@ class OrderController extends Controller
 
         // Apply sorting
         $orderRentals = $query->orderBy($orderColumn, $orderType)->get();
-        
+
         return $this->successResponse(OrderRentalResource::collection($orderRentals), __("mobile.fetch_orders_success"));
     }
-    
+
     public function store(StoreOrderRequest $request)
     {
         try {

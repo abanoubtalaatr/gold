@@ -24,7 +24,7 @@ class VendorSeeder extends Seeder
             ]
         );
 
-        $vendor->syncRoles(['vendor']);
-        
+        $vendor->syncRoles(roles: ['vendor']);
+
     }
 }
