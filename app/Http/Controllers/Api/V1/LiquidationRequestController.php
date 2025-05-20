@@ -25,7 +25,7 @@ class LiquidationRequestController extends Controller
             ->paginate();
 
         return $this->successResponse(
-            'Liquidation requests fetched successfully',
+            __('mobile.Liquidation requests fetched successfully'),
             LiquidationRequestResource::collection($liquidationRequests)->response()->getData(true)
         );
     }
@@ -43,7 +43,7 @@ class LiquidationRequestController extends Controller
 
         return $this->successResponse(
             new LiquidationRequestResource($liquidationRequest),
-            'Liquidation request created successfully'
+            __('mobile.Liquidation request created successfully')
         );
     }
 
@@ -56,7 +56,7 @@ class LiquidationRequestController extends Controller
 
         return $this->successResponse(
             new LiquidationRequestResource($liquidationRequest),
-            'Liquidation request fetched successfully'
+            __('mobile.Liquidation request fetched successfully')
         );
     }
 
@@ -71,7 +71,7 @@ class LiquidationRequestController extends Controller
 
         return $this->successResponse(
             new LiquidationRequestResource($liquidationRequest),
-            'Liquidation request deleted successfully'
+            __('mobile.Liquidation request deleted successfully')
         );
     }
 } 

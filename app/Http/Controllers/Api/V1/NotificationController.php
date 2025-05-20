@@ -33,7 +33,7 @@ class NotificationController extends Controller
 
         return $this->successResponse(
             NotificationResource::collection($notifications),
-            __('notifications.fetched_successfully')
+            __('mobile.fetched_successfully')
         );
     }
 
@@ -46,7 +46,7 @@ class NotificationController extends Controller
 
         return $this->successResponse([
             'count' => $count
-        ], __('notifications.count_fetched_successfully'));
+        ], __('mobile.count_fetched_successfully'));
     }
 
     /**
@@ -59,7 +59,7 @@ class NotificationController extends Controller
 
         return $this->successResponse(
             new NotificationResource($notification),
-            __('notifications.marked_as_read')
+            __('mobile.marked_as_read')
         );
     }
 
@@ -72,7 +72,7 @@ class NotificationController extends Controller
 
         return $this->successResponse(
             null,
-            __('notifications.all_marked_as_read')
+            __('mobile.all_marked_as_read')
         );
     }
 
@@ -86,7 +86,7 @@ class NotificationController extends Controller
 
         return $this->successResponse(
             null,
-            __('notifications.deleted_successfully')
+            __('mobile.deleted_successfully')
         );
     }
 
@@ -99,7 +99,7 @@ class NotificationController extends Controller
 
         return $this->successResponse(
             null,
-            __('notifications.all_deleted_successfully')
+            __('mobile.all_deleted_successfully')
         );
     }
 } 

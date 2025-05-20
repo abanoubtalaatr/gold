@@ -166,13 +166,13 @@ class LoginController extends AppBaseController
 
                 // $this->smsService->send_sms($mobile,$msg);
 
-                return $this->errorResponse('mobile_not_verified', ['code' => $cnfrm_data['code']], 200);
+                return $this->errorResponse('mobile.mobile_not_verified', ['code' => $cnfrm_data['code']], 200);
             }
         }
 
 
         if (!$user->isActive()) {
-            return $this->errorResponse('not_active', ['email' => $user->email, 'message' => __('your account has been deactivated.')], 200);
+            return $this->errorResponse('not_active', ['email' => $user->email, 'message' => __('mobile.your account has been deactivated.')], 200);
         }
 
         if (isset($request->device_token)) {
@@ -193,7 +193,7 @@ class LoginController extends AppBaseController
             'user' => $user,
             'token' => $token,
             'expires' => $expires
-        ], __('You have logged in successfully.'));
+        ], __('mobile.You have logged in successfully.'));
     }
 
     /**
@@ -213,10 +213,10 @@ class LoginController extends AppBaseController
             $user->tokens()->delete();
 
             Auth::guard('api')->logout();
-            return $this->successResponse([], __('messages.logout_success'));
+            return $this->successResponse([], __('mobile.logout_success'));
         }
 
-        return $this->errorResponse(__('auth.unauthenticated'), 401);
+        return $this->errorResponse(__('mobile.unauthenticated'), 401);
     }
 
     /**
@@ -244,7 +244,7 @@ class LoginController extends AppBaseController
             } catch (Exception $e) {
                 DB::rollBack();
 
-                throw new Exception(__('There was a problem connecting to :provider', ['provider' => $request->social_provider]));
+                throw new Exception(__('mobile.There was a problem connecting to :provider', ['provider' => $request->social_provider]));
             }
 
             DB::commit();
@@ -253,11 +253,11 @@ class LoginController extends AppBaseController
         if (null !== $user->email && !$user->isVerified()) {
             //implements ShouldQueue
             $user->sendEmailVerificationNotification();
-            return $this->errorResponse('not_verified', ['email' => $user->email, 'message' => __('We have sent a confirmation email.')], 200);
+            return $this->errorResponse('mobile.not_verified', ['email' => $user->email, 'message' => __('mobile.We have sent a confirmation email.')], 200);
         }
 
         if (!$user->isActive()) {
-            return response()->json(['success' => false, 'status' => 'not_active', 'email' => $user->email, 'message' => __('your account has been deactivated.')], 200);
+            return $this->errorResponse('mobile.not_active', ['email' => $user->email, 'message' => __('mobile.your account has been deactivated.')], 200);
         }
 
         $expires = Carbon::now()->addHours(5);
@@ -280,7 +280,7 @@ class LoginController extends AppBaseController
             'user' => $user,
             'token' => $token,
             'expires' => $expires
-        ], 'success' => true, 'message' => __('You have logged in successfully.')], 200);
+        ], 'success' => true, 'message' => __('mobile.You have logged in successfully.')], 200);
     }
 
 

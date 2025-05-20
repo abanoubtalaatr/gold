@@ -33,7 +33,7 @@ class EmailVerificationController extends Controller
 
             // Generate verification token
             $token = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-            $token = 123456;
+            $token = 1234;
             $expiresAt = Carbon::now()->addMinutes(15); // 1 hour expiration
 
             // Delete any existing verification attempts
@@ -80,7 +80,7 @@ class EmailVerificationController extends Controller
 
             if (!$verification) {
                 return $this->errorResponse(
-                    'Invalid or expired verification token',
+                    'mobile.Invalid or expired verification token',
                     null,
                     422
                 );
@@ -102,7 +102,7 @@ class EmailVerificationController extends Controller
                     'email' => $user->email,
                     'email_verified' => true
                 ],
-                'Email updated successfully'
+                'mobile.Email updated successfully'
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
@@ -129,7 +129,9 @@ class EmailVerificationController extends Controller
             }
 
             // Generate new token and extend expiration
-            $newToken = \Str::random(60);
+            $newToken = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            $newToken = 1234;
+
             $verification->update([
                 'expires_at' => Carbon::now()->addMinutes(60),
                 'token' => $newToken
@@ -140,11 +142,11 @@ class EmailVerificationController extends Controller
 
             return $this->successResponse(
                 null,
-                'Verification email resent to your email address'
+                'mobile.Verification email resent to your email address'
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                'Failed to resend verification email',
+                'mobile.Failed to resend verification email',
                 ['error' => $e->getMessage()]
             );
         }

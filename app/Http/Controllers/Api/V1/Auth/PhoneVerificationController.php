@@ -69,7 +69,7 @@ class PhoneVerificationController extends Controller
             $user = Auth::user();
 
             $validator = Validator::make($request->all(), [
-                'otp' => 'required|string|size:6',
+                'otp' => 'required|string|size:4',
             ]);
 
             if ($validator->fails()) {

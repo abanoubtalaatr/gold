@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\Password;
 
 /**
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Password;
  */
 class ForgotPasswordController extends Controller
 {
+    use ApiResponseTrait;
     /**
      * @group User Login
      * Send a password reset code to the given user.
@@ -50,6 +52,11 @@ class ForgotPasswordController extends Controller
             $message = trans('passwords.sent_code');
         }
 
+        return $this->successResponse(
+            [],
+            $message
+        );
+
         return response()->json(['success' => true, 'message' => $message], 200);
 
     }
@@ -62,6 +69,11 @@ class ForgotPasswordController extends Controller
      */
     protected function sendResetCodeFailedResponse(Request $request, $response)
     {
+
+        return $this->successResponse(
+            [],
+            trans($response)
+        );
 
         return response()->json(['data' => $request->only('email'), 'success' => false, 'message' => trans($response)], 400);
 

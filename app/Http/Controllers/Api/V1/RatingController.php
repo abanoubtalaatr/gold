@@ -29,7 +29,7 @@ class RatingController extends Controller
 
             return $this->successResponse(
                 RatingResource::collection($ratings)->response()->getData(true),
-                __('messages.fetch_ratings_success')
+                __('mobile.fetch_ratings_success')
             );
         } catch (\Exception $e) {
             Log::error('Failed to fetch ratings: ' . $e->getMessage());
@@ -50,7 +50,7 @@ class RatingController extends Controller
 
             if ($existingRating) {
                 return $this->errorResponse(
-                    __('messages.already_rated'),
+                    __('mobile.already_rated'),
                     ['error' => 'You have already rated this gold piece'],
                     409
                 );
@@ -65,7 +65,7 @@ class RatingController extends Controller
 
             return $this->successResponse(
                 new RatingResource($rating->load('user', 'goldPiece')),
-                __('messages.rating_created_success')
+                __('mobile.rating_created_success')
             );
         } catch (\Exception $e) {
             Log::error('Failed to create rating: ' . $e->getMessage());
@@ -81,7 +81,7 @@ class RatingController extends Controller
         try {
             if ($rating->user_id !== Auth::id()) {
                 return $this->errorResponse(
-                    __('messages.unauthorized'),
+                    __('mobile.unauthorized'),
                     ['error' => 'You can only update your own ratings'],
                     403
                 );
@@ -94,7 +94,7 @@ class RatingController extends Controller
 
             return $this->successResponse(
                 new RatingResource($rating->load('user', 'goldPiece')),
-                __('messages.rating_updated_success')
+                __('mobile.rating_updated_success')
             );
         } catch (\Exception $e) {
             Log::error('Failed to update rating: ' . $e->getMessage());
@@ -110,7 +110,7 @@ class RatingController extends Controller
         try {
             if ($rating->user_id !== Auth::id()) {
                 return $this->errorResponse(
-                    __('messages.unauthorized'),
+                    __('mobile.unauthorized'),
                     ['error' => 'You can only delete your own ratings'],
                     403
                 );
@@ -120,7 +120,7 @@ class RatingController extends Controller
 
             return $this->successResponse(
                 null,
-                __('messages.rating_deleted_success')
+                __('mobile.rating_deleted_success')
             );
         } catch (\Exception $e) {
             Log::error('Failed to delete rating: ' . $e->getMessage());

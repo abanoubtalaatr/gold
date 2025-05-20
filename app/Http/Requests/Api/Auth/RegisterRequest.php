@@ -12,7 +12,7 @@ class RegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'string', 'max:200', 'regex:/^[a-zA-ZÑñ0-9\s]+$/'],
+            'name' => ['required', 'string', 'max:200'],
             'mobile' => ['required', 'string', 'regex:/[0-9]/', 'min:9', 'max:9', Rule::unique('users', 'mobile')->where(function ($query) {
                 return $query->where('dialling_code', request()->input('dialling_code'))->first();
             })],

@@ -57,7 +57,7 @@ class GoldPieceController extends Controller
             // Get user's default address or first address
             $user = User::with('addresses')->find(Auth::id());
             if (!$user) {
-                return $this->errorResponse('User not found', [], 404);
+                return $this->errorResponse(__('mobile.User not found'), [], 404);
             }
 
             $address = $user->addresses()
@@ -70,7 +70,7 @@ class GoldPieceController extends Controller
 
             if (!$address) {
                 return $this->errorResponse(
-                    'User must have at least one address to create a gold piece', 
+                    __('mobile.User must have at least one address to create a gold piece'), 
                     [], 
                     422
                 );
@@ -87,7 +87,7 @@ class GoldPieceController extends Controller
 
             if ($branches->isEmpty()) {
                 return $this->errorResponse(
-                    'No active branches found in your city', 
+                    __('mobile.No active branches found in your city'), 
                     [], 
                     422
                 );
@@ -163,14 +163,14 @@ class GoldPieceController extends Controller
             $goldPiece->load('user');
             return $this->successResponse(
                 new GoldPieceResource($goldPiece), 
-                'Gold piece created successfully'
+                __('mobile.Gold piece created successfully')
             );
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to create gold piece: ' . $e->getMessage());
             return $this->errorResponse(
-                'Failed to create gold piece', 
+                __('mobile.Failed to create gold piece'), 
                 ['error' => $e->getMessage()]
             );
         }
@@ -178,7 +178,7 @@ class GoldPieceController extends Controller
 
     public function show(GoldPiece $goldPiece)
     {
-        return $this->successResponse(new GoldPieceResource($goldPiece->load('user')), 'Gold piece fetched successfully');
+        return $this->successResponse(new GoldPieceResource($goldPiece->load('user')), __('mobile.Gold piece fetched successfully'));
     }
 
     /**
@@ -191,13 +191,13 @@ class GoldPieceController extends Controller
     {
         try {
             if ($goldPiece->user_id !== Auth::id()) {
-                return $this->errorResponse('Unauthorized. You can only delete your own gold pieces.', [], 403);
+                return $this->errorResponse(__('mobile.Unauthorized. You can only delete your own gold pieces.'), [], 403);
             }
 
             // Check if the gold piece has any active rentals or sales
             if ($goldPiece->orderRentals()->whereIn('status', ['pending', 'active'])->exists() ||
                 $goldPiece->orderSales()->whereIn('status', ['pending', 'processing'])->exists()) {
-                return $this->errorResponse('Cannot delete gold piece with active orders.', [], 400);
+                return $this->errorResponse(__('mobile.Cannot delete gold piece with active orders.'), [], 400);
             }
 
             DB::beginTransaction();
@@ -210,11 +210,11 @@ class GoldPieceController extends Controller
 
             DB::commit();
 
-            return $this->successResponse(null, 'Gold piece deleted successfully');
+            return $this->successResponse(null, __('mobile.Gold piece deleted successfully'));
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to delete gold piece: ' . $e->getMessage());
-            return $this->errorResponse('Failed to delete gold piece', ['error' => $e->getMessage()]);
+            return $this->errorResponse(__('mobile.Failed to delete gold piece'), ['error' => $e->getMessage()]);
         }
     }
 
@@ -229,14 +229,14 @@ class GoldPieceController extends Controller
     {
         try {
             if ($goldPiece->user_id !== Auth::id()) {
-                return $this->errorResponse('Unauthorized. You can only update your own gold pieces.', [], 403);
+                return $this->errorResponse(__('mobile.Unauthorized. You can only update your own gold pieces.'), [], 403);
             }
 
             // Check if the gold piece has active orders before allowing type change
             if ($request->has('type') && $request->type !== $goldPiece->type) {
                 if ($goldPiece->orderRentals()->whereIn('status', ['pending', 'active'])->exists() ||
                     $goldPiece->orderSales()->whereIn('status', ['pending', 'processing'])->exists()) {
-                    return $this->errorResponse('Cannot change type while there are active orders.', [], 400);
+                    return $this->errorResponse(__('mobile.Cannot change type while there are active orders.'), [], 400);
                 }
             }
 
@@ -287,13 +287,13 @@ class GoldPieceController extends Controller
 
             return $this->successResponse(
                 new GoldPieceResource($goldPiece->fresh()),
-                'Gold piece updated successfully'
+                __('mobile.Gold piece updated successfully')
             );
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to update gold piece: ' . $e->getMessage());
-            return $this->errorResponse('Failed to update gold piece', ['error' => $e->getMessage()]);
+            return $this->errorResponse(__('mobile.Failed to update gold piece'), ['error' => $e->getMessage()]);
         }
     }
 

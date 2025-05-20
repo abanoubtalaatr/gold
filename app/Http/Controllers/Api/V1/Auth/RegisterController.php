@@ -76,11 +76,10 @@ class RegisterController extends AppBaseController
 
                 // $this->smsService->send_sms($mobile,$msg);
 
-                return $this->sendResponse(['user' => $user, 'code' => $cnfrm_data['code']], __('You have registered successfully,please verify your mobile'));
+                return $this->sendResponse(['user' => $user, 'code' => $cnfrm_data['code']], __('mobile.You have registered successfully,please verify your mobile'));
             }
 
-
-            return response()->json(['data' => $user, 'success' => true, 'message' => __('auth.registered_successfully')], 200);
+            return response()->json(['data' => $user, 'success' => true, 'message' => __('mobile.registered_successfully')], 200);
         } catch (\Exception $e) {
 
             return $this->sendError($e->getMessage());
@@ -106,7 +105,7 @@ class RegisterController extends AppBaseController
                 ->first();
 
             if (!$user) {
-                return $this->sendError(__('Mobile not found'));
+                return $this->sendError(__('mobile.Mobile not found'));
             }
         }
         $code = OTP::generateOtp();
@@ -135,7 +134,7 @@ class RegisterController extends AppBaseController
             return $this->sendResponse(['code' => $data['code']], trans('passwords.sms_sent'));
         }
 
-        return $this->sendError(__('auth.something_wrong'));
+        return $this->sendError(__('mobile.something_wrong'));
     }
 
     public function checkMobileToken(Request $request)
@@ -176,10 +175,10 @@ class RegisterController extends AppBaseController
                 return $this->sendResponse(['user' => $user, 'token' => $token, 'expires' => $expires], __('Your mobile has been verified'));
             }
 
-            return $this->sendError(__('you have provided wrong data'));
+            return $this->sendError(__('mobile.you have provided wrong data'));
         } catch (\Exception $e) {
 
-            return $this->sendError(__('auth.something_wrong'));
+            return $this->sendError(__('mobile.something_wrong'));
         }
     }
 
@@ -212,11 +211,11 @@ class RegisterController extends AppBaseController
                 'user' => $user,
                 'token' => $token,
                 'expires' => $expires
-            ], 'success' => true, 'message' => __('auth.account_confirmed')], 200);
+            ], 'success' => true, 'message' => __('mobile.account_confirmed')], 200);
 
          }
  
-         return $this->sendError(__('auth.wrong_code'));
+         return $this->sendError(__('mobile.wrong_code'));
      }
  
 
