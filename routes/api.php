@@ -7,20 +7,21 @@ use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\PageApiController;
 use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\ContactUsController;
+use App\Http\Controllers\Api\V1\RatingController;
 use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\SettingsApiController;
+use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\GoldPieceController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\LiquidationRequestController;
 use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
+use App\Http\Controllers\Api\V1\NotificationSettingController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
-use App\Http\Controllers\Api\V1\FavoriteController;
-use App\Http\Controllers\Api\V1\NotificationController;
-use App\Http\Controllers\Api\V1\RatingController;
-use App\Http\Controllers\Api\V1\LiquidationRequestController;
 
 
 Route::get('settings', [SettingsApiController::class, 'index'])->name('settings');
@@ -123,7 +124,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::delete('notifications/{id}', [NotificationController::class, 'destroy']);
     Route::delete('notifications', [NotificationController::class, 'destroyAll']);
-
+    Route::post('toggle-enable-notifications', NotificationSettingController::class);
     
     /*
     |--------------------------------------------------------------------------

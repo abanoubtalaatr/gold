@@ -139,4 +139,6 @@ return [
     'Failed to create rating' => 'فشل في إنشاء التقييم',
     'Failed to update rating' => 'فشل في تحديث التقييم',
     'Failed to delete rating' => 'فشل في حذف التقييم',
+
+    'notification setting updated successfully' => 'تم تحديث إعدادات الإشعارات بنجاح',
 ];

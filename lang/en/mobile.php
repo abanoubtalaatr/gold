@@ -192,4 +192,5 @@ return [
     'Failed to create rating' => 'Failed to create rating',
     'Failed to update rating' => 'Failed to update rating',
     'Failed to delete rating' => 'Failed to delete rating',
+    'notification setting updated successfully' => 'Notification setting updated successfully',
 ];
