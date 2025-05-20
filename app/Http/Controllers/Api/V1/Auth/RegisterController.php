@@ -151,7 +151,7 @@ class RegisterController extends AppBaseController
 
             if ($validator->fails()) {
 
-                return response()->json(['success' => false, 'errors' => $validator->errors(), 'message' => __('auth.wrong_data')], 422);
+                return $this->sendError('mobile.wrong_data');
             }
 
             $mobile = mobileHandler($request->mobile);
@@ -172,11 +172,7 @@ class RegisterController extends AppBaseController
                 $token = $user->createToken($user->type . '_' . $user->email, ['*'], $expires)->plainTextToken;
                // event(new UserLoggedIn($user));
 
-                return response()->json(['data' => [
-                    'user' => $user,
-                    'token' => $token,
-                    'expires' => $expires
-                ], 'success' => true, 'message' => __('Your mobile has been verified')], 200);
+                return $this->sendResponse(['user' => $user, 'token' => $token, 'expires' => $expires], __('Your mobile has been verified'));
             }
 
             return $this->sendError(__('you have provided wrong data'));

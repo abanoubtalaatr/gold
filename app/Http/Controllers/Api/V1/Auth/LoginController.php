@@ -101,8 +101,8 @@ class LoginController extends AppBaseController
                 $user->deviceTokens()->delete();
                 $user->tokens()->delete();
                 $expires = Carbon::now()->addHours(5);
-                $token = Auth::guard('api')->login($user);
-                // $token = $user->createToken('user_' . $user->email, ['*'], $expires)->plainTextToken;
+                // $token = Auth::guard('api')->login($user);
+                $token = $user->createToken('user_' . $user->email, ['*'], $expires)->plainTextToken;
                 $user->setRememberToken($expires);
                 $user->save();
 

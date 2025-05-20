@@ -7,4 +7,5 @@ return [
     'register' => 'تسجيل الحساب',
     'forgot_password' => 'نسيت كلمة المرور',
     'fetch_gold_pieces_success' => 'تم جلب القطع الذهبية بنجاح',
+    'wrong_data' => 'بيانات غير صالحة',
 ];
