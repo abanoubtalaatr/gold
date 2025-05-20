@@ -19,7 +19,7 @@ class UserController extends Controller
     {
         $this->middleware('permission:vendor read users', ['only' => ['index']]);
         $this->middleware('permission:vendor create users', ['only' => ['create']]);
-        $this->middleware('permission:vendor update users', ['only' => ['update','edit']]);
+        $this->middleware('permission:vendor update users', ['only' => ['update', 'edit']]);
         $this->middleware('permission:vendor delete users', ['only' => ['destroy']]);
     }
 
@@ -37,9 +37,9 @@ class UserController extends Controller
             'is_active' => $request->is_active,
         ];
 
-       $usersQuery = User::where('vendor_id', $vendorId)
-                        ->with('roles')
-                        ->latest();
+        $usersQuery = User::where('vendor_id', $vendorId)
+            ->with('roles')
+            ->latest();
 
 
         $usersQuery->when($filters['name'], function ($query, $name) {
@@ -78,11 +78,12 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
+
         $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'avatar' => 'avatars/default_avatar.png' ,
+            'avatar' => 'avatars/default_avatar.png',
             'vendor_id' => auth()->user()->id
         ];
 
@@ -130,7 +131,7 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-       
+
         // return $request->all();
         try {
             // DB::beginTransaction();
@@ -192,7 +193,7 @@ class UserController extends Controller
             ]
         );
         return redirect()->route('vendor.users.index')
-                ->with('success', __('messages.status_updated'));
+            ->with('success', __('messages.status_updated'));
     }
     /**
      * Remove the specified resource from storage.
@@ -201,6 +202,6 @@ class UserController extends Controller
     {
         $user->delete();
         return redirect()->route('vendor.users.index')
-        ->with('success',  __('messages.data_deleted_successfully'));
+            ->with('success', __('messages.data_deleted_successfully'));
     }
 }

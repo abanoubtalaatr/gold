@@ -84,20 +84,20 @@ class GoldPieceController extends Controller
         ]);
     }
 
-    // public function store(StoreGoldPieceRequest $request)
-    // {
-    //     $goldPiece = GoldPiece::create($request->validated());
+    public function store(StoreGoldPieceRequest $request)
+    {
+        $goldPiece = GoldPiece::create($request->validated());
 
-    //     // if ($request->hasFile('images')) {
-    //     //     foreach ($request->file('images') as $image) {
-    //     //         $path = $image->store('gold-pieces', 'public');
-    //     //         $goldPiece->images()->create(['path' => $path]);
-    //     //     }
-    //     // }
+        // if ($request->hasFile('images')) {
+        //     foreach ($request->file('images') as $image) {
+        //         $path = $image->store('gold-pieces', 'public');
+        //         $goldPiece->images()->create(['path' => $path]);
+        //     }
+        // }
 
-    //     return redirect()->route('vendor.gold-pieces.index')
-    //         ->with('success', 'Gold piece created successfully.');
-    // }
+        return redirect()->route('vendor.gold-pieces.index')
+            ->with('success', 'Gold piece created successfully.');
+    }
 
 
 
@@ -123,24 +123,24 @@ class GoldPieceController extends Controller
             'branches' => $branches,
         ]);
     }
-    public function store(StoreGoldPieceRequest $request)
-    {
-        // Create the gold piece record
-        $goldPiece = GoldPiece::create($request->validated());
+    // public function store(StoreGoldPieceRequest $request)
+    // {
+    //     // Create the gold piece record
+    //     $goldPiece = GoldPiece::create($request->validated());
 
-        // Check if images are uploaded
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                // Add each image to the 'images' media collection
-                $goldPiece->addMedia($image)
-                    ->preservingOriginal()
-                    ->toMediaCollection('images');
-            }
-        }
+    //     // Check if images are uploaded
+    //     if ($request->hasFile('images')) {
+    //         foreach ($request->file('images') as $image) {
+    //             // Add each image to the 'images' media collection
+    //             $goldPiece->addMedia($image)
+    //                 ->preservingOriginal()
+    //                 ->toMediaCollection('images');
+    //         }
+    //     }
 
-        return redirect()->route('vendor.gold-pieces.index')
-            ->with('success', 'Gold piece created successfully.');
-    }
+    //     return redirect()->route('vendor.gold-pieces.index')
+    //         ->with('success', 'Gold piece created successfully.');
+    // }
     public function update(UpdateGoldPieceRequest $request, GoldPiece $goldPiece)
     {
         // return $request;

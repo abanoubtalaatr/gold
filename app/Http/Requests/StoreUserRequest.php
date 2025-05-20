@@ -29,8 +29,8 @@ class StoreUserRequest extends FormRequest
                 'string',
                 'min:6',
                 'confirmed',
-                'regex:/[A-Z]/', // must contain at least one uppercase letter
-                'regex:/[@$!%*?&#]/' // must contain at least one special character],
+                // 'regex:/[A-Z]/', // must contain at least one uppercase letter
+                // 'regex:/[@$!%*?&#]/' // must contain at least one special character],
             ],
             'avatar' => 'nullable|image|mimes:webp,jpeg,png,jpg,gif|max:2048',
             'selectedRoles' => 'required|array',

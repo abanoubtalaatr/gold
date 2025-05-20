@@ -267,44 +267,6 @@ const toggleDropdown = (pieceId) => {
     activeDropdown.value = activeDropdown.value === pieceId ? null : pieceId;
 };
 
-// const confirmDelete = (piece) => {
-//   document.body.style.overflow = 'hidden';
-//   pieceToDelete.value = piece;
-//   confirmingDeletion.value = true;
-//   activeDropdown.value = null;
-// };
-
-// const Delete = (piece) => {
-//     Swal.fire({
-//         title: t("are_your_sure"),
-//         text: t("You_will_not_be_able_to_revert_this"),
-//         icon: "warning",
-//         showCancelButton: true,
-//         confirmButtonColor: "#d33",
-//         cancelButtonColor: "#3085d6",
-//         confirmButtonText: t("yes"),
-//         cancelButtonText: t("cancel"),
-//     }).then((result) => {
-//         if (result.isConfirmed) {
-//             router.delete("users/" + id, {
-//                 onSuccess: () => {
-//                     Swal.fire({
-//                         title: t("data_deleted_successfully"),
-//                         icon: "success",
-//                     });
-//                 },
-//                 onError: () => {
-//                     Swal.fire(
-//                         "Error!",
-//                         "There was an issue deleting the item.",
-//                         "error"
-//                     );
-//                 },
-//             });
-//         }
-//     });
-// };
-
 
 const confirmDelete = (piece) => {
     Swal.fire({
