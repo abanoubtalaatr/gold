@@ -115,7 +115,7 @@
                                             <dt class="text-sm font-medium text-gray-500">Deposit Amount</dt>
                                             <dd class="mt-1 text-sm text-gray-900">{{
                                                 formatCurrency(goldPiece.deposit_amount)
-                                                }}</dd>
+                                            }}</dd>
                                         </div>
                                     </dl>
                                 </div>
@@ -161,29 +161,8 @@
         </div>
 
         <!-- ✅ DELETE MODAL - STYLED ALERT -->
-        <Modal  :show="confirmingDeletion" @close="closeModal">
-            <div class="p-6 bg-red-50 rounded-lg">
-                <div class="flex items-center mb-4">
-                    <TrashIcon class="w-6 h-6 text-red-600 mr-2" />
-                    <h2 class="text-lg font-bold text-red-800">Delete Confirmation</h2>
-                </div>
-                <p class="text-sm text-red-700">Are you sure you want to delete this gold piece? This action
-                    <strong>cannot be
-                        undone</strong>.
-                </p>
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button type="button"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        @click="closeModal">
-                        Cancel
-                    </button>
-                    <button type="button"
-                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                        @click="deletePiece">
-                        Yes, Delete It
-                    </button>
-                </div>
-            </div>
+        <Modal :show="confirmingDeletion" @close="closeModal">
+
         </Modal>
     </AuthenticatedLayout>
 </template>

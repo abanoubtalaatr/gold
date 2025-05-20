@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use App\Http\Requests\Api\Auth\ResetPasswordRequest;
 use App\Http\Requests\Api\Auth\UpdatePasswordRequest;
+
 /**
  * Class PasswordController.
  */
@@ -27,7 +28,7 @@ class PasswordController extends Controller
      * Update Password Request.
      *
      * Requires Authorization by bearer token
-     * 
+     *
      * @bodyParam current_password string required the old password for the user
      * @bodyParam password string required the new password for the user
      * @bodyParam password_confirmation string required confrim the new password for the user
@@ -81,7 +82,7 @@ class PasswordController extends Controller
             $mobile = mobileHandler($request->mobile);
 
             $user = User::where('mobile',$mobile)->where('dialling_code',$request->dialling_code)->first();
-        
+
             if($user){
                 $record = MobileConfirm::where('code', $request->code)
                 ->where('mobile', $mobile)
@@ -114,12 +115,12 @@ class PasswordController extends Controller
                     $this->resetPassword($user,$password);
                 }
             );
-    
+
             return $response === Password::PASSWORD_RESET
             ? $this->sendResetResponse($response)
             : $this->sendResetFailedResponse($request, $response);
         }
-    
+
         return $this->sendResetFailedResponse($request, "passwords.token");
     }
 
@@ -168,7 +169,7 @@ class PasswordController extends Controller
     {
 
         $message = trans($response);
-        
+
         if ($response === Password::INVALID_TOKEN) {
             $message = trans('passwords.invalid_token');
         } else {

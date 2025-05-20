@@ -78,7 +78,7 @@ class OrderController extends Controller
             if ($order->goldPiece) {
                 $order->goldPiece->qr_code = base64_encode(
                     QrCode::format('png')->size(100)->generate(
-                        route('gold-piece.show', $order->goldPiece->id)
+                        route('vendor.gold-pieces.show', $order->goldPiece->id)
                     )
                 );
             }
@@ -89,7 +89,7 @@ class OrderController extends Controller
             if ($order->goldPiece) {
                 $order->goldPiece->qr_code = base64_encode(
                     QrCode::format('png')->size(100)->generate(
-                        route('gold-piece.show', $order->goldPiece->id)
+                        route('vendor.gold-pieces.show', $order->goldPiece->id)
                     )
                 );
             }
