@@ -27,12 +27,12 @@ class ProfileController extends Controller
             $user = Auth::user();
             
             if (!$user) {
-                return $this->unauthorizedResponse('User not authenticated');
+                return $this->unauthorizedResponse('mobile.User not authenticated');
             }
 
-            return $this->successResponse(new UserResource($user),'Profile retrieved successfully');
+            return $this->successResponse(new UserResource($user),'mobile.Profile retrieved successfully');
         } catch (\Exception $e) {
-            return $this->errorResponse('Error retrieving profile',['error' => $e->getMessage()]);
+            return $this->errorResponse('mobile.Error retrieving profile',['error' => $e->getMessage()]);
         }
     }
 
@@ -43,7 +43,7 @@ class ProfileController extends Controller
             $user = Auth::user();
             
             if (!$user) {
-                return $this->unauthorizedResponse('User not authenticated');
+                return $this->unauthorizedResponse('mobile.User not authenticated');
             }
 
             $data = $request->validated();
@@ -61,7 +61,7 @@ class ProfileController extends Controller
 
             $user->update($data);
 
-            return $this->successResponse(new UserResource($user),'Profile updated successfully');
+            return $this->successResponse(new UserResource($user),'mobile.Profile updated successfully');
         } catch (\Exception $e) {
             return $this->errorResponse(
                 'Error updating profile',
@@ -77,11 +77,11 @@ class ProfileController extends Controller
             $user = Auth::user();
             
             if (!$user) {
-                return $this->unauthorizedResponse('User not authenticated');
+                return $this->unauthorizedResponse('mobile.User not authenticated');
             }
 
             if (!Hash::check($request->current_password, $user->password)) {
-                return $this->errorResponse('Current password is incorrect', null, 422);
+                return $this->errorResponse('mobile.Current password is incorrect', null, 422);
             }
 
             $user->update([
@@ -90,11 +90,11 @@ class ProfileController extends Controller
 
             return $this->successResponse(
                 null,
-                'Password changed successfully'
+                'mobile.Password changed successfully'
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                'Error changing password',
+                'mobile.Error changing password',
                 ['error' => $e->getMessage()]
             );
         }
@@ -126,10 +126,10 @@ class ProfileController extends Controller
 
             DB::commit();
 
-            return $this->successResponse(null, 'Account deleted successfully');
+            return $this->successResponse(null, 'mobile.Account deleted successfully');
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->errorResponse('Failed to delete account', ['error' => $e->getMessage()]);
+            return $this->errorResponse('mobile.Failed to delete account', ['error' => $e->getMessage()]);
         }
     }
 }

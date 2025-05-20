@@ -33,11 +33,11 @@ class FavoriteController extends Controller
 
             return $this->successResponse(
                 GoldPieceResource::collection($favorites)->response()->getData(true),
-                'Favorites fetched successfully'
+                'mobile.Favorites fetched successfully'
             );
         } catch (\Exception $e) {
             Log::error('Failed to fetch favorites: ' . $e->getMessage());
-            return $this->errorResponse('Failed to fetch favorites', ['error' => $e->getMessage()]);
+            return $this->errorResponse('mobile.Failed to fetch favorites', ['error' => $e->getMessage()]);
         }
     }
 
@@ -59,13 +59,13 @@ class FavoriteController extends Controller
 
             if ($favorite) {
                 $favorite->delete();
-                $message = 'Gold piece removed from favorites';
+                $message = __('mobile.Gold piece removed from favorites');
                 $isFavorited = false;
             } else {
                 $user->favorites()->create([
                     'gold_piece_id' => $goldPiece->id
                 ]);
-                $message = 'Gold piece added to favorites';
+                $message = __('mobile.Gold piece added to favorites');
                 $isFavorited = true;
             }
 
@@ -78,7 +78,7 @@ class FavoriteController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Failed to toggle favorite: ' . $e->getMessage());
-            return $this->errorResponse('Failed to update favorite status', ['error' => $e->getMessage()]);
+            return $this->errorResponse('mobile.Failed to update favorite status', ['error' => $e->getMessage()]);
         }
     }
 
@@ -98,11 +98,11 @@ class FavoriteController extends Controller
 
             return $this->successResponse(
                 ['is_favorited' => $isFavorited],
-                'Favorite status checked successfully'
+                __('mobile.Favorite status checked successfully')
             );
         } catch (\Exception $e) {
             Log::error('Failed to check favorite status: ' . $e->getMessage());
-            return $this->errorResponse('Failed to check favorite status', ['error' => $e->getMessage()]);
+            return $this->errorResponse('mobile.Failed to check favorite status', ['error' => $e->getMessage()]);
         }
     }
 } 

@@ -18,6 +18,7 @@ use App\Http\Requests\Api\Auth\UpdatePasswordRequest;
  */
 class PasswordController extends Controller
 {
+    use ApiResponseTrait;
 
     /**
      * @group User Profile
@@ -41,11 +42,18 @@ class PasswordController extends Controller
 
             $this->updatePassword(auth('api')->user(),$request->validated());
 
-            return response()->json(['success' => true, 'message' => __('Password updated successfully')], 200);
+            return $this->successResponse(
+                [],
+                __('mobile.Password updated successfully')
+            );
 
         } catch (Exception $e) {
 
-            return response()->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
+            return $this->errorResponse(
+                $e->getMessage(),
+                [],
+                $e->getCode()
+            );
         }
     }
 
@@ -141,7 +149,10 @@ class PasswordController extends Controller
      */
     protected function sendResetResponse($response)
     {
-        return response()->json(['success' => true, 'message' => e(trans($response))], 200);
+        return $this->successResponse(
+            [],
+            e(trans($response))
+        );
 
     }
 
@@ -164,7 +175,11 @@ class PasswordController extends Controller
                 $message = trans('passwords.invalid_user');
             }
         }
-        return response()->json(['success' => false, 'message' =>  e($message)], 400);
+        return $this->errorResponse(
+        $message,
+            [],
+            400
+        );
     }
 
 
