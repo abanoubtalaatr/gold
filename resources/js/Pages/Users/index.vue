@@ -2,13 +2,8 @@
     <AuthenticatedLayout>
         <!-- breadcrumb-->
         <div class="pagetitle row">
-            <BreadcrumbComponent
-                :pageTitle="$t('users')"
-                createRoute="users.create"
-                createPermission="create users"
-                :homeLabel="$t('home')"
-                :createButtonLabel="$t('create')"
-            />
+            <BreadcrumbComponent :pageTitle="$t('users')" createRoute="users.create" createPermission="create users"
+                :homeLabel="$t('home')" :createButtonLabel="$t('create')" />
         </div>
 
         <!-- End breadcrumb-->
@@ -18,11 +13,8 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between">
                         <div class="col-md-12 px-2">
-                            <FilterComponent
-                                :filter-fields="filterFields"
-                                :initial-filters="filterForm"
-                                @update:filters="handleFilterUpdate"
-                            />
+                            <FilterComponent :filter-fields="filterFields" :initial-filters="filterForm"
+                                @update:filters="handleFilterUpdate" />
                         </div>
                         <div class="col-md-1 px-2">
                             <!-- <Link
@@ -137,65 +129,42 @@
 
                         <!-- Table -->
 
-                        <DataTable
-                            :headers="headers"
-                            :data="users.data"
-                            :pagination-links="users.links"
-                            noDataMessage="No users found."
-                            @update:page="handlePageChange"
-                        >
+                        <DataTable :headers="headers" :data="users.data" :pagination-links="users.links"
+                            noDataMessage="No users found." @update:page="handlePageChange">
                             <!-- Slot للأعمدة الخاصة -->
                             <template #avatar="{ data }">
-                                <img
-                                    :src="data.avatar"
-                                    alt="Avatar"
-                                    class="avatar"
-                                    width="45px"
-                                />
+                                <img :src="data.avatar" alt="Avatar" class="avatar" width="45px" />
                             </template>
 
                             <template #role="{ data }">
-                                <span
-                                    v-for="role in data.roles"
-                                    :key="role.id"
-                                    class="badge bg-secondary"
-                                >
+                                <span v-for="role in data.roles" :key="role.id" class="badge bg-secondary">
                                     {{ role.name }}
                                 </span>
                             </template>
 
                             <template #is_active="{ data }">
-                                <template
-                                    v-if="isSuperAdmin(data)"
-                                >
+                                <template v-if="isSuperAdmin(data)">
                                     <el-tag type="success">{{
                                         t("active")
-                                    }}</el-tag>
+                                        }}</el-tag>
                                 </template>
                                 <template v-else>
-                                    <ActivateToggle
-                                        v-if="!isSuperAdmin(data)"
-                                        :id="data.id"
-                                        :is-active="data.is_active == 1"
-                                        :activate-url="`/users/${data.id}/activate`"
+                                    <ActivateToggle v-if="!isSuperAdmin(data)" :id="data.id"
+                                        :is-active="data.is_active == 1" :activate-url="`/users/${data.id}/activate`"
                                         @update:is-active="
                                             (newStatus) =>
                                                 updateStatus(data.id, newStatus)
-                                        "
-                                    />
+                                        " />
                                 </template>
                             </template>
 
                             <template #edit="{ data }">
 
-                                  <EditButton
-                                   
-                                    @click="
-                                        router.get(
-                                            route('users.edit', { user: data.id })
-                                        )
-                                    "
-                                />
+                                <EditButton @click="
+                                    router.get(
+                                        route('users.edit', { user: data.id })
+                                    )
+                                    " />
                                 <!-- <a
                                     class="btn btn-outline-secondary"
                                     :href="
@@ -207,15 +176,10 @@
                             </template>
 
                             <template #delete="{ data }">
-                                <DeleteAction
-                                  v-if="!isSuperAdmin(data)"
-                                    :id="data.id"
-                                    :delete-url="
-                                        route('users.destroy', {
-                                            user: data.id,
-                                        })
-                                    "
-                                />
+                                <DeleteAction v-if="!isSuperAdmin(data)" :id="data.id" :delete-url="route('users.destroy', {
+                                    user: data.id,
+                                })
+                                    " />
                             </template>
                         </DataTable>
                     </div>

@@ -50,6 +50,31 @@ class GoldPieceController extends Controller
         ]);
     }
 
+    public function show(GoldPiece $goldPiece)
+    {
+        // Eager load relationships
+        $goldPiece->load(relations: ['branch']);
+
+        return Inertia::render('Vendor/GoldPieces/Show', [
+            'goldPiece' => [
+                'id' => $goldPiece->id,
+                'name' => $goldPiece->name,
+                'description' => $goldPiece->description,
+                'weight' => $goldPiece->weight,
+                'carat' => $goldPiece->carat,
+                'type' => $goldPiece->type,
+                'rental_price_per_day' => $goldPiece->rental_price_per_day,
+                'sale_price' => $goldPiece->sale_price,
+                'deposit_amount' => $goldPiece->deposit_amount,
+                'status' => $goldPiece->status,
+                'branch' => $goldPiece->branch,
+                // 'images' => $goldPiece->images,
+                'created_at' => $goldPiece->created_at->format('M d, Y h:i A'),
+                'updated_at' => $goldPiece->updated_at->format('M d, Y h:i A'),
+                // 'vendor' => $goldPiece->vendor,
+            ]
+        ]);
+    }
     public function create()
     {
         $branches = Branch::where('vendor_id', auth()->user()->id)->select('id', 'name')->get();
@@ -59,20 +84,22 @@ class GoldPieceController extends Controller
         ]);
     }
 
-    public function store(StoreGoldPieceRequest $request)
-    {
-        $goldPiece = GoldPiece::create($request->validated());
+    // public function store(StoreGoldPieceRequest $request)
+    // {
+    //     $goldPiece = GoldPiece::create($request->validated());
 
-        // if ($request->hasFile('images')) {
-        //     foreach ($request->file('images') as $image) {
-        //         $path = $image->store('gold-pieces', 'public');
-        //         $goldPiece->images()->create(['path' => $path]);
-        //     }
-        // }
+    //     // if ($request->hasFile('images')) {
+    //     //     foreach ($request->file('images') as $image) {
+    //     //         $path = $image->store('gold-pieces', 'public');
+    //     //         $goldPiece->images()->create(['path' => $path]);
+    //     //     }
+    //     // }
 
-        return redirect()->route('vendor.gold-pieces.index')
-            ->with('success', 'Gold piece created successfully.');
-    }
+    //     return redirect()->route('vendor.gold-pieces.index')
+    //         ->with('success', 'Gold piece created successfully.');
+    // }
+
+
 
     public function edit(GoldPiece $goldPiece)
     {
@@ -96,7 +123,24 @@ class GoldPieceController extends Controller
             'branches' => $branches,
         ]);
     }
+    public function store(StoreGoldPieceRequest $request)
+    {
+        // Create the gold piece record
+        $goldPiece = GoldPiece::create($request->validated());
 
+        // Check if images are uploaded
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                // Add each image to the 'images' media collection
+                $goldPiece->addMedia($image)
+                    ->preservingOriginal()
+                    ->toMediaCollection('images');
+            }
+        }
+
+        return redirect()->route('vendor.gold-pieces.index')
+            ->with('success', 'Gold piece created successfully.');
+    }
     public function update(UpdateGoldPieceRequest $request, GoldPiece $goldPiece)
     {
         // return $request;
@@ -128,8 +172,10 @@ class GoldPieceController extends Controller
     public function destroy(GoldPiece $goldPiece)
     {
         // Delete associated images from storage
-        foreach ($goldPiece->images as $image) {
-            Storage::disk('public')->delete($image->path);
+        if ($goldPiece->images) {
+            foreach ($goldPiece->images as $image) {
+                Storage::disk('public')->delete($image->path);
+            }
         }
 
         $goldPiece->delete();
