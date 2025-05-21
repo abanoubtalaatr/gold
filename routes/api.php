@@ -144,5 +144,5 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     | Liquidation-requests.... 
     |--------------------------------------------------------------------------
     */
-    Route::apiResource('liquidation-requests', LiquidationRequestController::class)->except(['update']);
+    Route::apiResource('liquidation-requests', controller: LiquidationRequestController::class)->except(['update']);
 });

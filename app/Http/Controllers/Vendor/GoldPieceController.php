@@ -7,7 +7,10 @@ use App\Http\Requests\Api\V1\StoreGoldPieceRequest;
 use App\Http\Requests\Api\V1\UpdateGoldPieceRequest;
 use App\Models\Branch;
 use App\Models\GoldPiece;
+use App\Notifications\Vendor\NewGoldPieceNotification;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -84,23 +87,49 @@ class GoldPieceController extends Controller
         ]);
     }
 
+    // public function store(StoreGoldPieceRequest $request)
+    // {
+    //     $goldPiece = GoldPiece::create($request->validated());
+    //     // if ($request->hasFile('images')) {
+    //     //     foreach ($request->file('images') as $image) {
+    //     //         $path = $image->store('gold-pieces', 'public');
+    //     //         $goldPiece->images()->create(['path' => $path]);
+    //     //     }
+    //     // }
+    //     return redirect()->route('vendor.gold-pieces.index')
+    //         ->with('success', 'Gold piece created successfully.');
+    // }
+
+
+
     public function store(StoreGoldPieceRequest $request)
     {
         $goldPiece = GoldPiece::create($request->validated());
 
-        // if ($request->hasFile('images')) {
-        //     foreach ($request->file('images') as $image) {
-        //         $path = $image->store('gold-pieces', 'public');
-        //         $goldPiece->images()->create(['path' => $path]);
-        //     }
-        // }
+        $authUser = auth()->user();
+        $type = $goldPiece->type == 'for_rent' ? 'للإيجار' : 'للبيع';
+        $enType = $goldPiece->type == 'for_rent' ? 'for rent' : 'for sale';
+
+        // Use your custom notification class
+        $authUser->notify(new NewGoldPieceNotification([
+            'title' => [
+                'ar' => 'قطعة ذهب جديدة',
+                'en' => 'New Gold Piece'
+            ],
+            'message' => [
+                'ar' => "تم إضافة قطعة ذهب جديدة $type: {$goldPiece->name}",
+                'en' => "New gold piece added $enType: {$goldPiece->name}"
+            ],
+            'type' => 'new_gold_piece',
+            'data' => [
+                'gold_piece_id' => $goldPiece->id,
+                'action_url' => route('vendor.gold-pieces.show', $goldPiece->id)
+            ]
+        ]));
 
         return redirect()->route('vendor.gold-pieces.index')
             ->with('success', 'Gold piece created successfully.');
     }
-
-
-
     public function edit(GoldPiece $goldPiece)
     {
         $branches = Branch::where('vendor_id', auth()->user()->id)->select('id', 'name')->get();

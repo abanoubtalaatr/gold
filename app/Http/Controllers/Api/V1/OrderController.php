@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\GoldPiece;
-use App\Models\OrderSale;
-use App\Models\OrderRental;
-use App\Models\Branch;
-use Illuminate\Http\Request;
-use App\Traits\ApiResponseTrait;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use App\Events\OrderRentalEvent;
-use App\Notifications\OrderRentalNotification;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\StoreOrderRequest;
 use App\Http\Resources\Api\OrderRentalResource;
+use App\Models\Branch;
+use App\Models\GoldPiece;
+use App\Models\OrderRental;
+use App\Models\OrderSale;
+use App\Notifications\OrderRentalNotification;
+use App\Notifications\Vendor\NewRentalOrderNotification;
+use App\Traits\ApiResponseTrait;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -79,7 +80,7 @@ class OrderController extends Controller
                 'branch_id' => $branch->id,
                 'end_date' => $request->end_date,
                 'total_price' => $request->total_price,
-                'type'=> OrderRental::LEASE_TYPE,
+                'type' => OrderRental::LEASE_TYPE,
                 'status' => 'pending',
             ]);
 
@@ -90,6 +91,10 @@ class OrderController extends Controller
                     'branch_id' => $branch->id,
                     'order_id' => $orderRental->id
                 ]);
+                // Send notification to vendor (gold piece owner)
+                if ($goldPiece->user) {
+                    $goldPiece->user->notify(new NewRentalOrderNotification($orderRental));
+                }
             } catch (\Exception $e) {
                 Log::error('Failed to send notification:', [
                     'error' => $e->getMessage(),
