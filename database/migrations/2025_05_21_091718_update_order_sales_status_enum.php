@@ -16,7 +16,7 @@ return new class extends Migration {
                 'approved',
                 'sold',
                 'rejected'
-            ])->default('pending-approval')->change();
+            ])->nullable()->default('pending-approval')->change();
         });
     }
 
