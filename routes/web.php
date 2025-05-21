@@ -11,8 +11,6 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\PageWebController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
-<<<<<<< HEAD
-use App\Http\Controllers\UsersController;
 use App\Http\Controllers\Vendor\Auth\RegisterController;
 use App\Http\Controllers\Vendor\BranchController;
 use App\Http\Controllers\Vendor\GoldPieceController;
@@ -20,21 +18,14 @@ use App\Http\Controllers\Vendor\OrderController;
 use App\Http\Controllers\Vendor\OrderRentalController;
 use App\Http\Controllers\Vendor\OrderSalesController;
 use App\Http\Controllers\Vendor\RentalRequestController;
-=======
 use App\Http\Controllers\DashboardController;
->>>>>>> a8584d55d7d0a93294bf9bfe2b8f6952eedc2495
 use App\Http\Controllers\Vendor\RoleController;
 use App\Http\Controllers\Vendor\UserController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\Vendor\OrderController;
-use App\Http\Controllers\Vendor\BranchController;
 use App\Http\Controllers\Vendor\VerifyController;
 use App\Http\Controllers\Banners\BannerController;
 use App\Http\Controllers\Vendor\ServiceController;
 use App\Http\Controllers\Contacts\ContactController;
-use App\Http\Controllers\Vendor\GoldPieceController;
-use App\Http\Controllers\Vendor\Auth\RegisterController;
-use App\Http\Controllers\Vendor\RentalRequestController;
 
 
 
@@ -215,17 +206,14 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
 });
 
 
-<<<<<<< HEAD
-require __DIR__ . '/auth.php';
-=======
+
 require __DIR__ . '/auth.php';
 
 
-    Route::get('/test-notification', function () {
-        $user = User::find(1);
-        $notification = new NotificationSent();
-        $notification->broadcast();
+Route::get('/test-notification', function () {
+    $user = User::find(1);
+    $notification = new NotificationSent();
+    $notification->broadcast();
 
-        return response()->json(['message' => 'Notification sent successfully']);
-    });
->>>>>>> a8584d55d7d0a93294bf9bfe2b8f6952eedc2495
+    return response()->json(['message' => 'Notification sent successfully']);
+});
