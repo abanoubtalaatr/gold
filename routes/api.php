@@ -114,18 +114,19 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
 
     /*
     |--------------------------------------------------------------------------
-    | Notifications.... 
+    |  Notification...
     |--------------------------------------------------------------------------
     */
 
-    Route::get('notifications', [NotificationController::class, 'index']);
-    Route::get('notifications/unread/count', [NotificationController::class, 'unreadCount']);
-    Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead']);
-    Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
-    Route::delete('notifications/{id}', [NotificationController::class, 'destroy']);
-    Route::delete('notifications', [NotificationController::class, 'destroyAll']);
+    Route::get('/notifications', [App\Http\Controllers\Api\V1\NotificationController::class, 'index']);
+    Route::get('notifications/unread/count', [App\Http\Controllers\Api\V1\NotificationController::class, 'notificationCounts']);
+    Route::get('/notifications/unread', [App\Http\Controllers\Api\V1\NotificationController::class, 'unread']);
+    Route::post('notifications/{id}/read', [App\Http\Controllers\Api\V1\NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all', [App\Http\Controllers\Api\V1\NotificationController::class, 'markAllAsRead']);
+    Route::delete('/notifications/{id}', [App\Http\Controllers\Api\V1\NotificationController::class, 'destroy']);
+    Route::delete('/notifications', [App\Http\Controllers\Api\V1\NotificationController::class, 'deleteAllNotifications']);
     Route::post('toggle-enable-notifications', NotificationSettingController::class);
-    
+   
     /*
     |--------------------------------------------------------------------------
     | Ratings.... 
@@ -145,5 +146,3 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     */
     Route::apiResource('liquidation-requests', LiquidationRequestController::class)->except(['update']);
 });
-
-
