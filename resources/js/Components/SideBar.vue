@@ -132,7 +132,7 @@
             <li class="nav-item" v-if="hasPermission('vendor read orders')">
                 <Link class="nav-link" :href="route('vendor.orders.rental.index')"
                     :class="{ collapsed: !$page.url.startsWith('vendor/orders') }">
-                <i class="bi bi-cart"></i>
+                <i class="bi bi-cart-check"></i>
                 <span>{{ $t("rental_orders") }}</span>
                 </Link>
             </li>
@@ -148,7 +148,7 @@
 
             <li class="nav-item" v-if="hasPermission('vendor read roles')">
                 <Link class="nav-link" :href="route('vendor.roles.index')"
-                    :class="{ collapsed: !$page.url.startsWith('vendor/roles') }">
+                :class="{ collapsed: !$page.url.startsWith('/vendor/roles') }">
                 <i class="bi bi-person-badge"></i>
                 <span>{{ $t("roles") }}</span>
                 </Link>

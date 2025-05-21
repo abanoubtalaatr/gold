@@ -56,7 +56,6 @@ class OrderController extends Controller
             // Get the rental order that has this gold piece
             $rentalOrder = OrderRental::where('gold_piece_id', $goldPiece->id)
                 ->where('type', OrderRental::RENT_TYPE)
-                ->where('status', 'accepted')
                 ->first();
 
             if (!$rentalOrder) {
