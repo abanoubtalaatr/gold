@@ -1,13 +1,13 @@
 <template>
     <Head title="Vendor Orders" />
-  
+
     <AuthenticatedLayout>
       <template #header>
         <h2 class="text-xl font-semibold leading-tight text-gray-800">
           {{ $t('Vendor Orders') }}
         </h2>
       </template>
-  
+
       <div class="py-12">
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
@@ -51,7 +51,7 @@
                   </button>
                 </div>
               </div>
-  
+
               <!-- Rental Orders -->
               <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Rental Orders') }}</h3>
               <div v-if="rentalOrders?.data?.length > 0" class="overflow-x-auto mb-8">
@@ -132,7 +132,7 @@
               <div v-else class="flex flex-col items-center justify-center py-12 text-gray-500">
                 <p class="text-xl font-semibold">{{ $t('No rental orders found.') }}</p>
               </div>
-  
+
               <!-- Sale Orders -->
               <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Sale Orders') }}</h3>
               <div v-if="saleOrders?.data?.length > 0" class="overflow-x-auto">
@@ -207,7 +207,7 @@
           </div>
         </div>
       </div>
-  
+
       <!-- Accept Order Modal -->
       <Modal :show="showAcceptModal" @close="closeAcceptModal">
         <div class="p-6">
@@ -247,7 +247,7 @@
           </form>
         </div>
       </Modal>
-  
+
       <!-- Piece Details Modal -->
       <Modal :show="showDetailsModal" @close="closeDetailsModal">
         <div class="p-6">
@@ -297,7 +297,7 @@
       </Modal>
     </AuthenticatedLayout>
   </template>
-  
+
   <script setup>
   import { ref } from 'vue';
   import { Head, useForm, router } from '@inertiajs/vue3';
@@ -308,7 +308,7 @@
   import InputError from '@/Components/InputError.vue';
   import PrimaryButton from '@/Components/PrimaryButton.vue';
   import debounce from 'lodash/debounce';
-  
+
   const props = defineProps({
     rentalOrders: {
       type: Object,
@@ -327,35 +327,35 @@
       default: () => ({}),
     },
   });
-  
+
   const form = useForm({
     search: props.filters.search || '',
     branch_id: props.filters.branch_id || '',
     status: props.filters.status || '',
   });
-  
+
   const showAcceptModal = ref(false);
   const selectedOrder = ref(null);
   const acceptForm = useForm({
     branch_id: '',
   });
-  
+
   const showDetailsModal = ref(false);
-  
+
   const debouncedSearch = debounce(() => {
     form.get(route('vendor.orders.index'), {
       preserveState: true,
       preserveScroll: true,
     });
   }, 300);
-  
+
   const applyFilters = () => {
     form.get(route('vendor.orders.index'), {
       preserveState: true,
       preserveScroll: true,
     });
   };
-  
+
   const resetFilters = () => {
     form.reset(); // Clear form fields
     router.visit(route('vendor.orders.index'), {
@@ -367,7 +367,7 @@
     });
     window.location.reload();
   };
-  
+
   const getStatusClass = (status) => {
     switch (status) {
       case 'pending_approval':
@@ -388,26 +388,26 @@
         return 'bg-gray-100 text-gray-800';
     }
   };
-  
+
   const formatStatus = (status) => {
     return status
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
-  
+
   const openAcceptModal = (order) => {
     selectedOrder.value = order;
     acceptForm.reset();
     showAcceptModal.value = true;
   };
-  
+
   const closeAcceptModal = () => {
     showAcceptModal.value = false;
     selectedOrder.value = null;
     acceptForm.reset();
   };
-  
+
   const acceptOrder = () => {
     acceptForm.post(route('vendor.orders.accept', selectedOrder.value.id), {
       preserveScroll: true,
@@ -416,7 +416,7 @@
       },
     });
   };
-  
+
   const rejectOrder = (orderId) => {
     if (confirm($t('Are you sure you want to reject this order?'))) {
       form.post(route('vendor.orders.reject', orderId), {
@@ -424,19 +424,19 @@
       });
     }
   };
-  
+
   const updateStatus = (orderId, status) => {
     form.patch(route('vendor.orders.updateStatus', orderId), {
       status,
       preserveScroll: true,
     });
   };
-  
+
   const showDetails = (order) => {
     selectedOrder.value = order;
     showDetailsModal.value = true;
   };
-  
+
   const closeDetailsModal = () => {
     showDetailsModal.value = false;
     selectedOrder.value = null;

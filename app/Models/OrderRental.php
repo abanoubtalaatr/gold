@@ -11,16 +11,16 @@ class OrderRental extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 
-        'gold_piece_id', 
+        'user_id',
+        'gold_piece_id',
         'branch_id',
-        'start_date', 
-        'end_date', 
-        'total_price', 
+        'start_date',
+        'end_date',
+        'total_price',
         'status'
     ];
 
-    
+
     /**
      * Order Types Constants
      * معني RENT_TYPE - المستخدم يضيف قطعة ذهبية لتأجيرها للمحل

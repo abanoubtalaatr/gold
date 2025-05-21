@@ -27,12 +27,12 @@ class OrderController extends Controller
         $statusFilter = $filters['status'] ?? null;
 
         // Rental Orders Query
-        $rentalOrdersQuery = OrderRental::query()->where('type',OrderRental::RENT_TYPE)
+        $rentalOrdersQuery = OrderRental::query()->where('type', OrderRental::RENT_TYPE)
             ->whereIn('branch_id', $branchIds)
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->whereHas('user', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%");
                 })->orWhereHas('goldPiece', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%");
                 });
@@ -55,7 +55,7 @@ class OrderController extends Controller
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->whereHas('user', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%");
                 })->orWhereHas('goldPiece', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%");
                 });
@@ -74,27 +74,27 @@ class OrderController extends Controller
         $saleOrders = $saleOrdersQuery->paginate(10, ['*'], 'sale_page')->appends($filters);
 
         // Generate QR codes for gold pieces
-        $rentalOrders->getCollection()->transform(function ($order) {
-            if ($order->goldPiece) {
-                $order->goldPiece->qr_code = base64_encode(
-                    QrCode::format('png')->size(100)->generate(
-                        route('vendor.gold-pieces.show', $order->goldPiece->id)
-                    )
-                );
-            }
-            return $order;
-        });
+        // $rentalOrders->getCollection()->transform(function ($order) {
+        //     if ($order->goldPiece) {
+        //         $order->goldPiece->qr_code = base64_encode(
+        //             QrCode::format('png')->size(100)->generate(
+        //                 route('vendor.gold-pieces.show', $order->goldPiece->id)
+        //             )
+        //         );
+        //     }
+        //     return $order;
+        // });
 
-        $saleOrders->getCollection()->transform(function ($order) {
-            if ($order->goldPiece) {
-                $order->goldPiece->qr_code = base64_encode(
-                    QrCode::format('png')->size(100)->generate(
-                        route('vendor.gold-pieces.show', $order->goldPiece->id)
-                    )
-                );
-            }
-            return $order;
-        });
+        // $saleOrders->getCollection()->transform(function ($order) {
+        //     if ($order->goldPiece) {
+        //         $order->goldPiece->qr_code = base64_encode(
+        //             QrCode::format('png')->size(100)->generate(
+        //                 route('vendor.gold-pieces.show', $order->goldPiece->id)
+        //             )
+        //         );
+        //     }
+        //     return $order;
+        // });
 
         return Inertia::render('Vendor/Orders/Index', [
             'rentalOrders' => $rentalOrders,
@@ -106,7 +106,8 @@ class OrderController extends Controller
 
     public function accept(Request $request, $orderId)
     {
-        $order = OrderRental::findOrFail($orderId);
+
+        $order = OrderSale::findOrFail($orderId);
         $this->authorizeVendor($order);
 
         $request->validate([
@@ -115,7 +116,7 @@ class OrderController extends Controller
 
         $order->update([
             'branch_id' => $request->branch_id,
-            'status' => OrderRental::STATUS_APPROVED,
+            'status' => OrderSale::STATUS_APPROVED,
         ]);
 
         Log::info('Order accepted', ['order_id' => $order->id, 'vendor_id' => $request->user()->id]);
@@ -164,5 +165,106 @@ class OrderController extends Controller
         if (!$vendorBranches->contains($order->branch_id) && $order->status !== OrderRental::STATUS_PENDING_APPROVAL) {
             abort(403, 'Unauthorized action.');
         }
+    }
+
+
+    public function rentalIndex(Request $request)
+    {
+        $vendorId = $request->user()->id;
+        $branchIds = Branch::where('vendor_id', $vendorId)->pluck('id');
+        $branches = Branch::where('vendor_id', $vendorId)->select('id', 'name')->get();
+
+        $filters = $request->only(['search', 'branch_id', 'status']);
+        $statusFilter = $filters['status'] ?? null;
+
+        $rentalOrdersQuery = OrderRental::query()->where('type', OrderRental::RENT_TYPE)
+            ->whereIn('branch_id', $branchIds)
+            ->when($filters['search'] ?? null, function ($query, $search) {
+                $query->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                })->orWhereHas('goldPiece', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            })
+            ->when($filters['branch_id'] ?? null, function ($query, $branchId) {
+                $query->where('branch_id', $branchId);
+            })
+            ->when($statusFilter === 'pending', function ($query) {
+                $query->where('status', OrderRental::STATUS_PENDING_APPROVAL);
+            })
+            ->when($statusFilter === 'available', function ($query) {
+                $query->whereIn('status', [OrderRental::STATUS_AVAILABLE, OrderRental::STATUS_RENTED]);
+            })
+            ->with(['user', 'goldPiece', 'branch'])
+            ->orderBy('created_at', 'desc');
+
+        $rentalOrders = $rentalOrdersQuery->paginate(10)->appends($filters);
+
+        // $rentalOrders->getCollection()->transform(function ($order) {
+        //     if ($order->goldPiece) {
+        //         $order->goldPiece->qr_code = base64_encode(
+        //             QrCode::format('png')->size(100)->generate(
+        //                 route('vendor.gold-pieces.show', $order->goldPiece->id)
+        //             )
+        //         );
+        //     }
+        //     return $order;
+        // });
+
+        return Inertia::render('Vendor/Orders/RentalIndex', [
+            'rentalOrders' => $rentalOrders,
+            'branches' => $branches,
+            'filters' => $filters,
+        ]);
+    }
+
+
+    public function saleIndex(Request $request)
+    {
+        $vendorId = $request->user()->id;
+        $branchIds = Branch::where('vendor_id', $vendorId)->pluck('id');
+        $branches = Branch::where('vendor_id', $vendorId)->select('id', 'name')->get();
+
+        $filters = $request->only(['search', 'branch_id', 'status']);
+        $statusFilter = $filters['status'] ?? null;
+
+        $saleOrdersQuery = OrderSale::query()
+            ->whereIn('branch_id', $branchIds)
+            ->when($filters['search'] ?? null, function ($query, $search) {
+                $query->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                })->orWhereHas('goldPiece', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            })
+            ->when($filters['branch_id'] ?? null, function ($query, $branchId) {
+                $query->where('branch_id', $branchId);
+            })
+            ->when($statusFilter === 'pending', function ($query) {
+                $query->where('status', 'pending_approval');
+            })
+            ->with(['user', 'goldPiece', 'branch'])
+            ->orderBy('created_at', 'desc');
+
+        $saleOrders = $saleOrdersQuery->paginate(10)->appends($filters);
+
+        // $saleOrders->getCollection()->transform(function ($order) {
+        //     if ($order->goldPiece) {
+        //         $order->goldPiece->qr_code = base64_encode(
+        //             QrCode::format('png')->size(100)->generate(
+        //                 route('vendor.gold-pieces.show', $order->goldPiece->id)
+        //             )
+        //         );
+        //     }
+        //     return $order;
+        // });
+
+        return Inertia::render('Vendor/Orders/SaleIndex', [
+            'saleOrders' => $saleOrders,
+            'branches' => $branches,
+            'filters' => $filters,
+        ]);
     }
 }

@@ -11,10 +11,10 @@ class OrderSale extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 
-        'gold_piece_id', 
+        'user_id',
+        'gold_piece_id',
         'branch_id',
-        'total_price', 
+        'total_price',
         'status'
     ];
 
@@ -27,7 +27,7 @@ class OrderSale extends Model
      * - Store approves: approved
      * - After sale: sold
      */
-    const STATUS_PENDING_APPROVAL = 'pending_approval'; // في انتظار المتجر
+    const STATUS_PENDING_APPROVAL = 'pending-approval'; // في انتظار المتجر
     const STATUS_APPROVED = 'approved'; // تم القبول من المتجر
     const STATUS_SOLD = 'sold'; // تم بيعها
 

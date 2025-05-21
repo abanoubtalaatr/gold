@@ -79,124 +79,101 @@
     "reset_password_link": "كود اعادة تعيين كلمة المرور",
     "reset_password_text": "سنرسل لك بريد الكتروني مع كود اعادة تعيين كلمة المرور، يرجى التحقق من بريدك الكتروني.",
     "remember_me": "تذكرني",
-
     "create roles": "إنشاء الأدوار",
     "read roles": "قراءة الأدوار",
     "update roles": "تحديث الأدوار",
     "delete roles": "حذف الأدوار",
     "view roles": "عرض الأدوار",
-
     "create permissions": "إنشاء الصلاحيات",
     "read permissions": "قراءة الصلاحيات",
     "update permissions": "تحديث الصلاحيات",
     "delete permissions": "حذف الصلاحيات",
     "view permissions": "عرض الصلاحيات",
-
     "create users": "إنشاء المستخدمين",
     "read users": "قراءة المستخدمين",
     "update users": "تحديث المستخدمين",
     "delete users": "حذف المستخدمين",
     "view users": "عرض المستخدمين",
-
     "create products": "إنشاء المنتجات",
     "read products": "قراءة المنتجات",
     "update products": "تحديث المنتجات",
     "delete products": "حذف المنتجات",
     "view products": "عرض المنتجات",
-
     "create logs": "إنشاء السجلات",
     "read logs": "قراءة السجلات",
     "update logs": "تحديث السجلات",
     "delete logs": "حذف السجلات",
     "view logs": "عرض السجلات",
-
     "create features": "إنشاء الميزات",
     "read features": "قراءة الميزات",
     "update features": "تحديث الميزات",
     "delete features": "حذف الميزات",
     "view features": "عرض الميزات",
-
     "create notifications": "إنشاء التنبيهات",
     "read notifications": "قراءة التنبيهات",
     "update notifications": "تحديث التنبيهات",
     "delete notifications": "حذف التنبيهات",
     "view notifications": "عرض التنبيهات",
-
     "create banners": "إنشاء البانرات",
     "read banners": "قراءة البانرات",
     "update banners": "تحديث البانرات",
     "delete banners": "حذف البانرات",
     "view banners": "عرض البانرات",
-
     "create partners": "إنشاء الشركاء",
     "read partners": "قراءة الشركاء",
     "update partners": "تحديث الشركاء",
     "delete partners": "حذف الشركاء",
     "view partners": "عرض الشركاء",
-
     "create subscriptions": "إنشاء الاشتراكات",
     "read subscriptions": "قراءة الاشتراكات",
     "update subscriptions": "تحديث الاشتراكات",
     "delete subscriptions": "حذف الاشتراكات",
     "view subscriptions": "عرض الاشتراكات",
-
     "create reports": "إنشاء التقارير",
     "read reports": "قراءة التقارير",
     "update reports": "تحديث التقارير",
     "delete reports": "حذف التقارير",
     "view reports": "عرض التقارير",
     "export reports": "تصدير التقارير",
-
     "delete contacts": "حذف الاتصالات",
     "view contacts": "عرض الاتصالات",
-
     "create job_roles": "إنشاء ادوار الوظائف",
     "read job_roles": "قراءة ادوار الوظائف",
     "update job_roles": "تحديث ادوار الوظائف",
     "delete job_roles": "حذف ادوار الوظائف",
     "view job_roles": "عرض ادوار الوظائف",
-
     "read reviews": "قراءة التعليقات",
     "update reviews": "تحديث التعليقات",
     "delete reviews": "حذف التعليقات",
     "view reviews": "عرض التعليقات",
-
     "read subservices": "قراءة الخدمات الفرعية",
     "update subservices": "تحديث الخدمات الفرعية",
     "delete subservices": "حذف الخدمات الفرعية",
     "view subservices": "عرض الخدمات الفرعية",
-
     "create providers": "إنشاء مزودين الخدمات",
     "read providers": "قراءة مزودين الخدمات",
     "update providers": "تحديث مزودين الخدمات",
     "delete providers": "حذف مزودين الخدمات",
     "view providers": "عرض مزودين الخدمات",
-
     "create main_services": "إنشاء خدمات الاساسية",
     "read main_services": "قراءة خدمات الاساسية",
     "update main_services": "تحديث خدمات الاساسية",
     "delete main_services": "حذف خدمات الاساسية",
     "view main_services": "عرض خدمات الاساسية",
-
     "read services": "قراءة الخدمات",
     "update services": "تحديث الخدمات",
     "delete services": "حذف الخدمات",
     "view services": "عرض الخدمات",
-
     "read contracts": "قراءة العقود",
     "update contracts": "تحديث العقود",
     "delete contracts": "حذف العقود",
     "view contracts": "عرض العقود",
-
     "read contacts": "قراءة الاتصالات",
     "update contacts": "تحديث الاتصالات",
-
     "read static_pages": "قراءة الصفحات الثابتة",
     "update static_pages": "تحديث الصفحات الثابتة",
-
     "read settings": "قراءة الاعدادات",
     "update settings": "تحديث الاعدادات",
-
     "email_verification": "التحقق من البريد الإلكتروني",
     "verify_otp": "التحقق من الكود",
     "resend_otp": "إعادة إرسال الكود",
@@ -260,7 +237,6 @@
         "contact_txt_en": "نص الاتصال بالإنجليزية",
         "mobile": "الجوال"
     },
-
     "placeholders": {
         "whatsapp": "أدخل رقم الواتساب الخاص بك",
         "email": "أدخل بريدك الإلكتروني",
@@ -283,11 +259,10 @@
         "contact_txt_ar": "نص الاتصال بالعربية",
         "contact_txt_en": "نص الاتصال بالإنجليزية",
         "mobile": "الجوال",
-        "workshops_no":"عدد ورش العمل وبرامج التدريب",
-        "clnts_stfction_prcnt":"نسبة رضاء رواد الأعمال",
-        "finnce_invstmnt_no":"حجم التمويل والاستثمار",
-        "prjcts_no":"عدد المشاريع"
-
+        "workshops_no": "عدد ورش العمل وبرامج التدريب",
+        "clnts_stfction_prcnt": "نسبة رضاء رواد الأعمال",
+        "finnce_invstmnt_no": "حجم التمويل والاستثمار",
+        "prjcts_no": "عدد المشاريع"
     },
     "edit_settings_info": "تحديث الاعدادت",
     "pages": "الصفحات",
@@ -422,12 +397,10 @@
             }
         }
     },
-
     "common": {
         "no": "لا",
         "yes": "نعم",
         "active": "نشط",
-
         "not_active": "غير نشط",
         "no_data": "لا توجد بيانات",
         "pagination": {
@@ -451,7 +424,6 @@
             "is_active": "نشط"
         }
     },
-
     "feature": {
         "fields": {
             "name": "الاسم",
@@ -524,7 +496,6 @@
     "total_reviews": "عدد التقييمات",
     "active_reviews": "عدد التقييمات المفعلة",
     "inactive_reviews": "عدد التقييمات الغير مفعلة",
-
     "reviewer": "المقيم",
     "reviewer_type": "نوع المقيم",
     "reviewer_name": "اسم المقيم",
@@ -591,7 +562,6 @@
     "draft": "مسودة",
     "pending_approval": "قيد الموافقة",
     "pending_payment": "قيد الدفع",
-
     "rejected": "مرفوض",
     "cannot_update_contract_status": "لا يمكن تحديث حالة هذا العقد",
     "contract_status_updated": "تم تحديث حالة العقد بنجاح",
@@ -627,11 +597,9 @@
                 "service_categories": "فئات الخدمات",
                 "subscriptions": "الاشتراكات",
                 "contracts": "العقود",
-
                 "revenue": "الإيرادات"
             }
         },
-
         "subscription_report": "تقرير الاشتراكات",
         "charts": {
             "title": "الرسوم البيانية",
@@ -676,7 +644,6 @@
                 "all_types": "جميع الأنواع",
                 "all_statuses": "جميع الحالات"
             },
-
             "table": {
                 "id": "الرقم",
                 "user_name": "اسم المستخدم",
@@ -796,7 +763,6 @@
     "answer_required_en": "الاجابة بالإنجليزية مطلوبة",
     "faqs": "الاسئلة الشائعة",
     "faq_updated_successfully": "تم تحديث السؤال الشائع بنجاح",
-
     "subscription_alerts_en": "Subscription Alerts (English)",
     "notification": {
         "title": "العنوان",
@@ -896,9 +862,7 @@
     "from_total": "من إجمالي",
     "number_of_requests": "عدد الطلبات",
     "category": "التصنيف",
-
     "revenue": "الإيرادات",
-
     "last_week": "آخر أسبوع",
     "last_month": "آخر شهر",
     "last_3_months": "آخر 3 شهور",
@@ -927,20 +891,20 @@
     "paid": "مدفوع",
     "contract": "عقد",
     "subscription": "اشتراك",
-    "Clients":"العملاء",
-    "clients":"العملاء",
-    "branches":"الفروع",
-    "vendor_admins":"المديرين",
-    "create_admin":"إنشاء مدير",
-    "edit_admin":"تعديل مدير",
-    "delete_admin":"حذف مدير",
-    "view_admin":"عرض مدير",
-    "create_branch":"إنشاء فرع",
-    "edit_branch":"تعديل فرع",
-    "delete_branch":"حذف فرع",
-    "view_branch":"عرض فرع",
-    "dont_have_account":"ليس لديك حساب؟",
-    "create_account":"إنشاء حساب كمتجر ",
+    "Clients": "العملاء",
+    "clients": "العملاء",
+    "branches": "الفروع",
+    "vendor_admins": "المديرين",
+    "create_admin": "إنشاء مدير",
+    "edit_admin": "تعديل مدير",
+    "delete_admin": "حذف مدير",
+    "view_admin": "عرض مدير",
+    "create_branch": "إنشاء فرع",
+    "edit_branch": "تعديل فرع",
+    "delete_branch": "حذف فرع",
+    "view_branch": "عرض فرع",
+    "dont_have_account": "ليس لديك حساب؟",
+    "create_account": "إنشاء حساب كمتجر ",
     "Vendor Registration": "تسجيل المتجر",
     "Fill in the details to register as a vendor": "املأ التفاصيل للتسجيل كمتجر",
     "Basic Information": "المعلومات الأساسية",
@@ -967,5 +931,7 @@
     "Sending...": "جارٍ الإرسال...",
     "Resend OTP": "إعادة إرسال OTP",
     "orders": "الطلبات",
+    "rental_orders": "طلبات الاستئجار",
+    "sales_orders": "طلبات البيع",
     "rental_requests": "طلبات الاستئجار"
 }

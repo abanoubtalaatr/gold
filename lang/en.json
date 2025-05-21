@@ -79,108 +79,89 @@
     "reset_password_link": "Reset password link",
     "remember_me": "Remember me",
     "reset_password_text": "We will send you an email with a link to reset your password, please check your email.",
-
     "create roles": "Create Roles",
     "read roles": "Read Roles",
     "update roles": "Update Roles",
     "delete roles": "Delete Roles",
     "view roles": "View Roles",
-
     "create permissions": "Create Permissions",
     "read permissions": "Read Permissions",
     "update permissions": "Update Permissions",
     "delete permissions": "Delete Permissions",
     "view permissions": "View Permissions",
-
     "create users": "Create Users",
     "read users": "Read Users",
     "update users": "Update Users",
     "delete users": "Delete Users",
     "view users": "View Users",
-
     "create products": "Create Products",
     "read products": "Read Products",
     "update products": "Update Products",
     "delete products": "Delete Products",
     "view products": "View Products",
-
     "create features": "Create Feature",
     "read features": "Read Feature",
     "update features": "Update Feature",
     "delete features": "Delete Feature",
     "view features": "View Feature",
-
     "create job_roles": "Create Job roles",
     "read job_roles": "Read job roles",
     "update job_roles": "Update job roles",
     "delete job_roles": "Delete job_roles",
     "view job_roles": "View job_roles",
-
     "read reviews": "Read Reviews",
     "update reviews": "Update Reviews",
     "delete reviews": "Delete Reviews",
     "view reviews": "View Reviews",
-
     "read subservices": "Read Subservices",
     "update subservices": "Update Subservices",
     "delete subservices": "Delete Subservices",
     "view subservices": "View Subservices",
-
     "read notifications": "Read Notifications",
     "update notifications": "Update Notifications",
     "delete notifications": "Delete Notifications",
     "view notifications": "View Notifications",
-
     "create banners": "Create Banners",
     "read banners": "Read Banners",
     "update banners": "Update Banners",
     "delete banners": "Delete Banners",
     "view banners": "View Banners",
-
     "create partners": "Create Partners",
     "read partners": "Read Partners",
     "update partners": "Update Partners",
     "delete partners": "Delete Partners",
     "view partners": "View Partners",
-
     "create subscriptions": "Create Subscriptions",
     "read subscriptions": "Read Subscriptions",
     "update subscriptions": "Update Subscriptions",
     "delete subscriptions": "Delete Subscriptions",
     "view subscriptions": "View Subscriptions",
-
     "create reports": "Create Reports",
     "read reports": "Read Reports",
     "update reports": "Update Reports",
     "delete reports": "Delete Reports",
     "view reports": "View Reports",
-
     "create contacts": "Create Contacts",
     "read contacts": "Read Contacts",
     "update contacts": "Update Contacts",
     "delete contacts": "Delete Contacts",
     "view contacts": "View Contacts",
-
     "export reports": "Export Reports",
-
     "create main_services": "Create Main Services",
     "read main_services": "Read Main Services",
     "update main_services": "Update Main Services",
     "delete main_services": "Delete Main Services",
     "view main_services": "View Main Services",
-
     "create static_pages": "Create Static Pages",
     "read static_pages": "Read Static Pages",
     "update static_pages": "Update Static Pages",
     "delete static_pages": "Delete Static Pages",
     "view static_pages": "View Static Pages",
-
     "create logs": "Create Logs",
     "read logs": "Read Logs",
     "update logs": "Update Logs",
     "delete logs": "Delete Logs",
     "view logs": "View Logs",
-
     "email_verification": "Email Verification",
     "verify_otp": "Verify OTP",
     "resend_otp": "Resend OTP",
@@ -250,7 +231,6 @@
         "contact_txt_en": "contact text in english",
         "mobile": "mobile"
     },
-
     "placeholders": {
         "whatsapp": "Enter your WhatsApp number",
         "email": "Enter your email address",
@@ -276,9 +256,7 @@
     },
     "edit_settings_info": "Edit Settings Information",
     "upload_image_tip": "Click or drag to upload image",
-
     "pages": "Pages",
-
     "edit_page": "Edit Page",
     "slug": "Slug",
     "image": "Image",
@@ -294,7 +272,6 @@
     "enter_description": "Enter Description",
     "sections": "Sections",
     "translations_for_sections": "Translations for Sections",
-
     "accounts": {
         "edit": {
             "title": "Edit Account",
@@ -414,7 +391,6 @@
     "contact_information": "Contact Information",
     "delete_confirmation": "Are you sure you want to delete this record?",
     "data_deleted": "Data deleted successfully",
-
     "updated_successfully": "Updated Successfully",
     "job_rolee": "Job Role",
     "deleted": "Deleted Successfully",
@@ -458,7 +434,6 @@
     "average_rating": "Average Rating",
     "reviews": "Reviews",
     "filter": "Filters",
-
     "rating": "Rating",
     "comment": "Comment",
     "actions": "Actions",
@@ -472,32 +447,25 @@
     "end_date": "End Date",
     "total_amount": "Total Amount",
     "services": "Services",
-
     "all": "All",
-
     "pending": "Pending",
     "expired": "Expired",
     "contract_number": "Contract Number",
-
     "view_details": "View Details",
     "approve": "Approve",
     "confirm_update_status": "Are you sure you want to update the contract status to approved and pending payment?",
     "confirm": "Confirm",
     "no": "No",
     "status_updated_successfully": "Contract status updated successfully",
-
     "draft": "Draft",
     "pending_approval": "Pending Approval",
     "pending_payment": "Pending Payment",
-
     "rejected": "Rejected",
     "cannot_update_contract_status": "Cannot update contract status",
     "contract_status_updated": "Contract status updated successfully",
     "error_updating_contract": "Error updating contract status",
     "partners": "Partners",
-
     "terminate": "Terminate",
-
     "rejection_details": "Rejection Details",
     "termination_details": "Termination Details",
     "rejection_reason": "Rejection Reason",
@@ -506,7 +474,6 @@
     "commission": "Commission",
     "vat": "VAT",
     "grand_total": "Grand Total",
-
     "statuses": {
         "draft": "Draft",
         "sent": "Sent",
@@ -562,7 +529,6 @@
                 "revenue": "Revenue"
             }
         },
-
         "user_activity": {
             "title": "User Activity",
             "filters": {
@@ -609,7 +575,6 @@
                 "items_per_page": "Items per page"
             }
         },
-       
         "subscription": {
             "title": "Subscription Report",
             "filters": {
@@ -693,7 +658,6 @@
         "reset": "Reset"
     },
     "Requested Services": "Requested Services",
-
     "commission_type": "Commission Type",
     "commission_value": "Commission Value",
     "commission_value_percentage": "Commission Value (Percentage)",
@@ -706,7 +670,6 @@
     "subscription_alerts_en": "Subscription Alerts (English)",
     "contarct_terms_and_conditions": "Contract Terms and Conditions",
     "subscription_terms_and_conditions": "Subscription Terms and Conditions",
-
     "message": "Message",
     "edit_faq": "Edit FAQ",
     "question": "Question",
@@ -833,17 +796,19 @@
     "paid": "Paid",
     "contract": "Contract",
     "subscription": "Subscription",
-    "vendor_admins" : "Admins",
-    "branches" : "Branches",
-    "create_admin" : "Create Admin",
-    "edit_admin" : "Edit Admin",
-    "delete_admin" : "Delete Admin",
-    "view_admin" : "View Admin",
-    "create_branch" : "Create Branch",
-    "edit_branch" : "Edit Branch",
-    "delete_branch" : "Delete Branch",
-    "dont_have_account" : "Don't have an account?",
-    "create_account" : "Create Account as vendor",
-    "orders" : "Orders",
-    "rental_requests" : "Rental Requests"
+    "vendor_admins": "Admins",
+    "branches": "Branches",
+    "create_admin": "Create Admin",
+    "edit_admin": "Edit Admin",
+    "delete_admin": "Delete Admin",
+    "view_admin": "View Admin",
+    "create_branch": "Create Branch",
+    "edit_branch": "Edit Branch",
+    "delete_branch": "Delete Branch",
+    "dont_have_account": "Don't have an account?",
+    "create_account": "Create Account as vendor",
+    "orders": "Orders",
+    "rental_orders": "Rental Orders",
+    "sales_orders": "Sales Orders",
+    "rental_requests": "Rental Requests"
 }

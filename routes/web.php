@@ -15,6 +15,8 @@ use App\Http\Controllers\Vendor\Auth\RegisterController;
 use App\Http\Controllers\Vendor\BranchController;
 use App\Http\Controllers\Vendor\GoldPieceController;
 use App\Http\Controllers\Vendor\OrderController;
+use App\Http\Controllers\Vendor\OrderRentalController;
+use App\Http\Controllers\Vendor\OrderSalesController;
 use App\Http\Controllers\Vendor\RentalRequestController;
 use App\Http\Controllers\Vendor\RoleController;
 use App\Http\Controllers\Vendor\ServiceController;
@@ -22,6 +24,8 @@ use App\Http\Controllers\Vendor\UserController;
 use App\Http\Controllers\Vendor\VerifyController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+
 
 
 
@@ -176,6 +180,22 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::patch('/orders/{orderId}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
 
 
+    route::controller(OrderRentalController::class)->group(function () {
+        Route::get('/rental-orders', action: 'index')->name('orders.rental.index');
+        Route::post('/rental-orders/{orderId}/accept', 'accept')->name('orders.rental.accept');
+        Route::post('/rental-orders/{orderId}/reject', 'reject')->name('orders.rental.reject');
+        Route::patch('/rental-orders/{orderId}/status', 'updateStatus')->name('orders.rental.updateStatus');
+
+    });
+
+
+    route::controller(OrderSalesController::class)->group(function () {
+        Route::get('/sale-orders', action: 'index')->name('orders.sale.index');
+        Route::post('/sale-orders/{orderId}/accept', 'accept')->name('orders.sales.accept');
+        Route::post('/sale-orders/{orderId}/reject', 'reject')->name('orders.sales.reject');
+        Route::patch('/sale-orders/{orderId}/status', 'updateStatus')->name('orders.sales.updateStatus');
+
+    });
     Route::get('/rental-requests', [RentalRequestController::class, 'index'])->name('rental-requests.index');
 
     Route::resource('roles', \App\Http\Controllers\Vendor\RoleController::class);

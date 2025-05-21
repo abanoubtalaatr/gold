@@ -109,16 +109,26 @@
                 </Link>
             </li>
 
-            <!-- Vendor orders -->
+            <!-- Vendor sale orders -->
 
             <li class="nav-item" v-if="hasPermission('vendor read orders')">
-                <Link class="nav-link" :href="route('vendor.orders.index')"
+                <Link class="nav-link" :href="route('vendor.orders.sale.index')"
                     :class="{ collapsed: !$page.url.startsWith('vendor/orders') }">
                 <i class="bi bi-cart"></i>
-                <span>{{ $t("orders") }}</span>
+                <span>{{ $t("sales_orders") }}</span>
                 </Link>
             </li>
 
+
+            <!-- Vendor rental orders -->
+
+            <li class="nav-item" v-if="hasPermission('vendor read orders')">
+                <Link class="nav-link" :href="route('vendor.orders.rental.index')"
+                    :class="{ collapsed: !$page.url.startsWith('vendor/orders') }">
+                <i class="bi bi-cart"></i>
+                <span>{{ $t("rental_orders") }}</span>
+                </Link>
+            </li>
             <!-- Vendor rental requests -->
 
             <li class="nav-item" v-if="hasPermission('vendor read rental-requests')">
