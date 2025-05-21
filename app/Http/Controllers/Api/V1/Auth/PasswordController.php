@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Auth\ResetPasswordRequest;
-use App\Http\Requests\Api\Auth\UpdatePasswordRequest;
-use App\Models\MobileConfirm;
-use App\Models\User;
-use App\Traits\ApiResponseTrait;
 use Exception;
-use Illuminate\Auth\Events\PasswordReset;
+use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\MobileConfirm;
+use App\Traits\ApiResponseTrait;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
+use Illuminate\Auth\Events\PasswordReset;
+use App\Http\Requests\Api\Auth\ResetPasswordRequest;
+use App\Http\Requests\Api\Auth\UpdatePasswordRequest;
+
 /**
  * Class PasswordController.
  */

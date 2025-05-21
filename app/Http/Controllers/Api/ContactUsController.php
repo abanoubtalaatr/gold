@@ -52,7 +52,7 @@ class ContactUsController extends AppBaseController
             if ($admin)
                 // $admin->notify(new ContactNotification($input, $contactUs->id));
 
-            return $this->sendSuccess(__('message sent successfully.'));
+            return $this->successResponse([],__('mobile.message sent successfully.'));
         } catch (TransportException $e) {
             // return $this->sendError(__('Email not valid'),['email' => __('Email not valid')]);
         }
@@ -64,7 +64,7 @@ class ContactUsController extends AppBaseController
 
         $contactUs = Contact::create($input);
 
-        return $this->successResponse(new ContactResource($contactUs), 'Contact us created successfully');
+        return $this->successResponse(new ContactResource($contactUs), __('mobile.Contact us created successfully'));
     }
 
     

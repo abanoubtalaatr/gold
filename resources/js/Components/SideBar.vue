@@ -2,7 +2,14 @@
     <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
 
-            <li class="nav-item">
+            <li class="nav-item" v-if="hasPermission('vendor view dashboard')">
+                <Link class="nav-link" :href="route('vendor.dashboard')" :class="{ collapsed: $page.url !== '/vendor/dashboard' }">
+                <i class="bi bi-grid"></i>
+                <span> {{ $t("dashboard") }} </span>
+                </Link>
+            </li>
+
+            <li class="nav-item" v-else>
                 <Link class="nav-link" :href="route('dashboard')" :class="{ collapsed: $page.url !== '/dashboard' }">
                 <i class="bi bi-grid"></i>
                 <span> {{ $t("dashboard") }} </span>

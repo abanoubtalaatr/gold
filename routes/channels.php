@@ -19,3 +19,8 @@ Broadcast::channel('branch.{branchId}', function ($user, $branchId) {
     return $branch && $user->id === $branch->vendor_id;
 });
 
+
+
+Broadcast::channel('notifications.{userId}', function ($user, $userId) {
+    return (int) $user->id === (int) $userId;
+});

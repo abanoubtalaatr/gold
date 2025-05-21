@@ -34,6 +34,7 @@ class UserRolePermissionSeeder extends Seeder
             'contacts' => ['read', 'update'],
             'static_pages' => ['read', 'update'],
             'branches' => ['create', 'read', 'update', 'delete', 'view'],
+            'dashboard' => ['view'],
             // Vendor-prefixed permissions
             'vendor' => [
                 'roles' => ['vendor create', 'vendor read', 'vendor update', 'vendor delete', 'vendor view'],
@@ -42,6 +43,7 @@ class UserRolePermissionSeeder extends Seeder
                 'branches' => ['vendor create', 'vendor read', 'vendor update', 'vendor delete', 'vendor view'],
                 'orders' => ['vendor create', 'vendor read', 'vendor update', 'vendor delete', 'vendor view'],
                 'rental-requests' => ['vendor create', 'vendor read', 'vendor update', 'vendor delete', 'vendor view'],
+                'dashboard' => ['vendor view'],
             ],
         ];
 
@@ -71,6 +73,7 @@ class UserRolePermissionSeeder extends Seeder
                 'vendor create branches', 'vendor read branches', 'vendor view branches', 'vendor update branches', 'vendor delete branches',
                 'vendor create orders', 'vendor read orders', 'vendor view orders', 'vendor update orders', 'vendor delete orders',
                 'vendor create rental-requests', 'vendor read rental-requests', 'vendor view rental-requests', 'vendor update rental-requests', 'vendor delete rental-requests',
+                'vendor view dashboard',
             ],
             'superadmin' => [
                 'create roles', 'read roles', 'view roles', 'update roles', 'delete roles',
@@ -81,11 +84,13 @@ class UserRolePermissionSeeder extends Seeder
                 'read contacts', 'update contacts',
                 'read static_pages', 'update static_pages',
                 'create branches', 'read branches', 'view branches', 'update branches', 'delete branches',
+                'view dashboard',
             ],
             'admin' => [
                 'create roles', 'read roles', 'view roles', 'update roles', 'delete roles',
                 'create permissions', 'read permissions', 'view permissions', 'update permissions', 'delete permissions',
                 'create users', 'read users', 'view users', 'update users', 'delete users',
+                'view dashboard',
             ],
         ];
 

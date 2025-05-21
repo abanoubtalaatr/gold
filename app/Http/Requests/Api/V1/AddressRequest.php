@@ -14,11 +14,7 @@ class AddressRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'street_name' => 'nullable|string|max:255',
-            'neighborhood' => 'nullable|string|max:255',
             'address' => 'required|string',
-            'country_id' => 'nullable|exists:countries,id',
-            'state_id' => 'nullable|exists:states,id',
             'city_id' => 'required|exists:cities,id',
             'is_default' => 'sometimes|boolean',
             'latitude' => 'sometimes|numeric',
