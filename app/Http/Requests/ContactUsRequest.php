@@ -16,16 +16,4 @@ class ContactUsRequest extends FormRequest
             'subject' => ['required', 'max:500'],
         ];
     }
-
-
-    public function attributes()
-    {
-        return [
-            'name' => trans('messages.name'),
-            'email' => trans('messages.email'),
-            'phone' => trans('messages.phone'),
-            'message' => trans('messages.message'),
-
-        ];
-    }
 }

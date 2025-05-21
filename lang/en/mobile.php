@@ -201,4 +201,5 @@ return [
     'Notification deleted.' => 'Notification deleted.',
     'Notification marked as read.' => 'Notification marked as read.',
     'Notifications fetched successfully' => 'Notifications fetched successfully',
+    'message sent successfully.' => 'Contact us created successfully',
 ];

@@ -149,6 +149,7 @@ return [
     'Notification deleted.' => 'تم حذف الإشعار',
     'Notification marked as read.' => 'تم وضع علامة مقروء على الإشعار',
     'Notifications fetched successfully' => 'تم استرجاع الإشعارات بنجاح',
+    'message sent successfully.' => 'تم إنشاء الاستفسار بنجاح',
     
 
 
