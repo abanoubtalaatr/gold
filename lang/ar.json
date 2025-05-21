@@ -991,6 +991,11 @@
     "vendor view orders": "عرض طلبات البيع",
     "vendor update orders": "تعديل طلبات البيع",
     "vendor view branches": "عرض فروع",
-    "vendor update rental-requests": "تعديل طلبات الاستئجار"
-    
+    "vendor update rental-requests": "تعديل طلبات الاستئجار",
+    "Welcome to your vendor dashboard!": "مرحبا بك في لوحة التحكم الخاصة بك",
+    "Total Roles": " الأدوار",
+    "Total Admins": " المديرين",
+    "Total Branches": " الفروع",
+    "Rental Requests": "طلبات الاستئجار",
+    "Sales Orders": "طلبات البيع"
 }

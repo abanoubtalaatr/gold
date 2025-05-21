@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Vendor\BranchRequest;
-use App\Models\Branch;
 use App\Models\City;
-use App\Services\BranchService;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\State;
+use App\Models\Branch;
+use App\Models\Country;
+use Illuminate\Http\Request;
+use App\Services\BranchService;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Vendor\BranchRequest;
 
 class BranchController extends Controller
 {
@@ -31,7 +34,16 @@ class BranchController extends Controller
 
     public function create()
     {
+        //saudi arabia country id is 194
+        
+        $country = Country::find(194);
+        
+        // i want to get all cities for this all states for this country  
+        $states = State::where('country_id', $country->id)->pluck('id')->toArray();
         $cities = City::select(['id as value', 'name as label'])->limit(10)->get()->toArray();
+
+        // $cities = City::whereIn('state_id',$states)->get()->toArray();
+     
 
         return Inertia::render('Vendor/Branches/Create', [
             'cities' => $cities,
@@ -79,7 +91,7 @@ class BranchController extends Controller
 
         return Inertia::render('Vendor/Branches/Edit', [
             'branch' => $branch,
-            'cities' => City::select(['id as value', 'name as label'])->get()->toArray(),
+            'cities' => City::select(['id as value', 'name as label'])->limit(10)->get()->toArray(),
         ]);
     }
 
@@ -101,7 +113,7 @@ class BranchController extends Controller
             // Handle image uploads
             if ($request->hasFile('images')) {
                 foreach ($branch->images as $image) {
-                    \Storage::disk('public')->delete($image->path);
+                    Storage::disk('public')->delete($image->path);
                     $image->delete();
                 }
                 foreach ($request->file('images') as $image) {
@@ -133,7 +145,7 @@ class BranchController extends Controller
         }
 
         foreach ($branch->images as $image) {
-            \Storage::disk('public')->delete($image->path);
+            Storage::disk('public')->delete($image->path);
             $image->delete();
         }
 
