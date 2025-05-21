@@ -141,4 +141,15 @@ return [
     'Failed to delete rating' => 'فشل في حذف التقييم',
 
     'notification setting updated successfully' => 'تم تحديث إعدادات الإشعارات بنجاح',
+    'Notification not found.' => 'الإشعار غير موجود',
+    'All notifications marked as read.' => 'تم وضع علامة مقروء على جميع الإشعارات',
+    'All notifications deleted.' => 'تم حذف جميع الإشعارات',
+    'Notification counts fetched successfully' => 'تم استرجاع عدد الإشعارات بنجاح',
+    'Unread notifications fetched successfully' => 'تم استرجاع الإشعارات غير المقروءة بنجاح',
+    'Notification deleted.' => 'تم حذف الإشعار',
+    'Notification marked as read.' => 'تم وضع علامة مقروء على الإشعار',
+    'Notifications fetched successfully' => 'تم استرجاع الإشعارات بنجاح',
+    
+
+
 ];

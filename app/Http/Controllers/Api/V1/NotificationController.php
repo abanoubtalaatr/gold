@@ -36,7 +36,7 @@ class NotificationController extends Controller
         $notifications->setCollection($groupedData);
 
 
-        return $this->successResponse( $notifications, 'mobile.Notifications fetched successfully');
+        return $this->successResponse( $notifications, __('mobile.Notifications fetched successfully'));
     }
 
     /**
@@ -63,7 +63,7 @@ class NotificationController extends Controller
         // Add the grouped data back to the paginated instance
         $unreadNotifications->setCollection($groupedData);
 
-        return $this->successResponse( $unreadNotifications, 'mobile.Unread notifications fetched successfully');
+        return $this->successResponse( $unreadNotifications, __('mobile.Unread notifications fetched successfully'));
     
     }
 
@@ -77,12 +77,12 @@ class NotificationController extends Controller
         $notification =  Auth::user()->notifications()->find($id);
 
         if (!$notification) {
-            return $this->returnError('404', 'Notification not found.');
+            return $this->returnError('404', __('mobile.Notification not found.'));
         }
 
         $notification->markAsRead();
 
-        return $this->successResponse(null, 'mobile.Notification marked as read.');
+        return $this->successResponse(null, __('mobile.Notification marked as read.'));
     }
 
     /**
@@ -92,7 +92,7 @@ class NotificationController extends Controller
     {
         Auth::user()->unreadNotifications->markAsRead();
 
-        return $this->successResponse(null, 'mobile.All notifications marked as read.');
+        return $this->successResponse(null, __('mobile.All notifications marked as read.'));
     }
 
     /**
@@ -103,12 +103,12 @@ class NotificationController extends Controller
         $notification = Auth::user()->notifications()->find($id);
 
         if (!$notification) {
-            return $this->returnError('404', 'Notification not found.');
+            return $this->returnError('404', __('mobile.Notification not found.'));
         }
 
         $notification->delete();
 
-        return $this->successResponse(null, 'mobile.Notification deleted.');
+        return $this->successResponse(null,__('mobile.Notification deleted.'));
     }
 
     /**
@@ -118,11 +118,11 @@ class NotificationController extends Controller
     {
         Auth::user()->notifications()->delete();
 
-        return $this->successResponse(null, 'mobile.All notifications deleted.');
+        return $this->successResponse(null, __('mobile.All notifications deleted.'));
     }
 
     public function notificationCounts()
     {
-        return $this->successResponse(Auth::user()->unreadNotifications()->count(), 'mobile.Notification counts fetched successfully');
+        return $this->successResponse(Auth::user()->unreadNotifications()->count(), __('mobile.Notification counts fetched successfully'));
     }
 }
