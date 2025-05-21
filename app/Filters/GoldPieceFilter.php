@@ -20,7 +20,7 @@ class GoldPieceFilter
         $this->query = $query;
 
         // Base query for approved orders
-        $this->approvedOrders();
+        // $this->approvedOrders();
 
         // Apply filters based on request parameters
         return $this
