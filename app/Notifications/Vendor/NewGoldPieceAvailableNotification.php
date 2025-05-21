@@ -37,7 +37,7 @@ class NewGoldPieceAvailableNotification extends Notification
                 'ar' => 'قطعة ذهب جديدة متاحة',
                 'en' => 'New Gold Piece Available'
             ],
-            'description' => [
+            'message' => [
                 'ar' => "قطعة ذهب جديدة $type: {$this->goldPiece->name} - الوزن: {$this->goldPiece->weight} جرام",
                 'en' => "New gold piece $enType: {$this->goldPiece->name} - Weight: {$this->goldPiece->weight} grams"
             ],

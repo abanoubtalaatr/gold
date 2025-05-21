@@ -26,7 +26,7 @@ class LoginController extends AppBaseController
 {
 
     use ApiResponseTrait;
-    
+
     protected $smsService;
 
     /**
@@ -276,11 +276,15 @@ class LoginController extends AppBaseController
 
         event(new UserLoggedIn($user));
 
-        return response()->json(['data' => [
-            'user' => $user,
-            'token' => $token,
-            'expires' => $expires
-        ], 'success' => true, 'message' => __('mobile.You have logged in successfully.')], 200);
+        return response()->json([
+            'data' => [
+                'user' => $user,
+                'token' => $token,
+                'expires' => $expires
+            ],
+            'success' => true,
+            'message' => __('mobile.You have logged in successfully.')
+        ], 200);
     }
 
 

@@ -3,18 +3,20 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\Branch;
 use App\Models\GoldPiece;
 use App\Models\OrderSale;
-use Illuminate\Support\Facades\Log;
+use App\Notifications\Client\GoldPieceAcceptedNotification;
+use App\Notifications\Client\GoldPieceRejectedNotification;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class OrderSalesController extends Controller
 {
-    
+
     public function index(Request $request)
     {
         $vendorId = $request->user()->id;
@@ -62,7 +64,7 @@ class OrderSalesController extends Controller
             'filters' => $filters,
         ]);
     }
-    
+
     public function accept(Request $request, $orderId)
     {
 
@@ -77,50 +79,61 @@ class OrderSalesController extends Controller
             'branch_id' => $request->branch_id,
             'status' => OrderSale::STATUS_APPROVED,
         ]);
-
+        // Notify gold piece owner
+        if ($order->goldPiece->user) {
+            $order->goldPiece->user->notify(
+                new GoldPieceAcceptedNotification($order, auth()->user()->name)
+            );
+        }
         Log::info('Order accepted', ['order_id' => $order->id, 'vendor_id' => $request->user()->id]);
 
         return back()->with('success', __('Order accepted successfully'));
     }
 
-     public function reject(Request $request, $orderId)
+    public function reject(Request $request, $orderId)
     {
         $order = OrderSale::findOrFail($orderId);
         $this->authorizeVendor($order);
 
         $order->update(['status' => 'rejected']);
 
+        // Notify gold piece owner
+        if ($order->goldPiece->user) {
+            $order->goldPiece->user->notify(
+                new GoldPieceRejectedNotification($order, auth()->user()->name)
+            );
+        }
         Log::info('Order rejected', ['order_id' => $order->id, 'vendor_id' => $request->user()->id]);
 
         return back()->with('success', __('Order rejected successfully'));
     }
 
-   public function updateStatus(Request $request, $orderId)
-{
-    $order = OrderSale::findOrFail($orderId);
-    $this->authorizeVendor($order);
+    public function updateStatus(Request $request, $orderId)
+    {
+        $order = OrderSale::findOrFail($orderId);
+        $this->authorizeVendor($order);
 
-    // Validate the incoming status to be one of the allowed statuses
-    $request->validate([
-        'status' => 'required|in:pending-approval,approved,sold',
-    ]);
+        // Validate the incoming status to be one of the allowed statuses
+        $request->validate([
+            'status' => 'required|in:pending-approval,approved,sold',
+        ]);
 
-    // Map the input status to the internal constants
-    $newStatus = match ($request->status) {
-        'pending-approval' => OrderSale::STATUS_PENDING_APPROVAL,
-        'approved' => OrderSale::STATUS_APPROVED,
-        'sold' => OrderSale::STATUS_SOLD,
-        default => throw new \Exception('Invalid status'),
-    };
+        // Map the input status to the internal constants
+        $newStatus = match ($request->status) {
+            'pending-approval' => OrderSale::STATUS_PENDING_APPROVAL,
+            'approved' => OrderSale::STATUS_APPROVED,
+            'sold' => OrderSale::STATUS_SOLD,
+            default => throw new \Exception('Invalid status'),
+        };
 
-    // Update the order with the new status
-    $order->update(['status' => $newStatus]);
+        // Update the order with the new status
+        $order->update(['status' => $newStatus]);
 
-    // Log the status update
-    Log::info('Order status updated', ['order_id' => $order->id, 'status' => $newStatus]);
+        // Log the status update
+        Log::info('Order status updated', ['order_id' => $order->id, 'status' => $newStatus]);
 
-    return back()->with('success', __('Order status updated successfully'));
-}
+        return back()->with('success', __('Order status updated successfully'));
+    }
 
     protected function authorizeVendor($order)
     {

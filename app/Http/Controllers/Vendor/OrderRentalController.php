@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\Branch;
 use App\Models\GoldPiece;
-use App\Models\OrderSale;
 use App\Models\OrderRental;
-use Illuminate\Support\Facades\Log;
+use App\Models\OrderSale;
+use App\Notifications\Client\GoldPieceAcceptedNotification;
+use App\Notifications\Client\GoldPieceRejectedNotification;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class OrderRentalController extends Controller
@@ -81,6 +83,12 @@ class OrderRentalController extends Controller
             'status' => OrderRental::STATUS_APPROVED,
         ]);
 
+        // Notify gold piece owner
+        if ($order->goldPiece->user) {
+            $order->goldPiece->user->notify(
+                new GoldPieceAcceptedNotification($order, auth()->user()->name)
+            );
+        }
         Log::info('Order accepted', ['order_id' => $order->id, 'vendor_id' => $request->user()->id]);
 
         return back()->with('success', __('Order accepted successfully'));
@@ -93,6 +101,12 @@ class OrderRentalController extends Controller
 
         $order->update(['status' => 'rejected']);
 
+        // Notify gold piece owner
+        if ($order->goldPiece->user) {
+            $order->goldPiece->user->notify(
+                new GoldPieceRejectedNotification($order, auth()->user()->name)
+            );
+        }
         Log::info('Order rejected', ['order_id' => $order->id, 'vendor_id' => $request->user()->id]);
 
         return back()->with('success', __('Order rejected successfully'));

@@ -308,6 +308,7 @@ return [
         'bank_account_swift' => 'رقم الحساب البنكي',
         'bank_account_iban' => 'رقم الحساب البنكي',
         'bank_account_holder_name' => 'اسم صاحب الحساب البنكي',
+        'is_including_lobes' => 'يشمل الفصوص',
     ],
 
     'reasons' => [

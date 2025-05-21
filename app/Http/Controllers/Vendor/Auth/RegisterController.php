@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Vendor\Auth;
 
-use  App\Http\Requests\Vendor\RegiserRequest;
+use App\Http\Requests\Vendor\RegiserRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Mail\VendorOtpMail;
@@ -41,6 +41,8 @@ class RegisterController extends Controller
         $registrationData = $validated;
         $registrationData['commercial_registration_image'] = $request->file('commercial_registration_image')
             ->store('commercial_registrations', 'public');
+        // Set is_active to false
+        $registrationData['is_active'] = false;
 
         // Generate OTP (6 digits)
         $otp = rand(100000, 999999);

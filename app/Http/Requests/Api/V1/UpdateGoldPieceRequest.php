@@ -16,7 +16,8 @@ class UpdateGoldPieceRequest extends FormRequest
         return [
             'name' => 'sometimes|string|max:255',
             'weight' => 'sometimes|numeric|min:0.1',
-            'carat' => 'sometimes|in:18,21,24',
+            'is_including_lobes' => 'sometimes|boolean',
+            'carat' => 'sometimes|in:18,21,22,24',
             'type' => 'sometimes|in:for_rent,for_sale',
             'description' => 'nullable|string',
             'rental_price_per_day' => 'required_if:type,for_rent|nullable|numeric|min:0',

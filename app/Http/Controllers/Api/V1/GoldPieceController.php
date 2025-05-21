@@ -2,31 +2,32 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\GoldPiece;
-use App\Models\User;
-use App\Models\Branch;
-use App\Models\OrderRental;
-use App\Models\OrderSale;
-use Illuminate\Http\Request;
+use App\Events\NewGoldPieceEvent;
+use App\Filters\GoldPieceFilter;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Resources\Api\GoldPieceResource;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Requests\Api\V1\StoreGoldPieceRequest;
 use App\Http\Requests\Api\V1\UpdateGoldPieceRequest;
+use App\Http\Resources\Api\GoldPieceResource;
+use App\Models\Address;
+use App\Models\Branch;
+use App\Models\GoldPiece;
+use App\Models\OrderRental;
+use App\Models\OrderSale;
+use App\Models\User;
 use App\Notifications\NewGoldPieceNotification;
-use App\Events\NewGoldPieceEvent;
+use App\Notifications\Vendor\NewGoldPieceAvailableNotification;
 use App\Traits\ApiResponseTrait;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use App\Models\Address;
-use App\Filters\GoldPieceFilter;
+use Illuminate\Support\Facades\Log;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class GoldPieceController extends Controller
 {
     use ApiResponseTrait;
-    
+
     public function index(Request $request)
     {
         $query = GoldPiece::query();
@@ -36,7 +37,7 @@ class GoldPieceController extends Controller
         $perPage = $request->per_page ?? 15;
         $goldPieces = $filteredQuery->paginate($perPage);
 
-        return $this->successResponse(GoldPieceResource::collection($goldPieces)->response()->getData(true),__("mobile.fetch_gold_pieces_success"));
+        return $this->successResponse(GoldPieceResource::collection($goldPieces)->response()->getData(true), __("mobile.fetch_gold_pieces_success"));
     }
 
     public function myGoldPieces(Request $request)
@@ -49,7 +50,7 @@ class GoldPieceController extends Controller
         $perPage = $request->per_page ?? 15;
         $goldPieces = $filteredQuery->paginate($perPage);
 
-        return $this->successResponse(GoldPieceResource::collection($goldPieces)->response()->getData(true),__("mobile.fetch_gold_pieces_success"));
+        return $this->successResponse(GoldPieceResource::collection($goldPieces)->response()->getData(true), __("mobile.fetch_gold_pieces_success"));
     }
     public function store(StoreGoldPieceRequest $request)
     {
@@ -62,16 +63,16 @@ class GoldPieceController extends Controller
 
             $address = $user->addresses()
                 ->where('is_default', true)
-                ->orWhere(function($query) use ($user) {
+                ->orWhere(function ($query) use ($user) {
                     $query->where('user_id', $user->id)
-                          ->orderBy('created_at', 'asc');
+                        ->orderBy('created_at', 'asc');
                 })
                 ->first();
 
             if (!$address) {
                 return $this->errorResponse(
-                    __('mobile.User must have at least one address to create a gold piece'), 
-                    [], 
+                    __('mobile.User must have at least one address to create a gold piece'),
+                    [],
                     422
                 );
             }
@@ -80,15 +81,15 @@ class GoldPieceController extends Controller
             $branches = Branch::query()
                 ->where('city_id', $address->city_id)
                 ->where('is_active', true)
-                ->whereHas('vendor', function($query) {
+                ->whereHas('vendor', function ($query) {
                     $query->where('is_active', true);
                 })
                 ->get();
 
             if ($branches->isEmpty()) {
                 return $this->errorResponse(
-                    __('mobile.No active branches found in your city'), 
-                    [], 
+                    __('mobile.No active branches found in your city'),
+                    [],
                     422
                 );
             }
@@ -159,10 +160,20 @@ class GoldPieceController extends Controller
 
             DB::commit();
 
+            // Get unique vendors from the branches we created orders for
+            $vendors = collect($branches)
+                ->pluck('vendor') // Get all vendors from branches
+                ->unique('id')    // Remove duplicates
+                ->filter();       // Remove null values
+
+            // Notify each vendor
+            foreach ($vendors as $vendor) {
+                $vendor->notify(new NewGoldPieceAvailableNotification($goldPiece));
+            }
             // Load the media relationship before returning the resource
             $goldPiece->load('user');
             return $this->successResponse(
-                new GoldPieceResource($goldPiece), 
+                new GoldPieceResource($goldPiece),
                 __('mobile.Gold piece created successfully')
             );
 
@@ -170,7 +181,7 @@ class GoldPieceController extends Controller
             DB::rollBack();
             Log::error('Failed to create gold piece: ' . $e->getMessage());
             return $this->errorResponse(
-                __('mobile.Failed to create gold piece'), 
+                __('mobile.Failed to create gold piece'),
                 ['error' => $e->getMessage()]
             );
         }
@@ -195,8 +206,10 @@ class GoldPieceController extends Controller
             }
 
             // Check if the gold piece has any active rentals or sales
-            if ($goldPiece->orderRentals()->whereIn('status', ['pending', 'active'])->exists() ||
-                $goldPiece->orderSales()->whereIn('status', ['pending', 'processing'])->exists()) {
+            if (
+                $goldPiece->orderRentals()->whereIn('status', ['pending', 'active'])->exists() ||
+                $goldPiece->orderSales()->whereIn('status', ['pending', 'processing'])->exists()
+            ) {
                 return $this->errorResponse(__('mobile.Cannot delete gold piece with active orders.'), [], 400);
             }
 
@@ -204,7 +217,7 @@ class GoldPieceController extends Controller
 
             // Delete associated media first
             $goldPiece->clearMediaCollection('images');
-            
+
             // Delete the gold piece
             $goldPiece->delete();
 
@@ -234,8 +247,10 @@ class GoldPieceController extends Controller
 
             // Check if the gold piece has active orders before allowing type change
             if ($request->has('type') && $request->type !== $goldPiece->type) {
-                if ($goldPiece->orderRentals()->whereIn('status', ['pending', 'active'])->exists() ||
-                    $goldPiece->orderSales()->whereIn('status', ['pending', 'processing'])->exists()) {
+                if (
+                    $goldPiece->orderRentals()->whereIn('status', ['pending', 'active'])->exists() ||
+                    $goldPiece->orderSales()->whereIn('status', ['pending', 'processing'])->exists()
+                ) {
                     return $this->errorResponse(__('mobile.Cannot change type while there are active orders.'), [], 400);
                 }
             }
@@ -244,13 +259,20 @@ class GoldPieceController extends Controller
 
             // Update basic information
             $updateData = $request->only([
-                'name', 'weight', 'carat', 'type', 'description',
-                'rental_price_per_day', 'sale_price'
+                'name',
+                'weight',
+                'carat',
+                'type',
+                'description',
+                'rental_price_per_day',
+                'sale_price'
             ]);
 
             // Calculate deposit amount if type is for_rent and weight or carat changed
-            if ($request->type === 'for_rent' || 
-                ($goldPiece->type === 'for_rent' && !$request->has('type'))) {
+            if (
+                $request->type === 'for_rent' ||
+                ($goldPiece->type === 'for_rent' && !$request->has('type'))
+            ) {
                 if ($request->has('weight') || $request->has('carat')) {
                     $weight = $request->weight ?? $goldPiece->weight;
                     $carat = $request->carat ?? $goldPiece->carat;

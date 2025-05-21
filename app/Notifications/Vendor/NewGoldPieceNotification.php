@@ -41,7 +41,7 @@ class NewGoldPieceNotification extends Notification
     {
         return new DatabaseMessage([
             'title' => $this->notificationData['title'],
-            'description' => $this->notificationData['message'],
+            'message ' => $this->notificationData['message'],
             'type' => $this->notificationData['type'],
             'data' => $this->notificationData['data'] ?? null,
         ]);

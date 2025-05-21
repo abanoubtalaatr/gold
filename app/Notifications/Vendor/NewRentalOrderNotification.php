@@ -12,12 +12,13 @@ class NewRentalOrderNotification extends Notification
 {
     use Queueable;
 
-  
     protected $orderRental;
+    protected $branch;
 
-    public function __construct($orderRental)
+    public function __construct($orderRental, $branch)
     {
         $this->orderRental = $orderRental;
+        $this->branch = $branch;
     }
 
     public function via($notifiable)
@@ -28,20 +29,21 @@ class NewRentalOrderNotification extends Notification
     public function toDatabase($notifiable)
     {
         $goldPiece = $this->orderRental->goldPiece;
-        $user = $this->orderRental->user;
-        
+        $customer = $this->orderRental->user;
+
         return [
             'title' => [
                 'ar' => 'حجز جديد',
                 'en' => 'New Rental Order'
             ],
-            'description' => [
-                'ar' => "تم استلام حجز جديد للقطعة: {$goldPiece->name} من العميل: {$user->name}",
-                'en' => "New rental order received for piece: {$goldPiece->name} from customer: {$user->name}"
+            'message' => [
+                'ar' => "حجز جديد للقطعة {$goldPiece->name} من العميل {$customer->name} في فرع {$this->branch->name}",
+                'en' => "New rental for {$goldPiece->name} from customer {$customer->name} at {$this->branch->name} branch"
             ],
             'type' => 'new_rental_order',
             'data' => [
                 'order_id' => $this->orderRental->id,
+                'branch_id' => $this->branch->id,
                 'gold_piece_id' => $goldPiece->id,
                 'action_url' => route('vendor.orders.rental.index', $this->orderRental->id)
             ]

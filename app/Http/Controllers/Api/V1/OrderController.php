@@ -57,7 +57,6 @@ class OrderController extends Controller
             // Get the rental order that has this gold piece
             $rentalOrder = OrderRental::where('gold_piece_id', $goldPiece->id)
                 ->where('type', OrderRental::RENT_TYPE)
-                ->where('status', 'accepted')
                 ->first();
 
             if (!$rentalOrder) {
@@ -65,7 +64,7 @@ class OrderController extends Controller
             }
 
             // Get the actual Branch model
-            $branch = Branch::findOrFail($rentalOrder->branch_id);
+            $branch = Branch::with('vendor')->findOrFail($rentalOrder->branch_id);
 
             Log::info('Found branch for notification:', [
                 'branch_id' => $branch->id,
@@ -81,7 +80,7 @@ class OrderController extends Controller
                 'end_date' => $request->end_date,
                 'total_price' => $request->total_price,
                 'type' => OrderRental::LEASE_TYPE,
-                'status' => 'pending',
+                'status' => OrderRental::STATUS_PENDING_APPROVAL
             ]);
 
             // Send notification and broadcast event
@@ -91,9 +90,9 @@ class OrderController extends Controller
                     'branch_id' => $branch->id,
                     'order_id' => $orderRental->id
                 ]);
-                // Send notification to vendor (gold piece owner)
-                if ($goldPiece->user) {
-                    $goldPiece->user->notify(new NewRentalOrderNotification($orderRental));
+                // 2. Send notification to the vendor (branch owner)
+                if ($branch->vendor) {
+                    $branch->vendor->notify(new NewRentalOrderNotification($orderRental, $branch));
                 }
             } catch (\Exception $e) {
                 Log::error('Failed to send notification:', [

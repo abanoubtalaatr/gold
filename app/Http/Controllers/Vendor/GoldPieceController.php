@@ -106,27 +106,6 @@ class GoldPieceController extends Controller
     {
         $goldPiece = GoldPiece::create($request->validated());
 
-        $authUser = auth()->user();
-        $type = $goldPiece->type == 'for_rent' ? 'للإيجار' : 'للبيع';
-        $enType = $goldPiece->type == 'for_rent' ? 'for rent' : 'for sale';
-
-        // Use your custom notification class
-        $authUser->notify(new NewGoldPieceNotification([
-            'title' => [
-                'ar' => 'قطعة ذهب جديدة',
-                'en' => 'New Gold Piece'
-            ],
-            'message' => [
-                'ar' => "تم إضافة قطعة ذهب جديدة $type: {$goldPiece->name}",
-                'en' => "New gold piece added $enType: {$goldPiece->name}"
-            ],
-            'type' => 'new_gold_piece',
-            'data' => [
-                'gold_piece_id' => $goldPiece->id,
-                'action_url' => route('vendor.gold-pieces.show', $goldPiece->id)
-            ]
-        ]));
-
         return redirect()->route('vendor.gold-pieces.index')
             ->with('success', 'Gold piece created successfully.');
     }

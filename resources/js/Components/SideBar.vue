@@ -110,7 +110,7 @@
             <!-- Branches -->
             <li class="nav-item" v-if="hasPermission('vendor read users')">
                 <Link class="nav-link" :href="route('vendor.users.index')"
-                    :class="{ collapsed: !$page.url.startsWith('vendor/users') }">
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/users') }">
                 <i class="bi bi-person"></i>
                 <span>{{ $t("vendor_admins") }}</span>
                 </Link>
@@ -120,7 +120,7 @@
 
             <li class="nav-item" v-if="hasPermission('vendor read orders')">
                 <Link class="nav-link" :href="route('vendor.orders.sale.index')"
-                    :class="{ collapsed: !$page.url.startsWith('vendor/orders') }">
+                :class="{ collapsed: !$page.url.startsWith('/vendor/sale-orders') }">
                 <i class="bi bi-cart"></i>
                 <span>{{ $t("sales_orders") }}</span>
                 </Link>
@@ -131,8 +131,8 @@
 
             <li class="nav-item" v-if="hasPermission('vendor read orders')">
                 <Link class="nav-link" :href="route('vendor.orders.rental.index')"
-                    :class="{ collapsed: !$page.url.startsWith('vendor/orders') }">
-                <i class="bi bi-cart"></i>
+                :class="{ collapsed: !$page.url.startsWith('/vendor/rental-orders') }">
+                <i class="bi bi-cart-check"></i>
                 <span>{{ $t("rental_orders") }}</span>
                 </Link>
             </li>
@@ -140,7 +140,7 @@
 
             <li class="nav-item" v-if="hasPermission('vendor read rental-requests')">
                 <Link class="nav-link" :href="route('vendor.rental-requests.index')"
-                    :class="{ collapsed: !$page.url.startsWith('vendor/rental-requests') }">
+                :class="{ collapsed: !$page.url.startsWith('/vendor/rental-requests') }">
                 <i class="bi bi-calendar-check"></i>
                 <span>{{ $t("rental_requests") }}</span>
                 </Link>
@@ -148,7 +148,7 @@
 
             <li class="nav-item" v-if="hasPermission('vendor read roles')">
                 <Link class="nav-link" :href="route('vendor.roles.index')"
-                    :class="{ collapsed: !$page.url.startsWith('vendor/roles') }">
+                :class="{ collapsed: !$page.url.startsWith('/vendor/roles') }">
                 <i class="bi bi-person-badge"></i>
                 <span>{{ $t("roles") }}</span>
                 </Link>
