@@ -76,7 +76,7 @@ class BranchController extends Controller
             
 
             return redirect()->route('vendor.branches.index')
-                ->with('success', __('Branch created successfully'));
+                ->with('success', __('dashboard.Branch created successfully'));
 
         // } catch (\Exception $e) {
         //     Log::error('Failed to create branch', ['error' => $e->getMessage()]);
@@ -87,8 +87,6 @@ class BranchController extends Controller
 
     public function edit(Branch $branch)
     {
-        $this->authorize('update', $branch);
-
         return Inertia::render('Vendor/Branches/Edit', [
             'branch' => $branch,
             'cities' => City::select(['id as value', 'name as label'])->limit(10)->get()->toArray(),
@@ -97,7 +95,6 @@ class BranchController extends Controller
 
     public function update(BranchRequest $request, Branch $branch)
     {
-        $this->authorize('update', $branch);
 
         try {
             $validated = $request->validated();
@@ -128,38 +125,25 @@ class BranchController extends Controller
             }
 
             return redirect()->route('vendor.branches.index')
-                ->with('success', __('Branch updated successfully'));
+                ->with('success', __('dashboard.Branch updated successfully'));
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', __('Failed to update branch: ') . $e->getMessage());
+                ->with('error', __('dashboard.Failed to update branch: ') . $e->getMessage());
         }
     }
 
     public function destroy(Branch $branch)
     {
-        $this->authorize('delete', $branch);
-
-        if (!$this->branchService->canDelete($branch)) {
-            return back()->with('error', __('This branch cannot be deleted due to active appointments.'));
-        }
-
-        foreach ($branch->images as $image) {
-            Storage::disk('public')->delete($image->path);
-            $image->delete();
-        }
-
         $branch->delete();
 
-        return back()->with('success', __('Branch deleted successfully'));
+        return back()->with('success', __('dashboard.Branch deleted successfully'));
     }
 
     public function toggleStatus(Branch $branch)
     {
-        $this->authorize('update', $branch);
-
         $branch->update(['is_active' => !$branch->is_active]);
 
-        return back()->with('success', __('Branch status updated successfully'));
+        return back()->with('success', __('dashboard.Branch status updated successfully'));
     }
 }
