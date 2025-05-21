@@ -79,7 +79,7 @@ class OrderController extends Controller
                 'end_date' => $request->end_date,
                 'total_price' => $request->total_price,
                 'type'=> OrderRental::LEASE_TYPE,
-                'status' => 'pending',
+                'status' => OrderRental::STATUS_PENDING_APPROVAL,
             ]);
 
             // Send notification and broadcast event

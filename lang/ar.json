@@ -969,8 +969,8 @@
     "vendor read branches": "عرض فروع",
     "vendor view roles": "عرض أدوار",
     "vendor update branches": "تعديل فروع",
-    "vendor create rental-requests": "إنشاء طلبات الايجار",
-    "vendor delete rental-requests": "حذف طلبات الايجار",
+    "vendor create rental-requests": "إنشاء طلبات الاستئجار",
+    "vendor delete rental-requests": "حذف طلبات الاستئجار",
     "vendor view dashboard": "عرض لوحة التحكم",
     "vendor view rental-requests": "عرض طلبات الايجار",
     "vendor read rental-requests": "عرض طلبات الايجار",
@@ -989,6 +989,8 @@
     "vendor create orders": "إنشاء طلبات البيع",
     "vendor read orders": "عرض طلبات البيع",
     "vendor view orders": "عرض طلبات البيع",
-    "vendor update orders": "تعديل طلبات البيع"
+    "vendor update orders": "تعديل طلبات البيع",
+    "vendor view branches": "عرض فروع",
+    "vendor update rental-requests": "تعديل طلبات الاستئجار"
     
 }
