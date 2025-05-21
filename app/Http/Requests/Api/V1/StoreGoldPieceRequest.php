@@ -18,6 +18,7 @@ class StoreGoldPieceRequest extends FormRequest
             'weight' => 'required|numeric|min:0.1',
             'carat' => 'required|in:18,21,24',
             'type' => 'required|in:for_rent,for_sale',
+            'is_including_lobes' => 'required|boolean',
             'description' => 'nullable|string',
             'rental_price_per_day' => 'required_if:type,for_rent|nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
