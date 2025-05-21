@@ -86,11 +86,11 @@
                                 (Array.isArray(form.working_days) ? form.working_days.filter(d => d !== day.value) : []));
                               handleDaySelection(day.value);
                             }"
-                            class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-0 group-hover:border-indigo-400 transition-all duration-200"
+                            class="h-4 w-4 px-3 text-indigo-600 border-gray-300 rounded focus:ring-0 group-hover:border-indigo-400 transition-all duration-200"
                             :class="{ 'border-red-500': form.errors.working_days }"
                           />
                           <span
-                            class="ml-2 text-xs font-medium text-gray-700 group-hover:text-indigo-600 transition-colors duration-200"
+                            class="ml-2 text-xs font-medium px-1 text-gray-700 group-hover:text-indigo-600 transition-colors duration-200"
                           >{{ day.label }}</span>
                         </label>
                       </div>
@@ -117,12 +117,12 @@
               </div>
 
               <!-- Branch Images -->
-              <div class="col-span-1 md:col-span-6">
+              <!-- <div class="col-span-1 md:col-span-6">
                 <InputLabel
                   :value="$t('Branch Images')"
                   class="text-sm font-semibold text-gray-800"
-                />
-                <FileUpload
+                /> -->
+                <!-- <FileUpload
                   v-model="form.images"
                   :multiple="true"
                   accept="image/*"
@@ -130,17 +130,17 @@
                   :maxSize="5120"
                   class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50"
                   :class="{ 'border-red-500': form.errors.images }"
-                />
-                <p class="mt-1 text-xs text-gray-500 font-medium">
+                /> -->
+                <!-- <p class="mt-1 text-xs text-gray-500 font-medium">
                   {{ $t('Max 5 images, 5MB each (JPG, PNG)') }}
                 </p>
                 <InputError
                   :message="form.errors.images"
                   class="mt-1 text-xs text-red-500 font-medium"
-                />
+                /> -->
                 
                 <!-- Display existing images -->
-                <div v-if="existingImages.length" class="mt-4">
+                <!-- <div v-if="existingImages.length" class="mt-4">
                   <h4 class="text-sm font-medium text-gray-700 mb-2">{{ $t('Existing Images') }}</h4>
                   <div class="flex flex-wrap gap-2">
                     <div v-for="(image, index) in existingImages" :key="index" class="relative">
@@ -156,8 +156,8 @@
                       </button>
                     </div>
                   </div>
-                </div>
-              </div>
+                </div> -->
+              <!-- </div> -->
 
               <!-- Submit Button -->
               <div class="col-span-1 md:col-span-12 flex items-center justify-end mt-3 space-x-2">
@@ -168,7 +168,7 @@
                   {{ $t('Cancel') }}
                 </Link>
                 <PrimaryButton
-                  class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold text-xs rounded-md hover:from-indigo-700 hover:to-indigo-800 transition-all duration-200"
+                  class="inline-flex items-center px-4   py-1.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold text-xs rounded-md hover:from-indigo-700 hover:to-indigo-800 transition-all duration-200"
                   :disabled="form.processing || form.working_days.length === 0"
                 >
                   {{ $t('Update Branch') }}
@@ -193,6 +193,9 @@ import PrimaryButton from '@/Components/PrimaryButton.vue'
 import Checkbox from '@/Components/Checkbox.vue'
 import TimePicker from '@/Components/TimePicker.vue'
 import FileUpload from '@/Components/FileUpload.vue'
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
   cities: {
@@ -206,13 +209,13 @@ const props = defineProps({
 })
 
 const weekDays = [
-  { value: 0, label: 'Sunday' },
-  { value: 1, label: 'Monday' },
-  { value: 2, label: 'Tuesday' },
-  { value: 3, label: 'Wednesday' },
-  { value: 4, label: 'Thursday' },
-  { value: 5, label: 'Friday' },
-  { value: 6, label: 'Saturday' },
+  { value: 0, label: t('Sunday') },
+  { value: 1, label: t('Monday') },
+  { value: 2, label: t('Tuesday') },
+  { value: 3, label: t('Wednesday') },
+  { value: 4, label: t('Thursday') },
+  { value: 5, label: t('Friday') },
+  { value: 6, label: t('Saturday') },
 ]
 
 // Initialize form with default working hours structure

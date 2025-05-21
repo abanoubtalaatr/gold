@@ -56,7 +56,6 @@ class OrderController extends Controller
 
             // Get the rental order that has this gold piece
             $rentalOrder = OrderRental::where('gold_piece_id', $goldPiece->id)
-                ->where('type', OrderRental::RENT_TYPE)
                 ->first();
 
             if (!$rentalOrder) {
@@ -102,7 +101,7 @@ class OrderController extends Controller
                 ]);
             }
 
-            broadcast(new OrderRentalEvent($orderRental, $branch->id))->toOthers();
+            // broadcast(new OrderRentalEvent($orderRental, $branch->id))->toOthers();
 
             return new OrderRentalResource($orderRental->load('goldPiece'));
         } catch (\Exception $e) {

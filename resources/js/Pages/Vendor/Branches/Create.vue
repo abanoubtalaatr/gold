@@ -1,4 +1,5 @@
 <template>
+
     <Head :title="editMode ? $t('Edit Branch') : $t('Add New Branch')" />
 
     <AuthenticatedLayout>
@@ -15,101 +16,66 @@
                         <form @submit.prevent="submit" class="grid grid-cols-1 md:grid-cols-12 gap-2">
                             <!-- Branch Name -->
                             <div class="col-span-1 md:col-span-6">
-                                <InputLabel
-                                    for="name"
-                                    :value="$t('Branch Name')"
-                                    class="text-sm font-semibold text-gray-800"
-                                />
-                                <TextInput
-                                    id="name"
-                                    v-model="form.name"
-                                    type="text"
+                                <InputLabel for="name" :value="$t('Branch Name')"
+                                    class="text-sm font-semibold text-gray-800" />
+                                <TextInput id="name" v-model="form.name" type="text"
                                     class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 ease-in-out"
                                     :class="{ 'border-red-500 focus:border-red-500': form.errors.name }"
-                                    placeholder="Branch name"
-                                />
-                                <InputError
-                                    :message="form.errors.name"
-                                    class="mt-1 text-xs text-red-500 font-medium"
-                                />
+                                    :placeholder="$t('Branch Name')" />
+                                <InputError :message="form.errors.name" class="mt-1 text-xs text-red-500 font-medium" />
                             </div>
 
                             <!-- City Selection -->
                             <div class="col-span-1 md:col-span-6">
-                                <InputLabel
-                                    for="city_id"
-                                    :value="$t('City')"
-                                    class="text-sm font-semibold text-gray-800"
-                                />
-                                <select
-                                    id="city_id"
-                                    v-model="form.city_id"
+                                <InputLabel for="city_id" :value="$t('City')"
+                                    class="text-sm font-semibold text-gray-800" />
+                                <select id="city_id" v-model="form.city_id"
                                     class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 ease-in-out"
-                                    :class="{ 'border-red-500 focus:border-red-500': form.errors.city_id }"
-                                >
+                                    :class="{ 'border-red-500 focus:border-red-500': form.errors.city_id }">
                                     <option value="" disabled selected>{{ $t('Select a city') }}</option>
                                     <option v-for="city in cities" :key="city.value" :value="city.value">
                                         {{ city.label }}
                                     </option>
                                 </select>
-                                <InputError
-                                    :message="form.errors.city_id"
-                                    class="mt-1 text-xs text-red-500 font-medium"
-                                />
+                                <InputError :message="form.errors.city_id"
+                                    class="mt-1 text-xs text-red-500 font-medium" />
                             </div>
 
                             <!-- Working Days and Hours -->
                             <div class="col-span-1 md:col-span-6">
-                                <InputLabel
-                                    :value="$t('Working Days and Hours')"
-                                    class="text-sm font-semibold text-gray-800"
-                                />
+                                <InputLabel :value="$t('Working Days and Hours')"
+                                    class="text-sm font-semibold text-gray-800" />
                                 <div class="mt-1 bg-gray-50 border-2 border-gray-200 rounded-md p-2">
-                                    <InputError
-                                        :message="form.errors.working_days"
-                                        class="text-xs text-red-500 font-medium"
-                                    />
+                                    <InputError :message="form.errors.working_days"
+                                        class="text-xs text-red-500 font-medium" />
                                     <div class="space-y-2">
-                                        <div
-                                            v-for="day in weekDays"
-                                            :key="day.value"
-                                            class="flex items-center space-x-2"
-                                        >
+                                        <div v-for="day in weekDays" :key="day.value"
+                                            class="flex items-center space-x-2">
                                             <div class="w-1/3">
                                                 <label class="flex items-center group">
-                                                    <Checkbox
-    :value="day.value"
-    :modelValue="form.working_days"
-    @update:modelValue="(newValue) => {
-        form.working_days = Array.isArray(newValue) ? newValue : 
-                           (newValue ? [...(Array.isArray(form.working_days) ? form.working_days : []), day.value] : 
-                           (Array.isArray(form.working_days) ? form.working_days.filter(d => d !== day.value) : []));
-        handleDaySelection(day.value);
-    }"
-    class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-0 group-hover:border-indigo-400 transition-all duration-200"
-    :class="{ 'border-red-500': form.errors.working_days }"
-/>
+                                                    <Checkbox :value="day.value" :modelValue="form.working_days"
+                                                        @update:modelValue="(newValue) => {
+                                                            form.working_days = Array.isArray(newValue) ? newValue :
+                                                                (newValue ? [...(Array.isArray(form.working_days) ? form.working_days : []), day.value] :
+                                                                    (Array.isArray(form.working_days) ? form.working_days.filter(d => d !== day.value) : []));
+                                                            handleDaySelection(day.value);
+                                                        }" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-0 group-hover:border-indigo-400 transition-all duration-200"
+                                                        :class="{ 'border-red-500': form.errors.working_days }" />
                                                     <span
-                                                        class="ml-2 text-xs font-medium text-gray-700 group-hover:text-indigo-600 transition-colors duration-200"
-                                                    >{{ day.label }}</span>
+                                                        class="ml-2 text-xs font-medium text-gray-700 px-1 group-hover:text-indigo-600 transition-colors duration-200">{{
+                                                        day.label }}</span>
                                                 </label>
                                             </div>
-                                            <div
-                                                v-if="form.working_days.includes(day.value)"
-                                                class="flex-1 grid grid-cols-2 gap-1 items-center"
-                                            >
-                                                <TimePicker
-                                                    v-model="form.working_hours[day.value].open"
+                                            <div v-if="form.working_days.includes(day.value)"
+                                                class="flex-1 grid grid-cols-2 gap-1 items-center">
+                                                <TimePicker v-model="form.working_hours[day.value].open"
                                                     :placeholder="$t('Open')"
                                                     class="rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 text-xs"
-                                                    :class="{ 'border-red-500 focus:border-red-500': form.errors[`working_hours.${day.value}.open`] }"
-                                                />
-                                                <TimePicker
-                                                    v-model="form.working_hours[day.value].close"
+                                                    :class="{ 'border-red-500 focus:border-red-500': form.errors[`working_hours.${day.value}.open`] }" />
+                                                <TimePicker v-model="form.working_hours[day.value].close"
                                                     :placeholder="$t('Close')"
                                                     class="rounded-md border-2 border-gray-200 bg-white text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 text-xs"
-                                                    :class="{ 'border-red-500 focus:border-red-500': form.errors[`working_hours.${day.value}.close`] }"
-                                                />
+                                                    :class="{ 'border-red-500 focus:border-red-500': form.errors[`working_hours.${day.value}.close`] }" />
                                             </div>
                                         </div>
                                     </div>
@@ -117,12 +83,12 @@
                             </div>
 
                             <!-- Branch Images -->
-                            <div class="col-span-1 md:col-span-6">
+                            <!-- <div class="col-span-1 md:col-span-6">
                                 <InputLabel
                                     :value="$t('Branch Images')"
                                     class="text-sm font-semibold text-gray-800"
-                                />
-                                <FileUpload
+                                /> -->
+                            <!-- <FileUpload
                                     v-model="form.images"
                                     :multiple="true"
                                     accept="image/*"
@@ -130,17 +96,17 @@
                                     :maxSize="5120"
                                     class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50"
                                     :class="{ 'border-red-500': form.errors.images }"
-                                />
-                                <p class="mt-1 text-xs text-gray-500 font-medium">
+                                /> -->
+                            <!-- <p class="mt-1 text-xs text-gray-500 font-medium">
                                     {{ $t('Max 5 images, 5MB each (JPG, PNG)') }}
                                 </p>
                                 <InputError
                                     :message="form.errors.images"
                                     class="mt-1 text-xs text-red-500 font-medium"
-                                />
-                                
-                                <!-- Display existing images in edit mode -->
-                                <div v-if="editMode && existingImages.length" class="mt-4">
+                                /> -->
+
+                            <!-- Display existing images in edit mode -->
+                            <!-- <div v-if="editMode && existingImages.length" class="mt-4">
                                     <h4 class="text-sm font-medium text-gray-700 mb-2">{{ $t('Existing Images') }}</h4>
                                     <div class="flex flex-wrap gap-2">
                                         <div v-for="(image, index) in existingImages" :key="index" class="relative">
@@ -156,21 +122,18 @@
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                </div> -->
+                            <!-- </div> -->
 
                             <!-- Submit Button -->
                             <div class="col-span-1 md:col-span-12 flex items-center justify-end mt-3 space-x-2">
-                                <Link
-                                    :href="route('vendor.branches.index')"
-                                    class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 hover:text-gray-900 transition-all duration-200"
-                                >
-                                    {{ $t('Cancel') }}
+                                <Link :href="route('vendor.branches.index')"
+                                    class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 hover:text-gray-900 transition-all duration-200">
+                                {{ $t('Cancel') }}
                                 </Link>
                                 <PrimaryButton
                                     class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold text-xs rounded-md hover:from-indigo-700 hover:to-indigo-800 transition-all duration-200"
-                                    :disabled="form.processing || form.working_days.length === 0"
-                                >
+                                    :disabled="form.processing || form.working_days.length === 0">
                                     {{ editMode ? $t('Update Branch') : $t('Create Branch') }}
                                 </PrimaryButton>
                             </div>
@@ -193,7 +156,9 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import TimePicker from '@/Components/TimePicker.vue';
 import FileUpload from '@/Components/FileUpload.vue';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const props = defineProps({
     cities: {
         type: Array,
@@ -208,13 +173,13 @@ const props = defineProps({
 const editMode = computed(() => !!props.branch);
 
 const weekDays = [
-    { value: 0, label: 'Sunday' },
-    { value: 1, label: 'Monday' },
-    { value: 2, label: 'Tuesday' },
-    { value: 3, label: 'Wednesday' },
-    { value: 4, label: 'Thursday' },
-    { value: 5, label: 'Friday' },
-    { value: 6, label: 'Saturday' },
+    { value: 0, label: t('Sunday') },
+    { value: 1, label: t('Monday') },
+    { value: 2, label: t('Tuesday') },
+    { value: 3, label: t('Wednesday') },
+    { value: 4, label: t('Thursday') },
+    { value: 5, label: t('Friday') },
+    { value: 6, label: t('Saturday') },
 ];
 
 // Initialize form with default working hours structure
@@ -234,7 +199,7 @@ const form = useForm({
     city_id: props.branch?.city_id || '',
     working_days: props.branch?.working_days || [], // Ensure this is always an array
     working_hours: initializeWorkingHours(
-        props.branch?.working_days, 
+        props.branch?.working_days,
         props.branch?.working_hours || {}
     ),
     images: [],
@@ -246,7 +211,7 @@ const existingImages = ref(props.branch?.images || []);
 const handleDaySelection = (dayValue) => {
     // Ensure working_days is always treated as an array
     const workingDays = Array.isArray(form.working_days) ? form.working_days : [];
-    
+
     if (workingDays.includes(dayValue)) {
         // Day is selected - ensure working hours exist
         if (!form.working_hours[dayValue]) {
@@ -254,8 +219,8 @@ const handleDaySelection = (dayValue) => {
         }
     } else {
         // Day is deselected - remove from working hours if empty
-        if (form.working_hours[dayValue] && 
-            form.working_hours[dayValue].open === '09:00' && 
+        if (form.working_hours[dayValue] &&
+            form.working_hours[dayValue].open === '09:00' &&
             form.working_hours[dayValue].close === '17:00') {
             delete form.working_hours[dayValue];
         }
@@ -270,7 +235,7 @@ const removeExistingImage = (index) => {
 
 const submit = () => {
     if (form.working_days.length === 0) {
-        form.errors.working_days = 'Please select at least one working day';
+        form.errors.working_days = t('Please select at least one working day');
         return;
     }
 

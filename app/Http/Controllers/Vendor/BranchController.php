@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Vendor\BranchRequest;
-use App\Models\Branch;
 use App\Models\City;
-use App\Services\BranchService;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\State;
+use App\Models\Branch;
+use App\Models\Country;
+use Illuminate\Http\Request;
+use App\Services\BranchService;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Vendor\BranchRequest;
 
 class BranchController extends Controller
 {
@@ -31,7 +34,16 @@ class BranchController extends Controller
 
     public function create()
     {
+        //saudi arabia country id is 194
+        
+        $country = Country::find(194);
+        
+        // i want to get all cities for this all states for this country  
+        $states = State::where('country_id', $country->id)->pluck('id')->toArray();
         $cities = City::select(['id as value', 'name as label'])->limit(10)->get()->toArray();
+
+        // $cities = City::whereIn('state_id',$states)->get()->toArray();
+     
 
         return Inertia::render('Vendor/Branches/Create', [
             'cities' => $cities,
@@ -64,7 +76,7 @@ class BranchController extends Controller
             
 
             return redirect()->route('vendor.branches.index')
-                ->with('success', __('Branch created successfully'));
+                ->with('success', __('dashboard.Branch created successfully'));
 
         // } catch (\Exception $e) {
         //     Log::error('Failed to create branch', ['error' => $e->getMessage()]);
@@ -75,17 +87,14 @@ class BranchController extends Controller
 
     public function edit(Branch $branch)
     {
-        $this->authorize('update', $branch);
-
         return Inertia::render('Vendor/Branches/Edit', [
             'branch' => $branch,
-            'cities' => City::select(['id as value', 'name as label'])->get()->toArray(),
+            'cities' => City::select(['id as value', 'name as label'])->limit(10)->get()->toArray(),
         ]);
     }
 
     public function update(BranchRequest $request, Branch $branch)
     {
-        $this->authorize('update', $branch);
 
         try {
             $validated = $request->validated();
@@ -101,7 +110,7 @@ class BranchController extends Controller
             // Handle image uploads
             if ($request->hasFile('images')) {
                 foreach ($branch->images as $image) {
-                    \Storage::disk('public')->delete($image->path);
+                    Storage::disk('public')->delete($image->path);
                     $image->delete();
                 }
                 foreach ($request->file('images') as $image) {
@@ -116,38 +125,25 @@ class BranchController extends Controller
             }
 
             return redirect()->route('vendor.branches.index')
-                ->with('success', __('Branch updated successfully'));
+                ->with('success', __('dashboard.Branch updated successfully'));
 
         } catch (\Exception $e) {
             return back()->withInput()
-                ->with('error', __('Failed to update branch: ') . $e->getMessage());
+                ->with('error', __('dashboard.Failed to update branch: ') . $e->getMessage());
         }
     }
 
     public function destroy(Branch $branch)
     {
-        $this->authorize('delete', $branch);
-
-        if (!$this->branchService->canDelete($branch)) {
-            return back()->with('error', __('This branch cannot be deleted due to active appointments.'));
-        }
-
-        foreach ($branch->images as $image) {
-            \Storage::disk('public')->delete($image->path);
-            $image->delete();
-        }
-
         $branch->delete();
 
-        return back()->with('success', __('Branch deleted successfully'));
+        return back()->with('success', __('dashboard.Branch deleted successfully'));
     }
 
     public function toggleStatus(Branch $branch)
     {
-        $this->authorize('update', $branch);
-
         $branch->update(['is_active' => !$branch->is_active]);
 
-        return back()->with('success', __('Branch status updated successfully'));
+        return back()->with('success', __('dashboard.Branch status updated successfully'));
     }
 }
