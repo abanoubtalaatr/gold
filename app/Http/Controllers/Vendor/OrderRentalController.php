@@ -114,14 +114,14 @@ class OrderRentalController extends Controller
 
     public function updateStatus(Request $request, $orderId)
     {
+
         $order = OrderRental::findOrFail($orderId);
         $this->authorizeVendor($order);
-
         $request->validate([
-            'status' => 'required|in:piece_sent,available,sold,rented,pending-approval,approved',
+            'data.status' => 'required|in:piece_sent,available,sold,rented,pending-approval,approved',
         ]);
 
-        $newStatus = match ($request->status) {
+        $newStatus = match ($request->input('data.status')) {
             'piece_sent' => OrderRental::STATUS_PIECE_SENT,
             'available' => OrderRental::STATUS_AVAILABLE,
             'sold' => OrderRental::STATUS_SOLD,

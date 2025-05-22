@@ -94,7 +94,7 @@
                                             <strong @click="showDetails(order)"
                                                 class="text-yellow-600 hover:text-yellow-200 hover:underline cursor-pointer transition-colors duration-200">
                                                 {{ order.gold_piece && order.gold_piece.name ? order.gold_piece.name :
-                                                'N/A' }}
+                                                    'N/A' }}
                                             </strong>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -186,23 +186,26 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <p><strong>{{ $t('Name') }}:</strong>
-                                         {{ selectedOrder.gold_piece && selectedOrder.gold_piece.name ? selectedOrder.gold_piece.name :
-                                                'N/A' }}
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.name ?
+                                            selectedOrder.gold_piece.name :
+                                            'N/A' }}
                                     </p>
                                     <p><strong>{{ $t('Description') }}:</strong>
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.description ? selectedOrder.gold_piece.description :
-                                                'N/A' }}
-                                        </p>
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.description ?
+                                            selectedOrder.gold_piece.description :
+                                            'N/A' }}
+                                    </p>
                                     <p><strong>{{ $t('Type') }}:</strong> {{ selectedOrder.goldPiece?.type === 'rent' ?
                                         $t('Rental') : $t('Sale') }}</p>
                                     <p><strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR')
-                                        }}</p>
+                                    }}</p>
                                     <p><strong>{{ $t('Weight') }}:</strong>
-                                        
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.weight ? selectedOrder.gold_piece.weight :
-                                                'N/A' }}
+
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.weight ?
+                                            selectedOrder.gold_piece.weight :
+                                            'N/A' }}
                                         {{
-                                        $t('grams') }}</p>
+                                            $t('grams') }}</p>
                                     <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || 'N/A' }}</p>
                                     <p><strong>{{ $t('Status') }}:</strong> {{ formatStatus(selectedOrder.status) }}</p>
                                 </div>
@@ -327,12 +330,13 @@ const getStatusClass = (status) => {
 
 const formatStatus = (status) => {
     const statusMap = {
-        'pending-approval': 'Pending Approval',
-        'approved': 'Approved',
-        'piece_sent': 'Piece Sent',
-        'rented': 'Rented',
-        'available': 'Available',
-        'sold': 'Sold'
+        'pending-approval': t('Pending Approval'),
+        'approved': t('Approved'),
+        'piece_sent': t('Piece Sent'),
+        'rented': t('Rented'),
+        'available': t('Available'),
+        'sold': t('Sold'),
+        'rejected': t('rejected'),
     };
 
     return statusMap[status] || status
@@ -369,7 +373,7 @@ const acceptOrder = () => {
 //         });
 //     }
 
-    const rejectOrder = (orderId) => {
+const rejectOrder = (orderId) => {
     if (confirm(t('Are you sure you want to reject this order?'))) {
         router.post(route('vendor.orders.sales.reject', orderId), {
             preserveScroll: true,

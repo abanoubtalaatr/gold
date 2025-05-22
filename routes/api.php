@@ -1,27 +1,29 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\FaqController;
-use App\Http\Controllers\Api\StateController;
-use App\Http\Controllers\Api\CountryController;
-use App\Http\Controllers\Api\PageApiController;
-use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\ContactUsController;
-use App\Http\Controllers\Api\V1\RatingController;
-use App\Http\Controllers\Api\V1\AddressController;
+use App\Http\Controllers\Api\CountryController;
+use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\PageApiController;
 use App\Http\Controllers\Api\SettingsApiController;
+use App\Http\Controllers\Api\StateController;
+use App\Http\Controllers\Api\V1\AddressController;
+use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
+use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
+use App\Http\Controllers\Api\V1\Auth\LoginController;
+use App\Http\Controllers\Api\V1\Auth\PasswordController;
+use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
+use App\Http\Controllers\Api\V1\Auth\ProfileController;
+use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\ContactController;
 use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\GoldPieceController;
-use App\Http\Controllers\Api\V1\Auth\LoginController;
-use App\Http\Controllers\Api\V1\Auth\ProfileController;
-use App\Http\Controllers\Api\V1\NotificationController;
-use App\Http\Controllers\Api\V1\Auth\PasswordController;
-use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\LiquidationRequestController;
-use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\NotificationSettingController;
-use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
-use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
+use App\Http\Controllers\Api\V1\OrderController;
+use App\Http\Controllers\Api\V1\RatingController;
+use Illuminate\Support\Facades\Route;
+
 
 
 Route::get('settings', [SettingsApiController::class, 'index'])->name('settings');
@@ -39,7 +41,7 @@ Route::group(["prefix" => "auth"], function () {
     Route::post('social_login', [LoginController::class, 'social_login']);
 });
 
-//Mockup 
+//Mockup
 Route::get('countries', [CountryController::class, 'index']);
 Route::get('countries/{country}/states', [CountryController::class, 'states']);
 Route::get('cities', [StateController::class, 'cities']);
@@ -105,7 +107,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
 
     /*
     |--------------------------------------------------------------------------
-    | Orders.... 
+    | Orders....
     |--------------------------------------------------------------------------
     */
 
@@ -126,10 +128,10 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::delete('/notifications/{id}', [App\Http\Controllers\Api\V1\NotificationController::class, 'destroy']);
     Route::delete('/notifications', [App\Http\Controllers\Api\V1\NotificationController::class, 'deleteAllNotifications']);
     Route::post('toggle-enable-notifications', NotificationSettingController::class);
-   
+
     /*
     |--------------------------------------------------------------------------
-    | Ratings.... 
+    | Ratings....
     |--------------------------------------------------------------------------
     */
 
@@ -141,8 +143,17 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
 
     /*
     |--------------------------------------------------------------------------
-    | Liquidation-requests.... 
+    | Liquidation-requests....
     |--------------------------------------------------------------------------
     */
     Route::apiResource('liquidation-requests', LiquidationRequestController::class)->except(['update']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | complains....
+    |--------------------------------------------------------------------------
+    */
+
+    Route::apiResource('/contacts', ContactController::class);
+
 });

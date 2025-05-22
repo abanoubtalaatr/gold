@@ -19,7 +19,7 @@ use App\Http\Controllers\Vendor\OrderRentalController;
 use App\Http\Controllers\Vendor\OrderSalesController;
 use App\Http\Controllers\Vendor\RentalRequestController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Vendor\RoleController;
+use App\Http\Controllers\Vendor\ContactController as VendorContactController;
 use App\Http\Controllers\Vendor\UserController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Vendor\VerifyController;
@@ -46,7 +46,11 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('notification', NotificationController::class)
         ->middleware('auth')
         ->only(['index']);
-
+    Route::prefix('notifications')->group(function () {
+        Route::post('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+        Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+    });
     /************************************************************************ */
 
     Route::resource('users', UsersController::class);
@@ -170,23 +174,27 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
         ->name('gold-pieces.toggle-status');
 
 
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::post('/orders/{orderId}/accept', [OrderController::class, 'accept'])->name('orders.accept');
+    Route::get('/orders', action: [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/{orderId}/accept', action: [OrderController::class, 'accept'])->name('orders.accept');
     Route::post('/orders/{orderId}/reject', [OrderController::class, 'reject'])->name('orders.reject');
     Route::patch('/orders/{orderId}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
 
 
     route::controller(OrderRentalController::class)->group(function () {
-        Route::get('/rental-orders', action: 'index')->name('orders.rental.index');
+        Route::get('/rental-orders', 'index')->name('orders.rental.index');
         Route::post('/rental-orders/{orderId}/accept', 'accept')->name('orders.rental.accept');
         Route::post('/rental-orders/{orderId}/reject', 'reject')->name('orders.rental.reject');
         Route::patch('/rental-orders/{orderId}/status', 'updateStatus')->name('orders.rental.updateStatus');
 
     });
 
+    Route::resource('contacts', VendorContactController::class)->except("show");
+    Route::post('contacts/{contact}/replay', [VendorContactController::class, 'reply'])->name('contacts.reply');
+    Route::PATCH('contacts/{contact}/markAsRead', [VendorContactController::class, 'markAsRead'])->name('contacts.markAsRead');
+
 
     route::controller(OrderSalesController::class)->group(function () {
-        Route::get('/sale-orders', action: 'index')->name('orders.sale.index');
+        Route::get('/sale-orders', 'index')->name('orders.sale.index');
         Route::post('/sale-orders/{orderId}/accept', 'accept')->name('orders.sales.accept');
         Route::post('/sale-orders/{orderId}/reject', 'reject')->name('orders.sales.reject');
         Route::patch('/sale-orders/{orderId}/status', 'updateStatus')->name('orders.sales.updateStatus');
