@@ -154,7 +154,6 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     |--------------------------------------------------------------------------
     */
 
-    Route::post('/contacts', [ContactController::class, 'store']);
-    Route::get('/contacts', [ContactController::class, 'index']);
+    Route::apiResource('/contacts', ContactController::class);
 
 });
