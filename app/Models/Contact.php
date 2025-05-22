@@ -21,7 +21,9 @@ class Contact extends Model
         'lat',
         'lng',
         'user_id',
-        'reply'
+        'reply',
+        'sale_order_id',
+        'rental_order_id',
     ];
 
 
@@ -39,5 +41,15 @@ class Contact extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function saleOrder()
+    {
+        return $this->belongsTo(OrderSale::class, 'sale_order_id');
+    }
+
+    public function rentalOrder()
+    {
+        return $this->belongsTo(OrderRental::class, 'rental_order_id');
     }
 }

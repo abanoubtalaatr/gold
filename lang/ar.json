@@ -1026,6 +1026,8 @@
     "Branch name": "اسم الفرع",
     "Create Branch": "إنشاء فرع",
     "Please select at least one working day": "يرجى اختيار يوم عمل على الأقل",
-    "Select a city": "اختر مدينة"
-    
+    "Select a city": "اختر مدينة",
+    "Mark as Rented": "تم استئجاره",
+    "Mark as Available": "متاح",
+    "Mark as Sold": "تم بيعه"
 }
