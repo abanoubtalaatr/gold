@@ -121,18 +121,91 @@
                                                     class="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors duration-200">
                                                     {{ $t('Reject') }}
                                                 </button>
-                                                <select
-  v-if="['approved', 'piece_sent', 'available'].includes(order.status)"
-  v-model="order.status"
-  @change="updateStatus(order.id, order.status)"
-  class="px-3 py-1 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
->
-  <option value="" disabled>{{ $t('Update Status') }}</option>
-  <option value="piece_sent" v-if="order.status === 'approved'">{{ $t('Piece Sent') }}</option>
-  <option value="rented" v-if="order.status === 'piece_sent'">{{ $t('Mark as Rented') }}</option>
-  <option value="available" v-if="order.status === 'rented'">{{ $t('Mark as Available') }}</option>
-  <option value="sold">{{ $t('Mark as Sold') }}</option>
-</select>
+
+                                                <!-- Updated Dropdown Menu with all status options -->
+                                                <div class="relative inline-block text-left"
+                                                    v-if="['approved', 'piece_sent', 'available', 'rented'].includes(order.status)">
+                                                    <button type="button" @click.stop="toggleOrderDropdown(order.id)"
+                                                        class="inline-flex items-center justify-center w-full px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-150"
+                                                        :aria-expanded="activeDropdown === order.id"
+                                                        aria-haspopup="true">
+                                                        {{ $t('Actions') }}
+                                                        <svg class="w-4 h-4 ml-2 -mr-1"
+                                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                            fill="currentColor">
+                                                            <path fill-rule="evenodd"
+                                                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                                                                clip-rule="evenodd" />
+                                                        </svg>
+                                                    </button>
+                                                    <transition enter-active-class="transition ease-out duration-100"
+                                                        enter-from-class="transform opacity-0 scale-95"
+                                                        enter-to-class="transform opacity-100 scale-100"
+                                                        leave-active-class="transition ease-in duration-75"
+                                                        leave-from-class="transform opacity-100 scale-100"
+                                                        leave-to-class="transform opacity-0 scale-95">
+                                                        <div v-if="activeDropdown === order.id" ref="dropdown"
+                                                            class="absolute right-0 z-20 w-48 mt-2 origin-top-right bg-white border border-gray-200 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                                            role="menu" aria-orientation="vertical"
+                                                            :aria-labelledby="'menu-button-' + order.id">
+                                                            <div class="py-1">
+                                                                <button v-if="order.status === 'approved'"
+                                                                    @click="updateStatus(order.id, 'piece_sent')"
+                                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-900 font-medium transition-colors duration-150 menue"
+                                                                    role="menuitem">
+                                                                    <svg class="w-4 h-4 mr-3 text-blue-500"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 20 20" fill="currentColor">
+                                                                        <path
+                                                                            d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                                                                    </svg>
+                                                                    {{ $t('Piece Sent') }}
+                                                                </button>
+
+                                                                <button v-if="order.status === 'piece_sent'"
+                                                                    @click="updateStatus(order.id, 'rented')"
+                                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-900 font-medium transition-colors duration-150 menue"
+                                                                    role="menuitem">
+                                                                    <svg class="w-4 h-4 mr-3 text-purple-500"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 20 20" fill="currentColor">
+                                                                        <path fill-rule="evenodd"
+                                                                            d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                                                                            clip-rule="evenodd" />
+                                                                    </svg>
+                                                                    {{ $t('Mark as Rented') }}
+                                                                </button>
+
+                                                                <button v-if="order.status === 'rented'"
+                                                                    @click="updateStatus(order.id, 'available')"
+                                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-900 font-medium transition-colors duration-150 menue"
+                                                                    role="menuitem">
+                                                                    <svg class="w-4 h-4 mr-3 text-indigo-500"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 20 20" fill="currentColor">
+                                                                        <path fill-rule="evenodd"
+                                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                                            clip-rule="evenodd" />
+                                                                    </svg>
+                                                                    {{ $t('Mark as Available') }}
+                                                                </button>
+
+                                                                <button @click="updateStatus(order.id, 'sold')"
+                                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-900 font-medium transition-colors duration-150 menue"
+                                                                    role="menuitem">
+                                                                    <svg class="w-4 h-4 mr-3 text-gray-500"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        viewBox="0 0 20 20" fill="currentColor">
+                                                                        <path fill-rule="evenodd"
+                                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                                                                            clip-rule="evenodd" />
+                                                                    </svg>
+                                                                    {{ $t('Mark as Sold') }}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </transition>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -197,20 +270,23 @@
                         <div v-if="selectedOrder" class="mt-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <p><strong>{{ $t('Name') }}:</strong> 
-                                         {{ selectedOrder.gold_piece && selectedOrder.gold_piece.name ? selectedOrder.gold_piece.name :
-                                                    'N/A' }}
+                                    <p><strong>{{ $t('Name') }}:</strong>
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.name ?
+                                            selectedOrder.gold_piece.name :
+                                            'N/A' }}
                                     </p>
                                     <p><strong>{{ $t('Description') }}:</strong>
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.description ? selectedOrder.gold_piece.description :
-                                                    'N/A' }}</p>
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.description ?
+                                            selectedOrder.gold_piece.description :
+                                            'N/A' }}</p>
                                     <p><strong>{{ $t('Type') }}:</strong> {{ selectedOrder.goldPiece?.type === 'rent' ?
                                         $t('Rental') : $t('Sale') }}</p>
                                     <p><strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR')
                                         }}</p>
                                     <p><strong>{{ $t('Weight') }}:</strong>
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.weight ? selectedOrder.gold_piece.weight :
-                                                    'N/A' }}
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.weight ?
+                                            selectedOrder.gold_piece.weight :
+                                            'N/A' }}
                                         {{
                                             $t('grams') }}</p>
                                     <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || 'N/A' }}</p>
@@ -245,7 +321,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
@@ -289,6 +365,7 @@ const acceptForm = useForm({
 });
 
 const showDetailsModal = ref(false);
+const activeDropdown = ref(null);
 
 const debouncedSearch = debounce(() => {
     form.get(route('vendor.orders.rental.index'), {
@@ -372,14 +449,6 @@ const acceptOrder = () => {
     });
 };
 
-// const rejectOrder = (orderId) => {
-//     if (confirm($t('Are you sure you want to reject this order?'))) {
-//         form.post(route('vendor.orders.rental.reject', orderId), {
-//             preserveScroll: true,
-//         });
-//     }
-// };
-
 const rejectOrder = (orderId) => {
     if (confirm(t('Are you sure you want to reject this order?'))) {
         router.post(route('vendor.orders.rental.reject', orderId), {
@@ -392,15 +461,23 @@ const rejectOrder = (orderId) => {
             }
         });
     }
-
 };
 
 const updateStatus = (orderId, status) => {
     if (!status) return;
 
-    form.patch(route('vendor.orders.rental.updateStatus', orderId), {
-        status,
+    // Close the dropdown after selection
+    activeDropdown.value = null;
+
+    router.patch(route('vendor.orders.rental.updateStatus', orderId), {
+        data: { status: status },  // Explicitly send status in data object
         preserveScroll: true,
+        onSuccess: () => {
+            // Optional: Add any success handling
+        },
+        onError: (errors) => {
+            console.error('Error updating status:', errors);
+        }
     });
 };
 
@@ -413,11 +490,39 @@ const closeDetailsModal = () => {
     showDetailsModal.value = false;
     selectedOrder.value = null;
 };
+
+const toggleOrderDropdown = (orderId) => {
+    if (activeDropdown.value === orderId) {
+        activeDropdown.value = null;
+    } else {
+        activeDropdown.value = orderId;
+    }
+};
+
+// Close dropdown when clicking outside
+const onClickOutside = (event) => {
+    if (activeDropdown.value && !event.target.closest('.relative.inline-block')) {
+        activeDropdown.value = null;
+    }
+};
+
+onMounted(() => {
+    document.addEventListener('click', onClickOutside);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', onClickOutside);
+});
 </script>
 
 <style>
 /* Ensure no duplicate overlays */
 .modal-overlay {
     display: none !important;
+}
+
+.menue {
+    background-color: inherit !important;
+    border: none !important;
 }
 </style>

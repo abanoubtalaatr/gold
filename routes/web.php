@@ -46,7 +46,11 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('notification', NotificationController::class)
         ->middleware('auth')
         ->only(['index']);
-
+Route::prefix('notifications')->group(function () {
+    Route::post('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+});
     /************************************************************************ */
 
     Route::resource('users', UsersController::class);
@@ -170,8 +174,8 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
         ->name('gold-pieces.toggle-status');
 
 
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::post('/orders/{orderId}/accept', [OrderController::class, 'accept'])->name('orders.accept');
+    Route::get('/orders', action: [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders/{orderId}/accept', action: [OrderController::class, 'accept'])->name('orders.accept');
     Route::post('/orders/{orderId}/reject', [OrderController::class, 'reject'])->name('orders.reject');
     Route::patch('/orders/{orderId}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
 
