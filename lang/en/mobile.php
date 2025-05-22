@@ -202,4 +202,5 @@ return [
     'Notification marked as read.' => 'Notification marked as read.',
     'Notifications fetched successfully' => 'Notifications fetched successfully',
     'message sent successfully.' => 'Contact us created successfully',
+    'mobile_not_verified' => 'Mobile not verified',
 ];

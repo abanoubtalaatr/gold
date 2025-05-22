@@ -150,6 +150,7 @@ return [
     'Notification marked as read.' => 'تم وضع علامة مقروء على الإشعار',
     'Notifications fetched successfully' => 'تم استرجاع الإشعارات بنجاح',
     'message sent successfully.' => 'تم إنشاء الاستفسار بنجاح',
+    'mobile_not_verified' => 'رقم الهاتف غير متحقق',
     
 
 

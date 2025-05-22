@@ -166,7 +166,7 @@ class LoginController extends AppBaseController
 
                 // $this->smsService->send_sms($mobile,$msg);
 
-                return $this->errorResponse('mobile.mobile_not_verified', ['code' => $cnfrm_data['code']], 200);
+                return $this->errorResponse('mobile.mobile_not_verified', ['code' => $cnfrm_data['code'],'is_verified' => false], 200);
             }
         }
 
