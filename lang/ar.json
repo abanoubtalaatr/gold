@@ -1029,5 +1029,9 @@
     "Select a city": "اختر مدينة",
     "Mark as Rented": "تم استئجاره",
     "Mark as Available": "متاح",
-    "Mark as Sold": "تم بيعه"
+    "Mark as Sold": "تم بيعه",
+    "User": "المستخدم",
+    "Gold Piece": "قطعة الذهب",
+    "Order ID": "رقم الطلب",
+    "Price": "السعر"
 }

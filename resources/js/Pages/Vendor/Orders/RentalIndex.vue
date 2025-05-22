@@ -414,12 +414,13 @@ const getStatusClass = (status) => {
 
 const formatStatus = (status) => {
     const statusMap = {
-        'pending_approval': 'Pending Approval',
-        'approved': 'Approved',
-        'piece_sent': 'Piece Sent',
-        'rented': 'Rented',
-        'available': 'Available',
-        'sold': 'Sold'
+        'pending_approval': t('Pending Approval'),
+        'approved': t('Approved'),
+        'piece_sent': t('Piece Sent'),
+        'rented': t('Rented'),
+        'available': t('Available'),
+        'sold': t('Sold'),
+        'rejected': t('rejected'),
     };
 
     return statusMap[status] || status
