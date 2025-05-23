@@ -54,10 +54,10 @@ class User extends Authenticatable implements JWTSubject
         'vendor_id',
         'latitude',
         'longitude',
-    'store_name_en',
-    'store_name_ar',
-    'commercial_registration_number',
-    'commercial_registration_image',
+        'store_name_en',
+        'store_name_ar',
+        'commercial_registration_number',
+        'commercial_registration_image',
     ];
 
     protected $appends = ['avatar'];
@@ -207,19 +207,24 @@ class User extends Authenticatable implements JWTSubject
 
     public function branches()
     {
-        return $this->hasMany(Branch::class,'vendor_id');
+        return $this->hasMany(Branch::class, 'vendor_id');
     }
 
 
     public function getStoreNameAttribute()
-{
-    return app()->getLocale() === 'ar' ? $this->store_name_ar : $this->store_name_en;
-}
+    {
+        return app()->getLocale() === 'ar' ? $this->store_name_ar : $this->store_name_en;
+    }
 
-public function getCommercialRegistrationImageUrlAttribute()
-{
-    return $this->commercial_registration_image 
-        ? Storage::url($this->commercial_registration_image)
-        : null;
-}
+    public function getCommercialRegistrationImageUrlAttribute()
+    {
+        return $this->commercial_registration_image
+            ? Storage::url($this->commercial_registration_image)
+            : null;
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
 }

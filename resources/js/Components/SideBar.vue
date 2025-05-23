@@ -199,12 +199,22 @@
                 </Link>
             </li>
 
-            <!-- contacts -->
+            <!-- Complaints -->
             <li class="nav-item" v-if="hasPermission('vendor read users')">
                 <Link class="nav-link" :href="route('vendor.contacts.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/contacts') }">
                 <i class="bi bi-person-lines-fill"></i>
-                <span>{{ $t("Contacts") }}</span>
+                <span>{{ $t("Complaints") }}</span>
+                </Link>
+            </li>
+
+
+            <!-- Wallet -->
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
+                <Link class="nav-link" :href="route('vendor.wallet.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/wallet') }">
+                <i class="bi bi-wallet"></i>
+                <span>{{ $t("Wallet") }}</span>
                 </Link>
             </li>
         </ul>

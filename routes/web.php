@@ -1,31 +1,35 @@
 <?php
 
-use App\Models\User;
-use Inertia\Inertia;
 use App\Events\NotificationSent;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Banners\BannerController;
+use App\Http\Controllers\Contacts\ContactController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LangController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\ExportController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PageWebController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\UsersController;
 use App\Http\Controllers\Vendor\Auth\RegisterController;
 use App\Http\Controllers\Vendor\BranchController;
+use App\Http\Controllers\Vendor\ContactController as VendorContactController;
 use App\Http\Controllers\Vendor\GoldPieceController;
 use App\Http\Controllers\Vendor\OrderController;
 use App\Http\Controllers\Vendor\OrderRentalController;
 use App\Http\Controllers\Vendor\OrderSalesController;
 use App\Http\Controllers\Vendor\RentalRequestController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Vendor\ContactController as VendorContactController;
-use App\Http\Controllers\Vendor\UserController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\Vendor\VerifyController;
-use App\Http\Controllers\Banners\BannerController;
 use App\Http\Controllers\Vendor\ServiceController;
-use App\Http\Controllers\Contacts\ContactController;
+use App\Http\Controllers\Vendor\SettlementController;
+use App\Http\Controllers\Vendor\UserController;
+use App\Http\Controllers\Vendor\VerifyController;
+use App\Http\Controllers\Vendor\WalletController;
+use App\Models\User;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+
 
 
 
@@ -211,6 +215,11 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::resource('users', UserController::class);
     Route::post('users/{user}/activate', [UserController::class, 'activate'])->name('activate');
     Route::post('users/{user}', [UserController::class, 'update'])->name('users.update'); //  inertia does not support send files using put request
+
+    Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
+    Route::get('/wallet/transactions', [WalletController::class, 'transactions'])->name('wallet.transactions');
+    Route::post('/wallet/settlement', [WalletController::class, 'requestSettlement'])->name('wallet.settlement.request');
+
 });
 
 
