@@ -9,6 +9,7 @@ use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LangController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PageWebController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UsersController;
@@ -20,14 +21,23 @@ use App\Http\Controllers\Vendor\OrderController;
 use App\Http\Controllers\Vendor\OrderRentalController;
 use App\Http\Controllers\Vendor\OrderSalesController;
 use App\Http\Controllers\Vendor\RentalRequestController;
+use App\Http\Controllers\Vendor\RoleController;
 use App\Http\Controllers\Vendor\ServiceController;
 use App\Http\Controllers\Vendor\SettlementController;
+use App\Http\Controllers\Vendor\StoreController;
 use App\Http\Controllers\Vendor\UserController;
 use App\Http\Controllers\Vendor\VerifyController;
 use App\Http\Controllers\Vendor\WalletController;
+use App\Models\Country;
+use App\Models\State;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+
+
+
+
 
 
 
@@ -220,10 +230,23 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::get('/wallet/transactions', [WalletController::class, 'transactions'])->name('wallet.transactions');
     Route::post('/wallet/settlement', [WalletController::class, 'requestSettlement'])->name('wallet.settlement.request');
 
+
+    // Store management
+    Route::get('/store', [StoreController::class, 'show'])->name('store.show');
+    Route::get('/store/edit', [StoreController::class, 'edit'])->name('store.edit');
+    Route::post('/store/update', [StoreController::class, 'update'])->name('store.update');
+    Route::post('/store/resubmit', [StoreController::class, 'resubmit'])->name('store.resubmit');
 });
 
 
+Route::get('/countries/{country}/states', function (Country $country) {
+        return $country->states;
+    });
 
+    Route::get('/states/{state}/cities', function (State $state) {
+        return $state->cities;
+    });
+    Route::get('/cities', [StoreController::class, 'getCities']);
 require __DIR__ . '/auth.php';
 
 

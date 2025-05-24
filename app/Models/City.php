@@ -20,4 +20,8 @@ class City extends Model
     {
         return $this->belongsTo(Country::class, 'country_id', 'id');
     }
+     public function users()
+    {
+        return $this->hasMany(User::class);
+    }
 }

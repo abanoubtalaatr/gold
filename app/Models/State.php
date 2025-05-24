@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Models;
 
@@ -19,5 +19,10 @@ class State extends Model
     public function cities()
     {
         return $this->hasMany(City::class);
+    }
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
     }
 }
