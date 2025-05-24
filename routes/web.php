@@ -30,6 +30,7 @@ use App\Http\Controllers\Contacts\ContactController;
 use App\Http\Controllers\Vendor\GoldPieceController;
 use App\Http\Controllers\Vendor\OrderSalesController;
 use App\Http\Controllers\Vendor\SettlementController;
+use App\Http\Controllers\Vendor\StatisticsController;
 use App\Http\Controllers\Vendor\OrderRentalController;
 use App\Http\Controllers\Vendor\Auth\RegisterController;
 use App\Http\Controllers\Vendor\RentalRequestController;
@@ -247,6 +248,9 @@ Route::middleware(['auth', 'verified', 'role:vendor'])->group(function () {
 
     Route::post('/vendor/reports/generate', [ReportController::class, 'generate'])
         ->name('vendor.reports.generate');
+
+    Route::get('/vendor/statistics', [StatisticsController::class, 'index'])
+        ->name('vendor.statistics');
 });
 
 

@@ -217,6 +217,15 @@
                 <span>{{ $t("Wallet") }}</span>
                 </Link>
             </li>
+
+            <!-- Reports -->
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
+                <Link class="nav-link" :href="route('vendor.reports.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/reports') }">
+                <i class="bi bi-file-earmark-bar-graph"></i>
+                <span>{{ $t("Reports") }}</span>
+                </Link>
+            </li>
         </ul>
     </aside>
 </template>

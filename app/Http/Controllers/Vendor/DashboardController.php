@@ -11,19 +11,36 @@ use App\Models\OrderRental;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // Get filter parameters from request
+        $period = $request->input('period', 'all');
+        $fromDate = $request->input('from_date');
+        $toDate = $request->input('to_date');
         
-        // i want number of roles, number of admins, number of branches, number or rental request, number of sales order , number of rental order 
+        // Apply date filters
+        $dateFilter = function ($query) use ($period, $fromDate, $toDate) {
+            if ($period !== 'all') {
+                $this->applyPeriodFilter($query, $period);
+            }
+            
+            if ($fromDate && $toDate) {
+                $query->whereBetween('created_at', [$fromDate, $toDate]);
+            }
+        };
+        
+        // Get counts with filters
         $roles = Role::where('vendor_id', Auth::id())->count();
         $admins = User::where('vendor_id', Auth::id())->whereHas('roles')->count();
         $branches = Branch::where('vendor_id', Auth::id())->count();
-        $rentalRequests = OrderRental::count();
-        $salesOrders = OrderSale::count();
-        $rentalOrders = OrderRental::count();
+        
+        $rentalRequests = OrderRental::when($period !== 'all' || ($fromDate && $toDate), $dateFilter)->count();
+        $salesOrders = OrderSale::when($period !== 'all' || ($fromDate && $toDate), $dateFilter)->count();
+        $rentalOrders = OrderRental::when($period !== 'all' || ($fromDate && $toDate), $dateFilter)->count();
         
         return Inertia::render('Vendor/Dashboard', [
             'roles' => $roles,
@@ -32,6 +49,53 @@ class DashboardController extends Controller
             'rentalRequests' => $rentalRequests,
             'salesOrders' => $salesOrders,
             'rentalOrders' => $rentalOrders,
+            'filters' => [
+                'period' => $period,
+                'from_date' => $fromDate,
+                'to_date' => $toDate,
+            ],
         ]);
+    }
+    
+    protected function applyPeriodFilter($query, $period)
+    {
+        $now = Carbon::now();
+        
+        switch ($period) {
+            case 'daily':
+                $query->whereDate('created_at', $now->toDateString());
+                break;
+            case 'weekly':
+                $query->whereBetween('created_at', [
+                    $now->startOfWeek()->toDateTimeString(),
+                    $now->endOfWeek()->toDateTimeString()
+                ]);
+                break;
+            case 'monthly':
+                $query->whereBetween('created_at', [
+                    $now->startOfMonth()->toDateTimeString(),
+                    $now->endOfMonth()->toDateTimeString()
+                ]);
+                break;
+            case 'quarterly':
+                $query->whereBetween('created_at', [
+                    $now->startOfQuarter()->toDateTimeString(),
+                    $now->endOfQuarter()->toDateTimeString()
+                ]);
+                break;
+            case 'semi-annually':
+                $month = $now->month <= 6 ? 1 : 7;
+                $query->whereBetween('created_at', [
+                    $now->month($month)->startOfMonth()->toDateTimeString(),
+                    $now->month($month + 5)->endOfMonth()->toDateTimeString()
+                ]);
+                break;
+            case 'annually':
+                $query->whereBetween('created_at', [
+                    $now->startOfYear()->toDateTimeString(),
+                    $now->endOfYear()->toDateTimeString()
+                ]);
+                break;
+        }
     }
 }

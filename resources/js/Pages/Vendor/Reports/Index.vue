@@ -17,8 +17,8 @@
                                 <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">{{ $t('Report Type')
-                                        }}</label>
-                                        <select v-model="form.type" class="w-full mt-1 rounded-md">
+                                            }}</label>
+                                        <select v-model="form.type" class="w-full mt-1 rounded-md type">
                                             <option value="rentals">{{ $t('Rental Orders') }}</option>
                                             <option value="sales">{{ $t('Sale Orders') }}</option>
                                             <option value="payments">{{ $t('Payments') }}</option>
@@ -28,14 +28,16 @@
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">{{ $t('Start Date')
-                                        }}</label>
-                                        <input v-model="form.start_date" type="date" class="w-full mt-1 rounded-md">
+                                            }}</label>
+                                        <input v-model="form.start_date" type="date"
+                                            class="w-full mt-1 rounded-md start-date">
                                     </div>
 
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">{{ $t('End Date')
-                                        }}</label>
-                                        <input v-model="form.end_date" type="date" class="w-full mt-1 rounded-md">
+                                            }}</label>
+                                        <input v-model="form.end_date" type="date"
+                                            class="w-full mt-1 rounded-md end-date">
                                     </div>
 
                                     <div class="flex items-end space-x-2">
@@ -124,14 +126,28 @@ const formatType = (type) => {
 
 <style scoped>
 .actionButtonExcel {
-    background-color: #d47b4b !important;  /* Warm orange-600 */
+    background-color: #d47b4b !important;
+    /* Warm orange-600 */
     color: white !important;
     @apply px-4 py-2 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 !important;
 }
 
 .actionButtonPDF {
-    background-color: #986831 !important;  /* Warm amber-600 */
+    background-color: #986831 !important;
+    /* Warm amber-600 */
     color: white !important;
     @apply px-4 py-2 rounded-md hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 !important;
+}
+
+.start-date {
+    @apply px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
+}
+
+.end-date {
+    @apply px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
+}
+
+.type {
+    @apply px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
 }
 </style>
