@@ -100,57 +100,71 @@ class StoreController extends Controller
         ]);
     }
 
-    public function update(UpdateStoreRequest $request)
-    {
-        $vendor = Auth::user();
+   public function update(UpdateStoreRequest $request)
+{
+    $vendor = Auth::user();
 
-        if (!$vendor instanceof \App\Models\User) {
-            return redirect()->back()->with('error', 'User not found');
-        }
-        $data = $request->validated();
-
-        if ($request->hasFile('commercial_image')) {
-            if ($vendor->commercial_registration_image) {
-                Storage::delete($vendor->commercial_registration_image);
-            }
-            $data['commercial_registration_image'] = $request->file('commercial_image')
-                ->store('commercial_registrations', 'public');
-        }
-
-        if ($request->hasFile('logo')) {
-            if ($vendor->logo) {
-                Storage::delete($vendor->logo);
-            }
-            $data['logo'] = $request->file('logo')
-                ->store('vendor_logos', 'public');
-        }
-
-        if ($request->has('working_hours')) {
-            $data['working_hours'] = json_encode($request->working_hours);
-        }
-
-        if ($request->has('address')) {
-            $vendor->addresses()->updateOrCreate(
-                ['is_default' => true],
-                [
-                    'address' => $request->address['address'],
-                    'city_id' => $request->address['city_id'],
-                    'is_default' => true,
-                ]
-            );
-        }
-
-        if (
-            $request->has('commercial_number') &&
-            $request->commercial_number !== $vendor->commercial_registration_number
-        ) {
-            $data['venodr_status'] = 'pending';
-        }
-        $vendor->update($data);
-
-        return redirect()->route('vendor.store.show')
-            ->with('success', 'Store information updated successfully');
+    if (!$vendor instanceof \App\Models\User) {
+        return redirect()->back()->with('error', 'User not found');
     }
+
+    $data = $request->validated();
+
+    // Handle commercial image update only if provided
+    if ($request->hasFile('commercial_image')) {
+        if ($vendor->commercial_registration_image) {
+            Storage::delete($vendor->commercial_registration_image);
+        }
+        $data['commercial_registration_image'] = $request->file('commercial_image')
+            ->store('commercial_registrations', 'public');
+    } else {
+        // Remove commercial_image from data if not provided to prevent nulling
+        unset($data['commercial_image']);
+    }
+
+    // Handle logo update only if provided
+    if ($request->hasFile('logo')) {
+        if ($vendor->logo) {
+            Storage::delete($vendor->logo);
+        }
+        $data['logo'] = $request->file('logo')
+            ->store('vendor_logos', 'public');
+    } else {
+        // Remove logo from data if not provided to prevent nulling
+        unset($data['logo']);
+    }
+
+    // Handle working hours
+    if ($request->has('working_hours')) {
+        $data['working_hours'] = json_encode($request->working_hours);
+    }
+
+    // Handle address
+    if ($request->has('address')) {
+        $vendor->addresses()->updateOrCreate(
+            ['is_default' => true],
+            [
+                'address' => $request->address['address'],
+                'city_id' => $request->address['city_id'],
+                'is_default' => true,
+            ]
+        );
+    }
+
+    // Handle vendor status change if commercial number changed
+    if (
+        $request->has('commercial_number') &&
+        $request->commercial_number !== $vendor->commercial_registration_number
+    ) {
+        $data['venodr_status'] = 'pending';
+    }
+
+    // Update only the fields that are present in the data array
+    $vendor->update($data);
+
+    return redirect()->route('vendor.store.show')
+        ->with('success', 'Store information updated successfully');
+}
 
     public function resubmit()
     {

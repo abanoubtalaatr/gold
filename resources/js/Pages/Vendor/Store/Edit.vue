@@ -1,4 +1,5 @@
 <template>
+
     <Head title="Edit Store Information" />
 
     <AuthenticatedLayout>
@@ -75,18 +76,40 @@
                                     <div>
                                         <InputLabel for="commercial_image"
                                             :value="$t('Commercial Registration Image')" />
-                                        <input id="commercial_image" type="file"
-                                            @change="handleFileChange($event, 'commercial_image')"
-                                            class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                            accept="image/*,.pdf" />
+                                        <div class="mt-1">
+                                            <input id="commercial_image" type="file"
+                                                @change="handleFileChange($event, 'commercial_image')"
+                                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                                accept="image/*,.pdf" />
+
+                                            <!-- Preview for new image -->
+                                            <div v-if="commercialImagePreview" class="mt-2">
+                                                <div class="relative inline-block">
+                                                    <img :src="commercialImagePreview"
+                                                        alt="Commercial registration preview"
+                                                        class="h-32 object-contain border rounded-md" />
+                                                    <button type="button" @click="removeImage('commercial_image')"
+                                                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Current image link -->
+                                            <p v-if="store.commercial_image && !commercialImagePreview"
+                                                class="mt-2 text-sm text-gray-500">
+                                                {{ $t('Current file:') }}
+                                                <a :href="store.commercial_image" target="_blank"
+                                                    class="text-blue-600 hover:text-blue-800">
+                                                    {{ $t('View') }}
+                                                </a>
+                                            </p>
+                                        </div>
                                         <InputError :message="form.errors.commercial_image" class="mt-2" />
-                                        <p v-if="store.commercial_image" class="mt-1 text-sm text-gray-500">
-                                            {{ $t('Current file:') }}
-                                            <a :href="store.commercial_image" target="_blank"
-                                                class="text-blue-600 hover:text-blue-800">
-                                                {{ $t('View') }}
-                                            </a>
-                                        </p>
                                     </div>
                                 </div>
 
@@ -128,40 +151,60 @@
 
                                     <div>
                                         <InputLabel for="logo" :value="$t('Store Logo')" />
-                                        <input id="logo" type="file" @change="handleFileChange($event, 'logo')"
-                                            class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                            accept="image/*" />
-                                        <InputError :message="form.errors.logo" class="mt-2" />
-                                        <div v-if="store.logo" class="mt-2">
-                                            <img :src="store.logo" class="h-24 w-24 rounded-lg object-cover" />
+                                        <div class="mt-1">
+                                            <input id="logo" type="file" @change="handleFileChange($event, 'logo')"
+                                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                                accept="image/*" />
+
+                                            <!-- Preview for new logo -->
+                                            <div v-if="logoPreview" class="mt-2">
+                                                <div class="relative inline-block">
+                                                    <img :src="logoPreview" alt="Logo preview"
+                                                        class="h-24 w-24 rounded-lg object-cover border" />
+                                                    <button type="button" @click="removeImage('logo')"
+                                                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Current logo -->
+                                            <div v-if="store.logo && !logoPreview" class="mt-2">
+                                                <img :src="store.logo"
+                                                    class="h-24 w-24 rounded-lg object-cover border" />
+                                            </div>
                                         </div>
+                                        <InputError :message="form.errors.logo" class="mt-2" />
                                     </div>
                                 </div>
 
                                 <!-- Working Hours -->
-                                <!-- Working Hours -->
-<div class="space-y-4">
-    <InputLabel :value="$t('Working Hours')" />
-    <div class="mt-2 space-y-2">
-        <div v-for="(day, index) in form.working_hours" :key="index"
-            class="grid grid-cols-5 gap-2 items-center">
-            <span class="text-sm font-medium text-gray-700">{{ $t(day.day) }}</span>
-            <TextInput v-model="day.open" type="time" class="w-full"
-                :disabled="day.closed" />
-            <TextInput v-model="day.close" type="time" class="w-full"
-                :disabled="day.closed" />
-            <div class="flex items-center">
-                <input v-model="day.closed" :id="`closed-${index}`" type="checkbox"
-                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                <label :for="`closed-${index}`"
-                    class="ml-2 block text-sm text-gray-700">
-                    {{ $t('Closed') }}
-                </label>
-            </div>
-        </div>
-    </div>
-    <InputError :message="form.errors.working_hours" class="mt-2" />
-</div>
+                                <div class="space-y-4">
+                                    <InputLabel :value="$t('Working Hours')" />
+                                    <div class="mt-2 space-y-2">
+                                        <div v-for="(day, index) in form.working_hours" :key="index"
+                                            class="grid grid-cols-5 gap-2 items-center">
+                                            <span class="text-sm font-medium text-gray-700">{{ $t(day.day) }}</span>
+                                            <TextInput v-model="day.open" type="time" class="w-full"
+                                                :disabled="day.closed" />
+                                            <TextInput v-model="day.close" type="time" class="w-full"
+                                                :disabled="day.closed" />
+                                            <div class="flex items-center">
+                                                <input v-model="day.closed" :id="`closed-${index}`" type="checkbox"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+                                                <label :for="`closed-${index}`"
+                                                    class="ml-2 block text-sm text-gray-700">
+                                                    {{ $t('Closed') }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <InputError :message="form.errors.working_hours" class="mt-2" />
+                                </div>
                             </div>
 
                             <div class="mt-6 flex justify-end space-x-4">
@@ -190,16 +233,34 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import {
-    Combobox,
-    ComboboxInput,
-    ComboboxOptions,
-    ComboboxOption,
-} from '@headlessui/vue';
 
 const props = defineProps({
     store: Object
 });
+
+// Image preview refs
+const commercialImagePreview = ref(null);
+const logoPreview = ref(null);
+
+// Initialize working hours properly
+const initializeWorkingHours = () => {
+    if (props.store.working_hours && props.store.working_hours.length) {
+        return props.store.working_hours.map(day => ({
+            ...day,
+            closed: day.closed || false // Ensure closed is boolean
+        }));
+    }
+
+    return [
+        { day: 'Sunday', open: '09:00', close: '18:00', closed: false },
+        { day: 'Monday', open: '09:00', close: '18:00', closed: false },
+        { day: 'Tuesday', open: '09:00', close: '18:00', closed: false },
+        { day: 'Wednesday', open: '09:00', close: '18:00', closed: false },
+        { day: 'Thursday', open: '09:00', close: '18:00', closed: false },
+        { day: 'Friday', open: '09:00', close: '18:00', closed: true },
+        { day: 'Saturday', open: '09:00', close: '18:00', closed: false }
+    ];
+};
 
 // Form setup
 const form = useForm({
@@ -217,74 +278,42 @@ const form = useForm({
         address: props.store.address?.address || '',
         city_id: props.store.address?.city_id || null
     },
-    working_hours: props.store.working_hours || [
-        { day: 'Sunday', open: '09:00', close: '18:00', closed: false },
-        { day: 'Monday', open: '09:00', close: '18:00', closed: false },
-        { day: 'Tuesday', open: '09:00', close: '18:00', closed: false },
-        { day: 'Wednesday', open: '09:00', close: '18:00', closed: false },
-        { day: 'Thursday', open: '09:00', close: '18:00', closed: false },
-        { day: 'Friday', open: '09:00', close: '18:00', closed: true },
-        { day: 'Saturday', open: '09:00', close: '18:00', closed: false }
-    ]
+    working_hours: initializeWorkingHours()
 });
+const handleFileChange = (event, field) => {
+    const file = event.target.files[0];
+    form[field] = file;
 
-// City selection
-const query = ref('');
-const selectedCity = ref(null);
-const cities = ref([]);
-const loading = ref(false);
-
-// Load initial city if exists
-if (props.store.address?.city_id) {
-    loading.value = true;
-    axios.get(`/api/cities/${props.store.address.city_id}`)
-        .then(response => {
-            selectedCity.value = response.data;
-            cities.value = [response.data];
-        })
-        .finally(() => {
-            loading.value = false;
-        });
-}
-
-// Watch for city selection changes
-watch(selectedCity, (newCity) => {
-    if (newCity) {
-        form.address.city_id = newCity.id;
+    // Create preview for images
+    if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (field === 'commercial_image') {
+                commercialImagePreview.value = e.target.result;
+            } else if (field === 'logo') {
+                logoPreview.value = e.target.result;
+            }
+        };
+        reader.readAsDataURL(file);
     } else {
-        form.address.city_id = null;
-    }
-});
-
-// Search cities when query changes
-watch(query, async (newQuery) => {
-    if (newQuery.length > 2) {
-        loading.value = true;
-        try {
-            const response = await axios.get('/api/cities', {
-                params: { search: newQuery }
-            });
-            cities.value = response.data;
-        } catch (error) {
-            console.error('Error fetching cities:', error);
-        } finally {
-            loading.value = false;
+        if (field === 'commercial_image') {
+            commercialImagePreview.value = null;
+        } else if (field === 'logo') {
+            logoPreview.value = null;
         }
     }
-});
+};
 
-// Filter cities based on search query
-const filteredCities = computed(() => {
-    if (query.value === '') {
-        return cities.value;
+const removeImage = (field) => {
+    if (field === 'commercial_image') {
+        commercialImagePreview.value = null;
+        form.commercial_image = null;
+        document.getElementById('commercial_image').value = '';
+    } else if (field === 'logo') {
+        logoPreview.value = null;
+        form.logo = null;
+        document.getElementById('logo').value = '';
     }
-    return cities.value.filter((city) => {
-        return city.name.toLowerCase().includes(query.value.toLowerCase());
-    });
-});
-
-const handleFileChange = (event, field) => {
-    form[field] = event.target.files[0];
 };
 
 const submit = () => {
@@ -292,6 +321,8 @@ const submit = () => {
         forceFormData: true,
         onSuccess: () => {
             form.reset('commercial_image', 'logo');
+            commercialImagePreview.value = null;
+            logoPreview.value = null;
         }
     });
 };

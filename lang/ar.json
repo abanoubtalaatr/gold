@@ -1162,5 +1162,14 @@
     "Filters": "الفلاتر",
     "Apply Filters": "تطبيق الفلاتر",
     "Clear Filters": "حذف الفلاتر",
-    "Clear": "مسح"
+    "Clear": "مسح",
+    "Financial Information": "معلومات المالية",
+    "Financial Information (English)": "معلومات المالية (بالانجليزية)",
+    "Financial Information (Arabic)": "معلومات المالية (بالعربية)",
+    "Bank Name": "اسم البنك",
+    "Bank Address": "عنوان البنك",
+    "Store Name(English)": "اسم المتجر (بالانجليزية)",
+    "Store Name(Arabic)": "اسم المتجر (بالعربية)",
+    "Address": "العنوان",
+    "Upload Store Logo": "تحميل شعار المتجر"
 }

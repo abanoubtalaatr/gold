@@ -226,6 +226,15 @@
                 <span>{{ $t("Reports") }}</span>
                 </Link>
             </li>
+
+            <!-- Store Information -->
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
+                <Link class="nav-link" :href="route('vendor.store.show')"
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/store/show') }">
+                <i class="bi bi-shop"></i>
+                <span>{{ $t("Store Information") }}</span>
+                </Link>
+            </li>
         </ul>
     </aside>
 </template>
