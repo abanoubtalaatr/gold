@@ -10,7 +10,7 @@ use Astrotomic\Translatable\Translatable;
 
 class Banner extends Model implements TranslatableContract
 {
-    use HasFactory, SoftDeletes, Translatable;
+    use HasFactory, Translatable;
 
     protected $fillable = [
         'image',

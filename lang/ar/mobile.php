@@ -160,6 +160,7 @@ return [
     'friday' => 'الجمعة',
     'saturday' => 'السبت',
     'order_updated_success' => 'تم تحديث الطلب بنجاح',
+    'banners_fetched_success' => 'تم استرجاع البانرات بنجاح',
     
     
 

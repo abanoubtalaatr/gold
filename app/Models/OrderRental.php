@@ -19,6 +19,8 @@ class OrderRental extends Model
         'total_price',
         'status',
         'type',
+        'is_suspended',
+        
     ];
 
 

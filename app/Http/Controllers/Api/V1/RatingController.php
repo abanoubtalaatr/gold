@@ -65,8 +65,9 @@ class RatingController extends Controller
     /**
      * Store a new rating.
      */
-    public function store(RatingRequest $request, GoldPiece $goldPiece)
+    public function store(RatingRequest $request)
     {
+        $goldPiece = GoldPiece::find($request->gold_piece_id);
         try {
             // Check if user has already rated this gold piece
             $existingRating = Rating::where('user_id', Auth::id())

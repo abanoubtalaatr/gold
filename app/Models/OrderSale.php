@@ -15,7 +15,8 @@ class OrderSale extends Model
         'gold_piece_id',
         'branch_id',
         'total_price',
-        'status'
+        'status',
+        'is_suspended',
     ];
 
     /**

@@ -211,4 +211,5 @@ return [
     'thursday' => 'Thursday',
     'friday' => 'Friday',
     'order_updated_success' => 'Order updated successfully',
+    'banners_fetched_success' => 'Banners fetched successfully',
 ];

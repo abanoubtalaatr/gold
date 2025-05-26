@@ -24,6 +24,7 @@ class GoldPiece extends Model implements HasMedia
 
     public function branch()
     {
+        return $this->belongsTo(Branch::class);
         // i want to return the branch if this gold pieces have row in order rental or  order sales so get the first branch if exist in the two tables
         $branch = $this->orderRentals()->first()?->branch ?? $this->orderSales()->first()?->branch;
         return $branch;
