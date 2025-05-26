@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 use App\Services\VerificationCode as VerificationCodeService;
+use Illuminate\Support\Facades\Auth;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -54,10 +55,15 @@ class User extends Authenticatable implements JWTSubject
         'vendor_id',
         'latitude',
         'longitude',
-    'store_name_en',
-    'store_name_ar',
-    'commercial_registration_number',
-    'commercial_registration_image',
+        'store_name_en',
+        'store_name_ar',
+        'commercial_registration_number',
+        'commercial_registration_image',
+        'iban',
+        'working_hours',
+        'venodr_status',
+        'rejection_reason',
+        'logo',
     ];
 
     protected $appends = ['avatar'];
@@ -207,19 +213,50 @@ class User extends Authenticatable implements JWTSubject
 
     public function branches()
     {
-        return $this->hasMany(Branch::class,'vendor_id');
+        return $this->hasMany(Branch::class, 'vendor_id');
     }
 
 
     public function getStoreNameAttribute()
-{
-    return app()->getLocale() === 'ar' ? $this->store_name_ar : $this->store_name_en;
-}
+    {
+        return app()->getLocale() === 'ar' ? $this->store_name_ar : $this->store_name_en;
+    }
 
-public function getCommercialRegistrationImageUrlAttribute()
-{
-    return $this->commercial_registration_image 
-        ? Storage::url($this->commercial_registration_image)
-        : null;
-}
+    public function getCommercialRegistrationImageUrlAttribute()
+    {
+        return $this->commercial_registration_image
+            ? Storage::url($this->commercial_registration_image)
+            : null;
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+
+    // Add these accessors for backward compatibility
+    public function getCountryAttribute()
+    {
+        return $this->city?->country;
+    }
+
+    public function getStateAttribute()
+    {
+        return $this->city?->state;
+    }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class);
+    }
+
+    public function storeAddress()
+    {
+        return $this->hasOne(Address::class)->where('user_id', Auth::id());
+    }
 }

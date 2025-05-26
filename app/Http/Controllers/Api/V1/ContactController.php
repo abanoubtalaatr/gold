@@ -7,6 +7,9 @@ use App\Http\Requests\Api\V1\ContactRequest;
 use App\Http\Requests\Api\V1\UpdateContactRequest;
 use App\Http\Resources\Api\V1\ContactRsource;
 use App\Models\Contact;
+use Illuminate\Support\Facades\Log;
+use App\Models\User;
+use App\Notifications\Vendor\NewContactMessage;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -54,6 +57,10 @@ class ContactController extends Controller
         // Create contact using mass assignment
         $contact = Contact::create($validated);
 
+
+        // Send notification if vendor exists
+        $this->notifyVendor($contact);
+
         return $this->successResponse($contact, 'Contact message saved successfully.');
     }
 
@@ -98,5 +105,30 @@ class ContactController extends Controller
         $contact->delete();
         return $this->successResponse(null, 'Contact deleted successfully');
 
+    }
+
+    protected function notifyVendor(Contact $contact)
+    {
+        $vendor = null;
+
+        if ($contact->rental_order_id) {
+            $order = $contact->rentalOrder;
+            $vendor = $order->branch->vendor ?? null;
+        } elseif ($contact->sale_order_id) {
+            $order = $contact->saleOrder;
+            $vendor = $order->branch->vendor ?? null;
+        }
+
+        // If no specific vendor (general inquiry), you might want to notify all vendors
+        // or a specific admin. Adjust this according to your business logic.
+        if (!$vendor) {
+            // Example: Notify all active vendors
+            $vendors = User::where('role', 'vendor')->get();
+            foreach ($vendors as $vendor) {
+                $vendor->notify(new NewContactMessage($contact));
+            }
+            return;
+        }
+        $vendor->notify(new NewContactMessage($contact));
     }
 }

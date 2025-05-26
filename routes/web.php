@@ -2,6 +2,8 @@
 
 use App\Models\User;
 use Inertia\Inertia;
+use App\Models\State;
+use App\Models\Country;
 use App\Events\NotificationSent;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
@@ -11,21 +13,35 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\PageWebController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\Vendor\Auth\RegisterController;
-use App\Http\Controllers\Vendor\BranchController;
-use App\Http\Controllers\Vendor\GoldPieceController;
-use App\Http\Controllers\Vendor\OrderController;
-use App\Http\Controllers\Vendor\OrderRentalController;
-use App\Http\Controllers\Vendor\OrderSalesController;
-use App\Http\Controllers\Vendor\RentalRequestController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Vendor\ContactController as VendorContactController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\Vendor\RoleController;
 use App\Http\Controllers\Vendor\UserController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Vendor\OrderController;
+use App\Http\Controllers\Vendor\StoreController;
+use App\Http\Controllers\Vendor\BranchController;
+use App\Http\Controllers\Vendor\ReportController;
 use App\Http\Controllers\Vendor\VerifyController;
+use App\Http\Controllers\Vendor\WalletController;
 use App\Http\Controllers\Banners\BannerController;
 use App\Http\Controllers\Vendor\ServiceController;
 use App\Http\Controllers\Contacts\ContactController;
+use App\Http\Controllers\Vendor\GoldPieceController;
+use App\Http\Controllers\Vendor\OrderSalesController;
+use App\Http\Controllers\Vendor\SettlementController;
+use App\Http\Controllers\Vendor\StatisticsController;
+use App\Http\Controllers\Vendor\OrderRentalController;
+use App\Http\Controllers\Vendor\Auth\RegisterController;
+use App\Http\Controllers\Vendor\RentalRequestController;
+use App\Http\Controllers\Vendor\ContactController as VendorContactController;
+
+
+
+
+
+
+
 
 
 
@@ -211,17 +227,40 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::resource('users', UserController::class);
     Route::post('users/{user}/activate', [UserController::class, 'activate'])->name('activate');
     Route::post('users/{user}', [UserController::class, 'update'])->name('users.update'); //  inertia does not support send files using put request
+
+    Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
+    Route::get('/wallet/transactions', [WalletController::class, 'transactions'])->name('wallet.transactions');
+    Route::post('/wallet/settlement', [WalletController::class, 'requestSettlement'])->name('wallet.settlement.request');
+
+
+    // Store management
+    Route::get('/store', [StoreController::class, 'show'])->name('store.show');
+    Route::get('/store/edit', [StoreController::class, 'edit'])->name('store.edit');
+    Route::post('/store/update', [StoreController::class, 'update'])->name('store.update');
+    Route::post('/store/resubmit', [StoreController::class, 'resubmit'])->name('store.resubmit');
 });
 
+
+// Vendor Reports Routes
+Route::middleware(['auth', 'verified', 'role:vendor'])->group(function () {
+    Route::get('/vendor/reports', [ReportController::class, 'index'])
+        ->name('vendor.reports.index');
+
+    Route::post('/vendor/reports/generate', [ReportController::class, 'generate'])
+        ->name('vendor.reports.generate');
+
+    Route::get('/vendor/statistics', [StatisticsController::class, 'index'])
+        ->name('vendor.statistics');
+});
 
 
 require __DIR__ . '/auth.php';
 
 
-Route::get('/test-notification', function () {
-    $user = User::find(1);
-    $notification = new NotificationSent();
-    $notification->broadcast();
+// Route::get('/test-notification', function () {
+//     $user = User::find(1);
+//     $notification = new NotificationSent();
+//     $notification->broadcast();
 
-    return response()->json(['message' => 'Notification sent successfully']);
-});
+//     return response()->json(['message' => 'Notification sent successfully']);
+// });

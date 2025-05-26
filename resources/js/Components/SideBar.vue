@@ -3,7 +3,8 @@
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item" v-if="hasPermission('vendor view dashboard')">
-                <Link class="nav-link" :href="route('vendor.dashboard')" :class="{ collapsed: $page.url !== '/vendor/dashboard' }">
+                <Link class="nav-link" :href="route('vendor.dashboard')"
+                    :class="{ collapsed: $page.url !== '/vendor/dashboard' }">
                 <i class="bi bi-grid"></i>
                 <span> {{ $t("dashboard") }} </span>
                 </Link>
@@ -120,7 +121,7 @@
 
             <li class="nav-item" v-if="hasPermission('vendor read orders')">
                 <Link class="nav-link" :href="route('vendor.orders.sale.index')"
-                :class="{ collapsed: !$page.url.startsWith('/vendor/sale-orders') }">
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/sale-orders') }">
                 <i class="bi bi-cart"></i>
                 <span>{{ $t("sales_orders") }}</span>
                 </Link>
@@ -131,7 +132,7 @@
 
             <li class="nav-item" v-if="hasPermission('vendor read orders')">
                 <Link class="nav-link" :href="route('vendor.orders.rental.index')"
-                :class="{ collapsed: !$page.url.startsWith('/vendor/rental-orders') }">
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/rental-orders') }">
                 <i class="bi bi-cart-check"></i>
                 <span>{{ $t("rental_orders") }}</span>
                 </Link>
@@ -140,7 +141,7 @@
 
             <li class="nav-item" v-if="hasPermission('vendor read rental-requests')">
                 <Link class="nav-link" :href="route('vendor.rental-requests.index')"
-                :class="{ collapsed: !$page.url.startsWith('/vendor/rental-requests') }">
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/rental-requests') }">
                 <i class="bi bi-calendar-check"></i>
                 <span>{{ $t("rental_requests") }}</span>
                 </Link>
@@ -148,7 +149,7 @@
 
             <li class="nav-item" v-if="hasPermission('vendor read roles')">
                 <Link class="nav-link" :href="route('vendor.roles.index')"
-                :class="{ collapsed: !$page.url.startsWith('/vendor/roles') }">
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/roles') }">
                 <i class="bi bi-person-badge"></i>
                 <span>{{ $t("roles") }}</span>
                 </Link>
@@ -195,6 +196,43 @@
                     :class="{ collapsed: !$page.url.startsWith('/settings') }">
                 <i class="bi bi-gear"></i>
                 <span>{{ $t("settings") }}</span>
+                </Link>
+            </li>
+
+            <!-- Complaints -->
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
+                <Link class="nav-link" :href="route('vendor.contacts.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/contacts') }">
+                <i class="bi bi-person-lines-fill"></i>
+                <span>{{ $t("Complaints") }}</span>
+                </Link>
+            </li>
+
+
+            <!-- Wallet -->
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
+                <Link class="nav-link" :href="route('vendor.wallet.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/wallet') }">
+                <i class="bi bi-wallet"></i>
+                <span>{{ $t("Wallet") }}</span>
+                </Link>
+            </li>
+
+            <!-- Reports -->
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
+                <Link class="nav-link" :href="route('vendor.reports.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/reports') }">
+                <i class="bi bi-file-earmark-bar-graph"></i>
+                <span>{{ $t("Reports") }}</span>
+                </Link>
+            </li>
+
+            <!-- Store Information -->
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
+                <Link class="nav-link" :href="route('vendor.store.show')"
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/store/show') }">
+                <i class="bi bi-shop"></i>
+                <span>{{ $t("Store Information") }}</span>
                 </Link>
             </li>
         </ul>

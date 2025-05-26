@@ -15,8 +15,6 @@ class Address extends Model
         'address',
         'city_id',
         'is_default',
-        'latitude',
-        'longitude',
     ];
 
     protected $casts = [
