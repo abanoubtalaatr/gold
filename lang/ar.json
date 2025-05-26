@@ -1143,7 +1143,7 @@
     "Review": "التعليق",
     "processing": "قيد المعالجة",
     "completed": "مكتمل",
-    "Reset Filters": "اعادة تعيين الفلاتر",
+    "Reset Filters": "اعادة تعيين ",
     "To Date": "الى تاريخ",
     "From Date": "من تاريخ",
     "Select Date": "اختر التاريخ",
@@ -1171,5 +1171,6 @@
     "Store Name(English)": "اسم المتجر (بالانجليزية)",
     "Store Name(Arabic)": "اسم المتجر (بالعربية)",
     "Address": "العنوان",
-    "Upload Store Logo": "تحميل شعار المتجر"
+    "Upload Store Logo": "تحميل شعار المتجر",
+    "Enter 6-digit code": "ادخل رمز 6 أرقام"
 }

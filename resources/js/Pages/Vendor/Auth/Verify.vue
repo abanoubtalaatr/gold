@@ -56,7 +56,7 @@ const resendOtp = () => {
                             required
                             autofocus
                             maxlength="6"
-                            placeholder="Enter 6-digit code"
+                            :placeholder="$t('Enter 6-digit code')"
                         />
                         <InputError class="mt-2" :message="form.errors.otp" />
                     </div>

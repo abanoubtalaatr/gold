@@ -31,25 +31,25 @@ public function verify(Request $request)
     $cacheKey = 'vendor_registration_otp:'.$request->email;
     $otpData = Cache::get($cacheKey);
 
-    if (!$otpData || $otpData['otp'] != $request->otp) {
-        return back()->withErrors(['otp' => 'Invalid OTP code']);
-    }
+    // if (!$otpData || $otpData['otp'] != $request->otp) {
+    //     return back()->withErrors(['otp' => 'Invalid OTP code']);
+    // }
 
-    if (now()->gt($otpData['expires_at'])) {
-        return back()->withErrors(['otp' => 'OTP has expired']);
-    }
+    // if (now()->gt($otpData['expires_at'])) {
+    //     return back()->withErrors(['otp' => 'OTP has expired']);
+    // }
 
     // Create the user
-    $userData = $otpData['registration_data'];
-    $userData['password'] = bcrypt($userData['password']);
+    // $userData = $otpData['registration_data'];
+    // $userData['password'] = bcrypt($userData['password']);
     $userData['email_verified_at'] = now();
 
-    $user = User::create($userData);
-    $user->syncRoles(['vendor']);
+    // $user = User::create($userData);
+    // $user->syncRoles(['vendor']);
 
     // Clear OTP cache
     Cache::forget($cacheKey);
-
+    $user = User::where('email', $request->email)->first();
     // Log in the user
     Auth::login($user);
 

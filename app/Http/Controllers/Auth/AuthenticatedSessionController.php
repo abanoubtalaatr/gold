@@ -45,10 +45,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        
         if (auth()->user()->hasRole('vendor')) {
-
+            
             return redirect()->intended(route("vendor.dashboard"));
         }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

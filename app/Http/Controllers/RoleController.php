@@ -62,43 +62,33 @@ class RoleController extends Controller
         return Inertia('roles-permissions/Roles/Create');
     }
 
-public function store(StoreRoleRequest $request)
-{
-    \Log::info('Store Request data:', $request->all());
-
-    DB::beginTransaction();
-    try {
+    public function store(StoreRoleRequest $request)
+    {
         $role = Role::create([
             'key' => $request->input('translations.en.name'),
             'name' => $request->input('translations.en.name'),
             'guard_name' => 'web',
             'vendor_id' => auth()->user()->id
         ]);
-
+    
+        $translations = [];
         foreach ($request->input('translations') as $locale => $translation) {
-            DB::table('role_translations')
-                ->insert([
-                    'role_id' => $role->id,
-                    'locale' => $locale,
-                    'name' => $translation['name']
-                ]);
+            $translations[] = [
+                'role_id' => $role->id,
+                'locale' => $locale,
+                'name' => $translation['name']
+            ];
         }
-
-        DB::commit();
-
-
+    
+        DB::table('role_translations')->upsert(
+            $translations,
+            ['role_id', 'locale'], // Unique key for checking duplicates
+            ['name'] // Fields to update if duplicate is found
+        );
+    
         return redirect()->route('roles.index')
             ->with('success', __('messages.data_created_successfully'));
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Store failed:', [
-            'message' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        return back()->with('error', 'Error creating role: ' . $e->getMessage());
     }
-}
 
 
     // public function edit(Role $role)
@@ -165,7 +155,8 @@ public function store(StoreRoleRequest $request)
 
     public function destroy($roleId)
     {
-        $role = Role::find($roleId);
+        
+        $role = Role::find($roleId->id);
         $role->delete();
         return redirect()->route('roles.index')
             ->with('success',  __('messages.data_deleted_successfully'));

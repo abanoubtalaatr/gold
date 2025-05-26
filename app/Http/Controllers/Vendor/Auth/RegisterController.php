@@ -37,31 +37,42 @@ class RegisterController extends Controller
             'commercial_registration_image' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        // Store registration data in session temporarily
-        $registrationData = $validated;
-        $registrationData['commercial_registration_image'] = $request->file('commercial_registration_image')
-            ->store('commercial_registrations', 'public');
-        // Set is_active to false
-        $registrationData['is_active'] = false;
+        // Create new user with vendor role
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'mobile' => $validated['mobile'],
+            'store_name_en' => $validated['store_name_en'],
+            'store_name_ar' => $validated['store_name_ar'],
+            'commercial_registration_number' => $validated['commercial_registration_number'],
+            'commercial_registration_image' => $request->file('commercial_registration_image')
+                ->store('commercial_registrations', 'public'),
+            'is_active' => true
+        ]);
 
-        // Generate OTP (6 digits)
+        // Assign vendor role
+        $user->assignRole('vendor');
+
+        
+        // Generate OTP for email verification
         $otp = rand(100000, 999999);
         $otp=123456;
         $expiresAt = now()->addMinutes(10);
 
         // Store OTP in cache
-        Cache::put('vendor_registration_otp:' . $validated['email'], [
+        Cache::put('vendor_verification_otp:' . $user->email, [
             'otp' => $otp,
             'expires_at' => $expiresAt,
-            'registration_data' => $registrationData
+            'user_id' => $user->id
         ], $expiresAt);
 
-        // Send OTP via email (implement this method)
-        $this->sendOtpEmail($validated['email'], $otp);
+        // Send verification OTP email
+        $this->sendOtpEmail($user->email, $otp);
 
         return redirect()->route('vendor.verify')->with([
-            'email' => $validated['email'],
-            'message' => 'OTP sent to your email address'
+            'email' => $user->email,
+            'message' => 'Registration successful. Please verify your email with the OTP sent.'
         ]);
     }
 

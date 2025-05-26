@@ -15,7 +15,7 @@ return [
 
     'name' => env('APP_NAME', 'Fudex'),
 
-    'admin_pass' => env('APP_ADMIN_SECRET', '12345678'),
+    'admin_pass' => env('APP_ADMIN_SECRET', '   '),
 
     'pagination_limit' => 20,
     /*

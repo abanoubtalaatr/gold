@@ -28,7 +28,9 @@ const props = defineProps<{
 const period = ref(props.filters.period || 'all')
 const fromDate = ref(props.filters.from_date || '')
 const toDate = ref(props.filters.to_date || '')
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 // Watch for filter changes
 watch([period, fromDate, toDate], ([newPeriod, newFromDate, newToDate]) => {
     router.get(route('vendor.dashboard'), {
@@ -56,7 +58,7 @@ const resetFilters = () => {
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Vendor Dashboard
+                {{ $t("Vendor Dashboard") }}
             </h2>
         </template>
 
