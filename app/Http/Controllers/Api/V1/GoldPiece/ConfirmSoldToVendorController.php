@@ -8,15 +8,17 @@ use App\Traits\ApiResponseTrait;
 use App\Models\GoldPiece;
 use App\Models\OrderRental;
 use App\Http\Resources\Api\GoldPieceResource;
+use App\Http\Resources\Api\OrderSaleResource;
+use App\Models\OrderSale;
 
 class ConfirmSoldToVendorController extends Controller
 {
     use ApiResponseTrait;
 
-    public function __invoke(GoldPiece $goldPiece)
+    public function index(OrderSale $order)
     {
-        $goldPiece->update(['status' => OrderRental::STATUS_SOLD]);
+        $order->update(['status' => OrderRental::STATUS_SOLD]);
 
-        return $this->successResponse(GoldPieceResource::make($goldPiece), __("mobile.piece_sold_to_vendor_successfully"));
+        return $this->successResponse(OrderSaleResource::make($order), __("mobile.piece_sold_to_vendor_successfully"));
     }
 }

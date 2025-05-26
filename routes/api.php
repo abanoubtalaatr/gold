@@ -25,7 +25,7 @@ use App\Http\Controllers\Api\V1\NotificationSettingController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
 use App\Http\Controllers\Api\V1\GoldPiece\ConfirmSoldToVendorController;
-use App\Http\Controllers\Api\v1\GoldPiece\ConfirmSendPieceToVendorController;
+use App\Http\Controllers\Api\V1\GoldPiece\ConfirmSendPieceToVendorController;
 
 
 
@@ -98,8 +98,8 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::post('/gold-pieces', [GoldPieceController::class, 'store']);
     Route::delete('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'destroy']);
     Route::post('/gold-pieces/{goldPiece}/update', [GoldPieceController::class, 'update']);
-    Route::post('gold-pieces/{goldPiece}/confirm-send-to-vendor', ConfirmSendPieceToVendorController::class);
-    Route::post('gold-pieces/{goldPiece}/confirm-sold-to-vendor', ConfirmSoldToVendorController::class);
+    Route::post('orders/{order}/confirm-send-to-vendor', [ConfirmSendPieceToVendorController::class, 'index']);
+    Route::post('order/{order}/confirm-sold-to-vendor', [ConfirmSoldToVendorController::class, 'index']);
    
     /*
     |--------------------------------------------------------------------------
