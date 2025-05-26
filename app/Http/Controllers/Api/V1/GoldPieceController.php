@@ -342,6 +342,7 @@ class GoldPieceController extends Controller
             $query->where('end_date', '<', now());
         })->limit(3)->get();
         
-        return $this->successResponse($goldPieces, __('mobile.Gold pieces will finish rental soon'));
+
+        return $this->successResponse(GoldPieceResource::collection($goldPieces), __('mobile.Gold pieces will finish rental soon'));
     }
 }

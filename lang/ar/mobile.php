@@ -161,7 +161,8 @@ return [
     'saturday' => 'السبت',
     'order_updated_success' => 'تم تحديث الطلب بنجاح',
     'banners_fetched_success' => 'تم استرجاع البانرات بنجاح',
-    
+    'piece_sent_to_vendor_successfully' => 'تم إرسال قطعة الذهب إلى للمحل بنجاح',
+    'piece_sold_to_vendor_successfully' => 'تم بيع قطعة الذهب إلى المحل بنجاح',
     
 
 

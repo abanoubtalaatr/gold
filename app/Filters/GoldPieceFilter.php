@@ -21,8 +21,12 @@ class GoldPieceFilter
 
         // Base query for approved orders
         // $this->approvedOrders();
+        $this->rentalFilter();
 
-        // Apply filters based on request parameters
+        if ($this->request->filled('price_sort')) {
+            $this->query->orderBy('rental_price_per_day', $this->request->price_sort);
+        }
+
         return $this
             ->caratFilter()
             ->weightFilter()
@@ -30,10 +34,40 @@ class GoldPieceFilter
             ->typeFilter()
             ->statusFilter()
             ->searchFilter()
+            ->availableToRentFilter()
             ->sortByPrice()
+            ->cityFilter()
             ->getQuery();
     }
 
+    protected function availableToRentFilter(): self
+    {
+        $dateFrom = $this->request->date_from;
+        $dateTo = $this->request->date_to;
+    
+        // Validate dates (optional but recommended)
+        if ($dateFrom && $dateTo) {
+            $this->query->whereDoesntHave('orderRentals', function ($query) use ($dateFrom, $dateTo) {
+                $query->where('start_date', '<=', $dateTo)
+                      ->where('end_date', '>=', $dateFrom);
+            });
+        }
+    
+        return $this;
+    }
+
+    protected function ratingsFilter(): self
+    {
+        if ($this->request->filled('rating')) {
+            $rating = $this->request->rating;
+            
+            $this->query->whereHas('ratings', function($query) use ($rating) {
+                $query->where('rating', $rating);
+            });
+        }
+
+        return $this;
+    }
     protected function approvedOrders(): self
     {
         $this->query->whereHas('orderRentals', function($query) {
@@ -44,18 +78,29 @@ class GoldPieceFilter
 
         return $this;
     }
+    protected function rentalFilter(): self
+    {
+        $this->query->whereHas('orderRentals');
 
+        return $this;
+    }
     protected function caratFilter(): self
     {
-        if ($this->request->filled(['from_carat', 'to_carat'])) {
-            $this->query->whereBetween('carat', [
-                $this->request->from_carat,
-                $this->request->to_carat
-            ]);
+        if ($this->request->filled('carat')) {
+            $this->query->where('carat', $this->request->carat);
         }
 
-        if ($this->request->carat) {
-            $this->query->where('carat', $this->request->carat);
+        return $this;
+    }
+
+    protected function cityFilter(): self
+    {
+        if ($this->request->filled('city_id')) {
+            $this->query->whereHas('orderRentals', function($query) {
+                $query->whereHas('branch', function($query) {
+                    $query->where('city_id', $this->request->city_id);
+                });
+            });
         }
 
         return $this;

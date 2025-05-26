@@ -212,4 +212,5 @@ return [
     'friday' => 'Friday',
     'order_updated_success' => 'Order updated successfully',
     'banners_fetched_success' => 'Banners fetched successfully',
+    'piece_sent_to_vendor_successfully' => 'Gold piece sent to vendor successfully',
 ];

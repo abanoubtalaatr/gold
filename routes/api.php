@@ -1,29 +1,31 @@
 <?php
 
-use App\Http\Controllers\Api\ContactUsController;
-use App\Http\Controllers\Api\CountryController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\FaqController;
-use App\Http\Controllers\Api\PageApiController;
-use App\Http\Controllers\Api\SettingsApiController;
 use App\Http\Controllers\Api\StateController;
+use App\Http\Controllers\Api\CountryController;
+use App\Http\Controllers\Api\PageApiController;
+use App\Http\Controllers\Api\V1\OrderController;
+use App\Http\Controllers\Api\ContactUsController;
+use App\Http\Controllers\Api\V1\BannerController;
+use App\Http\Controllers\Api\V1\RatingController;
 use App\Http\Controllers\Api\V1\AddressController;
-use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
-use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
-use App\Http\Controllers\Api\V1\Auth\LoginController;
-use App\Http\Controllers\Api\V1\Auth\PasswordController;
-use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
-use App\Http\Controllers\Api\V1\Auth\ProfileController;
-use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\ContactController;
+use App\Http\Controllers\Api\SettingsApiController;
 use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\GoldPieceController;
-use App\Http\Controllers\Api\V1\LiquidationRequestController;
+use App\Http\Controllers\Api\V1\Auth\LoginController;
+use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\Auth\PasswordController;
+use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\LiquidationRequestController;
+use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\V1\NotificationSettingController;
-use App\Http\Controllers\Api\V1\OrderController;
-use App\Http\Controllers\Api\V1\RatingController;
-use App\Http\Controllers\Api\V1\BannerController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
+use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
+use App\Http\Controllers\Api\V1\GoldPiece\ConfirmSoldToVendorController;
+use App\Http\Controllers\Api\v1\GoldPiece\ConfirmSendPieceToVendorController;
 
 
 
@@ -96,7 +98,9 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::post('/gold-pieces', [GoldPieceController::class, 'store']);
     Route::delete('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'destroy']);
     Route::post('/gold-pieces/{goldPiece}/update', [GoldPieceController::class, 'update']);
-
+    Route::post('gold-pieces/{goldPiece}/confirm-send-to-vendor', ConfirmSendPieceToVendorController::class);
+    Route::post('gold-pieces/{goldPiece}/confirm-sold-to-vendor', ConfirmSoldToVendorController::class);
+   
     /*
     |--------------------------------------------------------------------------
     | Favorites
@@ -157,8 +161,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     |--------------------------------------------------------------------------
     */
 
-    Route::apiResource('/contacts', ContactController::class);
-
+    Route::apiResource('/contacts', ContactController::class); 
 });
 
 Route::get('banners', [BannerController::class, 'index']);

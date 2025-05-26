@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Resources\Api;
+
+use DateTime;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +13,19 @@ class GoldPieceResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $rental = $this->orderRentals()->first();
+        $remainingDays = 0;
+        $totalDays = 0;
+
+        if ($rental && $rental->end_date) {
+            $diff = (new DateTime())->diff(new DateTime($rental->end_date));
+            $remainingDays = $diff->invert ? 0 : $diff->days;
+        }
+
+        if ($rental && $rental->start_date && $rental->end_date) {
+            $totalDays = (new DateTime($rental->start_date))->diff(new DateTime($rental->end_date))->days;
+        }
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -42,9 +57,17 @@ class GoldPieceResource extends JsonResource
                 'count' => $this->rating_count,
             ],
             'is_favorited' => $request->user() ? $this->favoritedBy()->where('user_id', $request->user()->id)->exists() : false,
-          
-            //return the branch that accept the gold piece
-            'branch' => new BranchResource($this->branch),
+            'branch' => new BranchResource($this->branchDetails()),
+            'start_date' => $rental?->start_date,
+            'end_date' => $rental?->end_date,
+            'remaining_days' => $remainingDays,
+            'total_days' => $totalDays,
+            'city' => SimpleCityResource::make($this->branchDetails()->city),
         ];
+    }
+
+    public function branchDetails()
+    {
+        return $this->orderRentals()->first()?->branch ?? $this->orderSales()->first()?->branch;
     }
 }

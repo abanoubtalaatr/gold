@@ -9,10 +9,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class BranchResource extends JsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
+39     * Transform the resource into an array.
+40     *
+41     * @return array<string, mixed>
+42     */
     public function toArray(Request $request): array
     {
         $dayNames = [
@@ -25,22 +25,28 @@ class BranchResource extends JsonResource
             6 => __('mobile.saturday'),
         ];
 
-        // Parse working days and hours
-        $workingDays = json_decode($this->working_days, true) ?? [];
-        $workingHours = json_decode($this->working_hours, true) ?? [];
+        // Parse working days and hours safely
+        $workingDays = is_array($this->working_days) 
+            ? $this->working_days 
+            : (json_decode($this->working_days, true) ?? []);
+            
+        $workingHours = is_array($this->working_hours)
+            ? $this->working_hours
+            : (json_decode($this->working_hours, true) ?? []);
 
-        // Combine days and hours into a structured array
+        // Build working schedule for all days (0 to 6)
         $workingSchedule = [];
-        foreach ($workingDays as $index => $day) {
-            if (isset($dayNames[$day], $workingHours[$index])) {
-                $workingSchedule[] = [
-                    'day' => $dayNames[$day],
-                    'hours' => [
-                        'open' => $workingHours[$index]['open'],
-                        'close' => $workingHours[$index]['close'],
-                    ],
-                ];
-            }
+        for ($day = 0; $day <= 6; $day++) {
+            $index = array_search($day, $workingDays);
+            $workingSchedule[] = [
+                'day' => $dayNames[$day],
+                'hours' => $index !== false && isset($workingHours[$index]) && is_array($workingHours[$index])
+                    ? [
+                        'open' => $workingHours[$index]['open'] ?? null,
+                        'close' => $workingHours[$index]['close'] ?? null,
+                    ]
+                    :null,
+            ];
         }
 
         return [
@@ -48,6 +54,7 @@ class BranchResource extends JsonResource
             'name' => $this->name,
             'city' => SimpleCityResource::make($this->city),
             'working_schedule' => $workingSchedule,
+            'image' => asset('banner.png'),
         ];
     }
 }
