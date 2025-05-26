@@ -11,7 +11,7 @@ class OrderRentalResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'gold_piece' => new GoldPieceResource($this->whenLoaded('goldPiece')),
+            'gold_piece' => new GoldPieceResource($this->goldPiece),
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'total_price' => $this->total_price,

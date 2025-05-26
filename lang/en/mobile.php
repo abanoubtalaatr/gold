@@ -203,4 +203,12 @@ return [
     'Notifications fetched successfully' => 'Notifications fetched successfully',
     'message sent successfully.' => 'Contact us created successfully',
     'mobile_not_verified' => 'Mobile not verified',
+    'Gold pieces will finish rental soon' => 'Gold pieces will finish rental soon', 
+    'sunday' => 'Sunday',
+    'monday' => 'Monday',
+    'tuesday' => 'Tuesday',
+    'wednesday' => 'Wednesday',
+    'thursday' => 'Thursday',
+    'friday' => 'Friday',
+    'order_updated_success' => 'Order updated successfully',
 ];

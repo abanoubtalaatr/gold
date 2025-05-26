@@ -61,7 +61,7 @@ class User extends Authenticatable implements JWTSubject
         'commercial_registration_image',
         'iban',
         'working_hours',
-        'venodr_status',
+        'vendor_status',
         'rejection_reason',
         'logo',
     ];

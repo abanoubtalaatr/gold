@@ -118,34 +118,34 @@
             </li>
 
             <!-- Vendor sale orders -->
-
+<!-- 
             <li class="nav-item" v-if="hasPermission('vendor read orders')">
                 <Link class="nav-link" :href="route('vendor.orders.sale.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/sale-orders') }">
                 <i class="bi bi-cart"></i>
                 <span>{{ $t("sales_orders") }}</span>
                 </Link>
-            </li>
+            </li> -->
 
 
             <!-- Vendor rental orders -->
 
-            <li class="nav-item" v-if="hasPermission('vendor read orders')">
+            <!-- <li class="nav-item" v-if="hasPermission('vendor read orders')">
                 <Link class="nav-link" :href="route('vendor.orders.rental.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/rental-orders') }">
                 <i class="bi bi-cart-check"></i>
                 <span>{{ $t("rental_orders") }}</span>
                 </Link>
-            </li>
+            </li> -->
             <!-- Vendor rental requests -->
 
-            <li class="nav-item" v-if="hasPermission('vendor read rental-requests')">
+            <!-- <li class="nav-item" v-if="hasPermission('vendor read rental-requests')">
                 <Link class="nav-link" :href="route('vendor.rental-requests.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/rental-requests') }">
                 <i class="bi bi-calendar-check"></i>
                 <span>{{ $t("rental_requests") }}</span>
                 </Link>
-            </li>
+            </li> -->
 
             <li class="nav-item" v-if="hasPermission('vendor read roles')">
                 <Link class="nav-link" :href="route('vendor.roles.index')"
@@ -200,41 +200,41 @@
             </li>
 
             <!-- Complaints -->
-            <li class="nav-item" v-if="hasPermission('vendor read users')">
+            <!-- <li class="nav-item" v-if="hasPermission('vendor read users')">
                 <Link class="nav-link" :href="route('vendor.contacts.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/contacts') }">
                 <i class="bi bi-person-lines-fill"></i>
                 <span>{{ $t("Complaints") }}</span>
                 </Link>
-            </li>
+            </li> -->
 
 
             <!-- Wallet -->
-            <li class="nav-item" v-if="hasPermission('vendor read users')">
+            <!-- <li class="nav-item" v-if="hasPermission('vendor read users')">
                 <Link class="nav-link" :href="route('vendor.wallet.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/wallet') }">
                 <i class="bi bi-wallet"></i>
                 <span>{{ $t("Wallet") }}</span>
                 </Link>
-            </li>
+            </li> -->
 
             <!-- Reports -->
-            <li class="nav-item" v-if="hasPermission('vendor read users')">
+            <!-- <li class="nav-item" v-if="hasPermission('vendor read users')">
                 <Link class="nav-link" :href="route('vendor.reports.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/reports') }">
                 <i class="bi bi-file-earmark-bar-graph"></i>
                 <span>{{ $t("Reports") }}</span>
                 </Link>
-            </li>
+            </li> -->
 
             <!-- Store Information -->
-            <li class="nav-item" v-if="hasPermission('vendor read users')">
+            <!-- <li class="nav-item" v-if="hasPermission('vendor read users')">
                 <Link class="nav-link" :href="route('vendor.store.show')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/store/show') }">
                 <i class="bi bi-shop"></i>
                 <span>{{ $t("Store Information") }}</span>
                 </Link>
-            </li>
+            </li> -->
         </ul>
     </aside>
 </template>

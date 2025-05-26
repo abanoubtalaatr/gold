@@ -151,6 +151,16 @@ return [
     'Notifications fetched successfully' => 'تم استرجاع الإشعارات بنجاح',
     'message sent successfully.' => 'تم إنشاء الاستفسار بنجاح',
     'mobile_not_verified' => 'رقم الهاتف غير متحقق',
+    'Gold pieces will finish rental soon' => 'قطع الذهب سوف تنتهي في الإيجار',
+    'sunday' => 'الأحد',
+    'monday' => 'الأثنين',
+    'tuesday' => 'الثلاثاء',
+    'wednesday' => 'الأربعاء',
+    'thursday' => 'الخميس',
+    'friday' => 'الجمعة',
+    'saturday' => 'السبت',
+    'order_updated_success' => 'تم تحديث الطلب بنجاح',
+    
     
 
 

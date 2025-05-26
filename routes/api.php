@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\NotificationSettingController;
 use App\Http\Controllers\Api\V1\OrderController;
 use App\Http\Controllers\Api\V1\RatingController;
+use App\Http\Controllers\Api\V1\BannerController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -113,6 +114,8 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
 
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders', [OrderController::class, 'index']);
+    Route::post('/orders/{order}/toggle-suspend-rental', [OrderController::class, 'toggleSuspendRental']);
+    Route::post('/orders/{order}/toggle-suspend-sale', [OrderController::class, 'toggleSuspendSale']);
 
     /*
     |--------------------------------------------------------------------------
@@ -139,8 +142,8 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::post('ratings', [RatingController::class, 'store'])->name('ratings.store');
     Route::post('ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
     Route::delete('ratings/{rating}', [RatingController::class, 'destroy'])->name('ratings.destroy');
-
-
+    Route::get('gold-pieces-will-finish-rental-soon', [GoldPieceController::class, 'goldPiecesWillFinishRentalSoon']);
+    
     /*
     |--------------------------------------------------------------------------
     | Liquidation-requests....
@@ -157,3 +160,5 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::apiResource('/contacts', ContactController::class);
 
 });
+
+Route::get('banners', [BannerController::class, 'index']);

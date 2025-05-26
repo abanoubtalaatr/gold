@@ -335,4 +335,13 @@ class GoldPieceController extends Controller
     {
         return $this->calculateRentalPrice($weight, $carat) * 10;
     }
+
+    public function goldPiecesWillFinishRentalSoon()
+    {
+        $goldPieces = GoldPiece::whereHas('orderRentals', function ($query) {
+            $query->where('end_date', '<', now());
+        })->limit(3)->get();
+        
+        return $this->successResponse($goldPieces, __('mobile.Gold pieces will finish rental soon'));
+    }
 }

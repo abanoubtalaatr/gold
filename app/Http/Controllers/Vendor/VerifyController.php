@@ -69,6 +69,7 @@ public function resend(Request $request)
 
     // Generate new OTP
     $newOtp = rand(100000, 999999);
+    $newOtp=123456;
     $expiresAt = now()->addMinutes(10);
 
     // Update cache

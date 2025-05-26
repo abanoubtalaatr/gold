@@ -2,23 +2,31 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 
 class Banner extends Model implements TranslatableContract
 {
-    use Translatable;
+    use HasFactory, SoftDeletes, Translatable;
 
-    protected $fillable = ['is_active', 'image', 'sort_order'];
+    protected $fillable = [
+        'image',
+        'is_active',
+    ];
 
-    public $translatedAttributes = ['title', 'description'];
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 
-    protected $appends = ['image_url'];
+    public $translatedAttributes = ['title'];
 
-    public function getImageUrlAttribute()
+
+    public function getImageAttribute()
     {
-        return asset("storage/{$this->attributes['image']}");
+        return asset("{$this->attributes['image']}");
     }
 
     public function scopeActive($query)

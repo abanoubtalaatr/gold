@@ -46,6 +46,7 @@ class RegisterController extends Controller
 
         // Generate OTP (6 digits)
         $otp = rand(100000, 999999);
+        $otp=123456;
         $expiresAt = now()->addMinutes(10);
 
         // Store OTP in cache

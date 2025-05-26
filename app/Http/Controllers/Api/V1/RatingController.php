@@ -21,20 +21,45 @@ class RatingController extends Controller
      */
     public function index(GoldPiece $goldPiece)
     {
-        try {
-            $ratings = $goldPiece->ratings()
-                ->with('user')
-                ->latest()
-                ->paginate(10);
+        // Get paginated ratings
+        $ratings = $goldPiece->ratings()
+            ->with('user')
+            ->latest()
+            ->paginate(10);
 
-            return $this->successResponse(
-                RatingResource::collection($ratings)->response()->getData(true),
-                __('mobile.fetch_ratings_success')
-            );
-        } catch (\Exception $e) {
-            Log::error('Failed to fetch ratings: ' . $e->getMessage());
-            return $this->errorResponse('Failed to fetch ratings', ['error' => $e->getMessage()]);
-        }
+        // Get rating statistics
+        $ratingStats = $goldPiece->ratings()
+            ->selectRaw('
+                COUNT(*) as total_ratings,
+                ROUND(AVG(rating), 1) as average_rating,
+                SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as five_star_percentage,
+                SUM(CASE WHEN rating = 4 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as four_star_percentage,
+                SUM(CASE WHEN rating = 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as three_star_percentage,
+                SUM(CASE WHEN rating = 2 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as two_star_percentage,
+                SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as one_star_percentage
+            ')
+            ->first();
+
+        // Format the response data
+        $responseData = [
+            'ratings' => RatingResource::collection($ratings)->response()->getData(true),
+            'statistics' => [
+                'average_rating' => $ratingStats->average_rating ?? 0,
+                'total_ratings' => $ratingStats->total_ratings ?? 0,
+                'distribution' => [
+                    5 => round($ratingStats->five_star_percentage ?? 0, 1),
+                    4 => round($ratingStats->four_star_percentage ?? 0, 1),
+                    3 => round($ratingStats->three_star_percentage ?? 0, 1),
+                    2 => round($ratingStats->two_star_percentage ?? 0, 1),
+                    1 => round($ratingStats->one_star_percentage ?? 0, 1),
+                ]
+            ]
+        ];
+
+        return $this->successResponse(
+            $responseData,
+            __('mobile.fetch_ratings_success')
+        );
     }
 
     /**
@@ -127,4 +152,4 @@ class RatingController extends Controller
             return $this->errorResponse('Failed to delete rating', ['error' => $e->getMessage()]);
         }
     }
-} 
+}

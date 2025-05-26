@@ -112,4 +112,16 @@ class OrderController extends Controller
             return $this->errorResponse(__("mobile.order_creation_failed"), [], 500);
         }
     }
+
+    public function toggleSuspendRental(OrderRental $order)
+    {
+        $order->update(['is_suspended' => !$order->is_suspended]);
+        return $this->successResponse($order, __("mobile.order_updated_success"));
+    }
+
+    public function toggleSuspendSale(OrderSale $order)
+    {
+        $order->update(['is_suspended' => !$order->is_suspended]);
+        return $this->successResponse($order, __("mobile.order_updated_success"));
+    }
 }

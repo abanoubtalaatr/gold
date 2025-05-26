@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class BannerResource extends JsonResource
 {
@@ -13,28 +14,14 @@ class BannerResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray($request): array
+    public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
-            'title' => $this->title,
-            'desc' => $this->description,
             'image' => $this->image,
-            'image_url' => $this->getImageUrl(),
-            'base_url' => env('APP_URL').'/storage/',
+            'title' => $this->title,
+            'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::parse($this->updated_at)->format('Y-m-d H:i:s'),
         ];
-    }
-
-    protected function getImageUrl()
-    {
-        if (!$this->image) {
-            return null;
-        }
-
-        if (Storage::disk('public')->exists($this->image)) {
-            return asset('storage/' . $this->image);
-        }
-
-        return null;
     }
 }

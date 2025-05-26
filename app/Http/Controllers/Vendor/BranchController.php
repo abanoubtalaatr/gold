@@ -70,7 +70,6 @@ class BranchController extends Controller
             ]);
 
             // Log branch creation
-            Log::info('Branch created', ['branch_id' => $branch->id, 'vendor_id' => $request->user()->id]);
 
             // Handle image uploads
             

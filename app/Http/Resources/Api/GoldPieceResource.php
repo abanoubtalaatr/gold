@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Http\Resources\Api;
-use App\Http\Resources\UserResource;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\Api\V1\BranchResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class GoldPieceResource extends JsonResource
 {
@@ -41,7 +42,9 @@ class GoldPieceResource extends JsonResource
                 'count' => $this->rating_count,
             ],
             'is_favorited' => $request->user() ? $this->favoritedBy()->where('user_id', $request->user()->id)->exists() : false,
-            // 'branch' => new BranchResource($this->whenLoaded('branch')),
+          
+            //return the branch that accept the gold piece
+            'branch' => new BranchResource($this->branch),
         ];
     }
 }
