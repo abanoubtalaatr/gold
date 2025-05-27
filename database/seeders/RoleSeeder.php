@@ -12,13 +12,13 @@ class RoleSeeder extends Seeder
     {
         // Create vendor role
         Role::create(['name' => 'vendor']);
-        // i want to set role permissions to vendor 
+        // i want to set role permissions to vendor
 
-        
+
         // You can add permissions for vendors here if needed
         // Example:
         // Permission::create(['name' => 'manage products']);
         // $vendorRole = Role::findByName('vendor');
         // $vendorRole->givePermissionTo('manage products');
     }
-} 
+}
