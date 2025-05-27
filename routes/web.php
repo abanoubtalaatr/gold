@@ -2,6 +2,7 @@
 
 use App\Events\NotificationSent;
 use App\Http\Controllers\Admin\SystemSettingsController;
+use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Banners\BannerController;
 use App\Http\Controllers\Contacts\ContactController;
 use App\Http\Controllers\DashboardController;
@@ -36,6 +37,7 @@ use App\Models\State;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
 
 
 
@@ -145,6 +147,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/system-settings/sliders', [SystemSettingsController::class, 'storeSlider'])->name('system-settings.sliders.store');
     Route::put('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'updateSlider'])->name('system-settings.sliders.update');
     Route::delete('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'destroySlider'])->name('system-settings.sliders.destroy');
+
+    Route::resource('admin/vendors', VendorController::class);
+
+    // Vendor status management
+    Route::post('/vendors/{vendor}/approve', [VendorController::class, 'approve'])->name('vendors.approve');
+    Route::post('/vendors/{vendor}/reject', [VendorController::class, 'reject'])->name('vendors.reject');
+    Route::patch('/vendors/{vendor}/toggle-status', [VendorController::class, 'toggleStatus'])->name('vendors.toggle-status');
 });
 Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::middleware('guest')->group(function () {
