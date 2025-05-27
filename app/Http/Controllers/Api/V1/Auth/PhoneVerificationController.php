@@ -52,12 +52,12 @@ class PhoneVerificationController extends Controller
 
             return $this->successResponse(
                 null,
-                'OTP sent to your phone number',
+                __('mobile.OTP sent to your phone number'),
                 200
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                'Failed to initiate phone change',
+                __('mobile.Failed to initiate phone change'),
                 ['error' => $e->getMessage()]
             );
         }
@@ -83,7 +83,7 @@ class PhoneVerificationController extends Controller
 
             if (!$verification) {
                 return $this->errorResponse(
-                    'Invalid or expired OTP',
+                    __('mobile.Invalid or expired OTP'),
                     null,
                     422
                 );
@@ -103,11 +103,11 @@ class PhoneVerificationController extends Controller
                     'phone_number' => $user->mobile,
                     'dialling_code' => $user->dialling_code
                 ],
-                'Phone number updated successfully'
+                __('mobile.Phone number updated successfully')
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                'Failed to verify and update phone number',
+                __('mobile.Failed to verify and update phone number'),
                 ['error' => $e->getMessage()]
             );
         }
@@ -147,11 +147,11 @@ class PhoneVerificationController extends Controller
 
             return $this->successResponse(
                 null,
-                'OTP resent to your phone number'
+                __('mobile.OTP resent to your phone number')
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                'Failed to resend OTP',
+                __('mobile.Failed to resend OTP'),
                 ['error' => $e->getMessage()]
             );
         }

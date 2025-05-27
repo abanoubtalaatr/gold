@@ -163,6 +163,14 @@ return [
     'banners_fetched_success' => 'تم استرجاع البانرات بنجاح',
     'piece_sent_to_vendor_successfully' => 'تم إرسال قطعة الذهب إلى للمحل بنجاح',
     'piece_sold_to_vendor_successfully' => 'تم بيع قطعة الذهب إلى المحل بنجاح',
+
+    'OTP sent to your phone number' => 'تم إرسال رمز التحقق إلى هاتفك المحمول',
+    'Failed to initiate phone change' => 'فشل في بدء تغيير الهاتف',
+    'Invalid or expired OTP' => 'رمز التحقق غير صالح أو منتهي الصلاحية',
+    'Phone number updated successfully' => 'تم تحديث رقم الهاتف بنجاح',
+    'Failed to verify and update phone number' => 'فشل في التحقق وتحديث رقم الهاتف',
+    'OTP resent to your phone number' => 'تم إعادة إرسال رمز التحقق إلى هاتفك المحمول',
+    'Failed to resend OTP' => 'فشل في إعادة إرسال رمز التحقق',
     
 
 

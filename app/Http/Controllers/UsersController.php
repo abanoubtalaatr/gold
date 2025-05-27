@@ -16,10 +16,10 @@ class UsersController extends Controller
 
     public function __construct()
     {
-        $this->middleware('permission:read users', ['only' => ['index']]);
-        $this->middleware('permission:create users', ['only' => ['create']]);
-        $this->middleware('permission:update users', ['only' => ['update','edit']]);
-        $this->middleware('permission:delete users', ['only' => ['destroy']]);
+        // $this->middleware('permission:read users', ['only' => ['index']]);
+        // $this->middleware('permission:create users', ['only' => ['create']]);
+        // $this->middleware('permission:update users', ['only' => ['update','edit']]);
+        // $this->middleware('permission:delete users', ['only' => ['destroy']]);
     }
 
 
@@ -66,7 +66,15 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $roles = Role::where('vendor_id', auth()->user()->id)->pluck('name')->toArray();
+        $roles = Role::where('vendor_id', auth()->user()->id)
+    ->join('role_translations', function ($join) {
+        $join->on('roles.id', '=', 'role_translations.role_id')
+             ->where('role_translations.locale', 'en');
+    })
+    ->pluck('role_translations.name')
+    ->toArray();
+       
+        
         return Inertia('Users/Create', ['roles' => $roles]);
     }
 
@@ -75,6 +83,7 @@ class UsersController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
+        
         $userData = [
             'name' => $request->name,
             'email' => $request->email,
@@ -82,6 +91,7 @@ class UsersController extends Controller
             'avatar' => 'avatars/default_avatar.png', // القيمة الافتراضية
             'vendor_id' => auth()->user()->id
         ];
+
 
         if ($request->hasFile('avatar')) {
             $userData['avatar'] = $request->file('avatar')->store('avatars', 'public');
@@ -92,7 +102,26 @@ class UsersController extends Controller
         $user->save();
 
         if ($request->has('selectedRoles')) {
-            $user->syncRoles($request->selectedRoles);
+            // Map translated role names to role IDs
+            $roleIds = Role::join('role_translations', function ($join) {
+                $join->on('roles.id', '=', 'role_translations.role_id')
+                     ->where('role_translations.locale', 'en');
+            })
+            ->where('roles.guard_name', 'web')
+            ->where('roles.vendor_id', auth()->user()->id)
+            ->whereIn('role_translations.name', $request->selectedRoles)
+            ->pluck('roles.id')
+            ->toArray();
+
+            if (empty($roleIds)) {
+                return redirect()->back()
+                    ->withErrors(['selectedRoles' => __('rules.No_valid_roles_found')])
+                    ->withInput();
+            }
+
+            // Sync the roles with the user
+            $user = auth()->user(); // Or fetch the user as needed
+            $user->syncRoles($roleIds);
         }
 
         return redirect()->route('users.index')
