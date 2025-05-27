@@ -7,7 +7,7 @@
                     class="logo d-flex align-items-center"
                     :href="route('dashboard')"
                 >
-                    <img src="/dashboard-assets/img/logos/logo.svg" alt="" />
+                    <img src="/dashboard-assets/img/logo2.png" alt="" />
                     <!-- <span class="d-none d-lg-block">Fudex</span> -->
                 </Link>
                 <i

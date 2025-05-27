@@ -75,7 +75,7 @@ const submit = () => {
         <!-- Right Side - Image -->
         <div class="login-image">
             <div class="image-content">
-                <img src="/dashboard-assets/img/logos/logo.svg" alt="Logo" class="logo" />
+                <img src="/dashboard-assets/img/logo2.png" alt="Logo" class="logo" />
             </div>
         </div>
     </div>

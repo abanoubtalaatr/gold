@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <!-- Favicons -->
-    <link href="{{ asset('dashboard-assets/img/logos/logo.png') }}" rel="icon">
+    <link href="{{ asset('dashboard-assets/img/logo2.png') }}" rel="icon">
     <link href="{{ asset('dashboard-assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
 

@@ -1,3 +1,3 @@
 <template>
-    <img src="/dashboard-assets/img/logos/logo.svg" alt="" />
+    <img src="/dashboard-assets/img/logo2.png" alt="" />
 </template>
