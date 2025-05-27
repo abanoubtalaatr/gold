@@ -30,7 +30,7 @@ class AddressController extends Controller
             
             return $this->successResponse(
                 AddressResource::collection($addresses)->response()->getData(true),
-                'mobile.Addresses retrieved successfully'
+                __('mobile.Addresses retrieved successfully')
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
@@ -56,7 +56,7 @@ class AddressController extends Controller
 
             return $this->successResponse(
                 new AddressResource($address->load(['country', 'state', 'city'])),
-                'mobile.Address added successfully',
+                __('mobile.Address added successfully'),
                 201
             );
         } catch (\Exception $e) {
@@ -79,11 +79,11 @@ class AddressController extends Controller
             
             return $this->successResponse(
                 new AddressResource($address),
-                'mobile.Address retrieved successfully'
+                __('mobile.Address retrieved successfully')
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                'mobile.Address not found',
+                __('mobile.Address not found'),
                 ['error' => $e->getMessage()],
                 404
             );
@@ -109,11 +109,11 @@ class AddressController extends Controller
 
             return $this->successResponse(
                 new AddressResource($address->load(['country', 'state', 'city'])),
-                'mobile.Address updated successfully'
+                __('mobile.Address updated successfully')
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                'mobile.Failed to update address',
+                __('mobile.Failed to update address'),
                 ['error' => $e->getMessage()]
             );
         }
@@ -130,7 +130,7 @@ class AddressController extends Controller
             // Prevent deletion if it's the last address
             if ($user->addresses()->count() <= 1) {
                 return $this->errorResponse(
-                    'mobile.Cannot delete the last address',
+                    __('mobile.Cannot delete the last address'),
                     null,
                     422
                 );
@@ -140,11 +140,11 @@ class AddressController extends Controller
 
             return $this->successResponse(
                 null,
-                'mobile.Address deleted successfully'
+                __('mobile.Address deleted successfully')
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                'mobile.Failed to delete address',
+                __('mobile.Failed to delete address'),
                 ['error' => $e->getMessage()]
             );
         }
@@ -168,11 +168,11 @@ class AddressController extends Controller
 
             return $this->successResponse(
                 new AddressResource($address->load(['country', 'state', 'city'])),
-                'mobile.Default address set successfully'
+                __('mobile.Default address set successfully')
             );
         } catch (\Exception $e) {
             return $this->errorResponse(
-                'mobile.Failed to set default address',
+                __('mobile.Failed to set default address'),
                 ['error' => $e->getMessage()]
             );
         }

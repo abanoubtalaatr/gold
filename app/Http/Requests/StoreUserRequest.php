@@ -33,8 +33,8 @@ class StoreUserRequest extends FormRequest
                 // 'regex:/[@$!%*?&#]/' // must contain at least one special character],
             ],
             'avatar' => 'nullable|image|mimes:webp,jpeg,png,jpg,gif|max:2048',
-            'selectedRoles' => 'required|array',
-            'selectedRoles.*' => 'required|string|exists:roles,name',
+            // 'selectedRoles' => 'required|array',
+            // 'selectedRoles.*' => 'required|string|exists:roles,name',
         ];
 
         return $rules;

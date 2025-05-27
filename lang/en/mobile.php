@@ -213,4 +213,11 @@ return [
     'order_updated_success' => 'Order updated successfully',
     'banners_fetched_success' => 'Banners fetched successfully',
     'piece_sent_to_vendor_successfully' => 'Gold piece sent to vendor successfully',
+    'OTP sent to your phone number' => 'OTP sent to your phone number',
+    'Failed to initiate phone change' => 'Failed to initiate phone change',
+    'Invalid or expired OTP' => 'Invalid or expired OTP',
+    'Phone number updated successfully' => 'Phone number updated successfully',
+    'Failed to verify and update phone number' => 'Failed to verify and update phone number',
+    'OTP resent to your phone number' => 'OTP resent to your phone number',
+    'Failed to resend OTP' => 'Failed to resend OTP',
 ];
