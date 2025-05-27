@@ -22,11 +22,12 @@ class SlidersRequest extends FormRequest
     public function rules(): array
     {
         return [
-             'image' => 'required|image|max:5120', // 5MB max
+             'image' => 'nullable|image|max:5120', // 5MB max
             'display_from' => 'required|date',
             'display_to' => 'required|date|after:display_from',
             'display_order' => 'required|integer|min:1',
-        
+            "is_active" => "required|boolean",
+
         ];
     }
 }

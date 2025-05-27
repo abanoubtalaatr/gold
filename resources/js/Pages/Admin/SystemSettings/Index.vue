@@ -54,7 +54,7 @@
                             <!-- Tax Settings -->
                             <div class="col-span-1 md:col-span-12 mt-4">
                                 <h4 class="text-md font-medium text-gray-700 mb-2 border-b pb-1">{{ $t('Tax Settings')
-                                }}</h4>
+                                    }}</h4>
                             </div>
 
                             <div class="col-span-1 md:col-span-6">
@@ -71,7 +71,7 @@
                             <!-- Gold Settings -->
                             <div class="col-span-1 md:col-span-12 mt-4">
                                 <h4 class="text-md font-medium text-gray-700 mb-2 border-b pb-1">{{ $t('Gold Settings')
-                                }}</h4>
+                                    }}</h4>
                             </div>
 
                             <div class="col-span-1 md:col-span-4">
@@ -126,7 +126,7 @@
                             <!-- Order Settings -->
                             <div class="col-span-1 md:col-span-12 mt-4">
                                 <h4 class="text-md font-medium text-gray-700 mb-2 border-b pb-1">{{ $t('Order Settings')
-                                }}</h4>
+                                    }}</h4>
                             </div>
 
                             <div class="col-span-1 md:col-span-4">
@@ -246,7 +246,7 @@
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold text-gray-800">{{ $t('Home Sliders') }}</h3>
                             <button @click="showSliderForm = true"
-                                class="inline-flex items-center px-3 py-1.5 bg-gray-900/30 from-green-600 to-green-700 text-black font-semibold text-xs rounded-md hover:from-green-700 hover:to-green-800 transition-all duration-200">
+                                class="inline-flex items-center px-3 py-1.5 bg-ingradient from-green-600 to-green-700 text-black font-semibold text-xs rounded-md hover:from-green-700 hover:to-green-800 transition-all duration-200">
                                 {{ $t('Add New Slider') }}
                             </button>
                         </div>
@@ -568,9 +568,20 @@ const cancelSliderForm = () => {
 
 const submitSlider = () => {
     try {
+        // Create FormData object
+        const formData = new FormData();
+
+        // Append all form fields
+        if (sliderForm.image) {
+            formData.append('image', sliderForm.image);
+        }
+        formData.append('display_from', sliderForm.display_from);
+        formData.append('display_to', sliderForm.display_to);
+        formData.append('display_order', sliderForm.display_order);
+        formData.append('is_active', sliderForm.is_active);
+
         const requestOptions = {
             preserveScroll: true,
-            forceFormData: true, // Ensure FormData is used for file uploads
             onSuccess: () => {
                 Swal.fire({
                     title: 'Success!',
@@ -593,11 +604,10 @@ const submitSlider = () => {
         };
 
         if (editingSlider.value) {
-            sliderForm._method = 'PUT';
-            sliderForm.put(route('system-settings.sliders.update', editingSlider.value.id), requestOptions);
+            formData.append('_method', 'PUT'); // Laravel's way to simulate PUT request
+            router.post(route('system-settings.sliders.update', editingSlider.value.id), formData, requestOptions);
         } else {
-            sliderForm._method = 'POST';
-            sliderForm.post(route('system-settings.sliders.store'), requestOptions);
+            router.post(route('system-settings.sliders.store'), formData, requestOptions);
         }
     } catch (error) {
         console.error('Error submitting slider:', error);
@@ -609,7 +619,6 @@ const submitSlider = () => {
         });
     }
 };
-
 const confirmDeleteSlider = (slider) => {
     Swal.fire({
         title: 'Are you sure?',
