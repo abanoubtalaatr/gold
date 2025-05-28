@@ -36,6 +36,7 @@ trait ApiResponseTrait
         $response = [
             'status' => false,
             'message' => $message,
+            'errors' => $errors,
         ];
 
         if ($errors !== null) {

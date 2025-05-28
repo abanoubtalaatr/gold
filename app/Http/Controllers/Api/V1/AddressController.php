@@ -55,7 +55,7 @@ class AddressController extends Controller
             $address = $user->addresses()->create($request->validated());
 
             return $this->successResponse(
-                new AddressResource($address->load(['country', 'state', 'city'])),
+                new AddressResource($address->load([ 'city'])),
                 __('mobile.Address added successfully'),
                 201
             );

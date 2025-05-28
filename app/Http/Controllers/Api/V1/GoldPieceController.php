@@ -2,27 +2,28 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Events\NewGoldPieceEvent;
+use App\Models\User;
+use App\Models\Branch;
+use App\Models\Address;
+use App\Models\GoldPiece;
+use App\Models\OrderSale;
+use App\Models\OrderRental;
+use Illuminate\Http\Request;
 use App\Filters\GoldPieceFilter;
+use App\Traits\ApiResponseTrait;
+use App\Events\NewGoldPieceEvent;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Http\Resources\Api\GoldPieceResource;
+use App\Http\Resources\Api\OrderRentalResource;
+use App\Notifications\NewGoldPieceNotification;
 use App\Http\Requests\Api\V1\StoreGoldPieceRequest;
 use App\Http\Requests\Api\V1\UpdateGoldPieceRequest;
-use App\Http\Resources\Api\GoldPieceResource;
-use App\Models\Address;
-use App\Models\Branch;
-use App\Models\GoldPiece;
-use App\Models\OrderRental;
-use App\Models\OrderSale;
-use App\Models\User;
-use App\Notifications\NewGoldPieceNotification;
 use App\Notifications\Vendor\NewGoldPieceAvailableNotification;
-use App\Traits\ApiResponseTrait;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class GoldPieceController extends Controller
 {
@@ -338,11 +339,14 @@ class GoldPieceController extends Controller
 
     public function goldPiecesWillFinishRentalSoon()
     {
-        $goldPieces = GoldPiece::whereHas('orderRentals', function ($query) {
-            $query->where('end_date', '<', now());
-        })->limit(3)->get();
-        
+        $orderRentals = OrderRental::where('end_date', '<', now())
+            ->with('goldPiece')
+            ->limit(3)
+            ->get();
 
-        return $this->successResponse(GoldPieceResource::collection($goldPieces), __('mobile.Gold pieces will finish rental soon'));
+        return $this->successResponse(
+            OrderRentalResource::collection($orderRentals), 
+            __('mobile.Gold pieces will finish rental soon')
+        );
     }
 }

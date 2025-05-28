@@ -8,6 +8,7 @@ use App\Traits\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\WalletResource;
+use App\Http\Requests\Api\V1\ChargeWalletRequest;
 use App\Http\Resources\WalletTransactionResource;
 
 class WalletController extends Controller
@@ -26,6 +27,20 @@ class WalletController extends Controller
         return $this->successResponse([
             'wallet' => new WalletResource($wallet),
             'transactions' => WalletTransactionResource::collection($transactions),
+        ]);
+    }
+
+    public function charge(ChargeWalletRequest $request)
+    {
+        $this->validate($request, [
+            'amount' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        // $this->walletService->charge($request->user(), $request->amount, $request->description);
+
+        return $this->successResponse([
+            'message' => __('mobile.Wallet charged successfully'),
         ]);
     }
 }
