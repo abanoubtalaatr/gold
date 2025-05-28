@@ -320,6 +320,7 @@ import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } fro
 import { PencilSquareIcon } from '@heroicons/vue/24/outline';
 import Pagination from '@/Components/Pagination.vue';
 import { useI18n } from 'vue-i18n';
+import Swal from 'sweetalert2';
 
 const { t } = useI18n();
 const props = defineProps({
@@ -360,16 +361,31 @@ const formatDateTime = (dateString) => {
 
 const submitBalanceAdjustment = async () => {
     if (!props.wallet?.id) {
-        alert(t('Wallet not available'));
+        Swal.fire({
+            icon: 'error',
+            title: t('Error'),
+            text: t('Wallet not available'),
+            confirmButtonColor: '#3085d6',
+        });
         return;
     }
     if (!adjustmentAmount.value || adjustmentAmount.value <= 0) {
-        alert(t('Please enter a valid amount'));
+        Swal.fire({
+            icon: 'error',
+            title: t('Error'),
+            text: t('Please enter a valid amount'),
+            confirmButtonColor: '#3085d6',
+        });
         return;
     }
 
     if (!adjustmentReason.value) {
-        alert(t('Please enter a reason for the adjustment'));
+        Swal.fire({
+            icon: 'error',
+            title: t('Error'),
+            text: t('Please enter a reason for the adjustment'),
+            confirmButtonColor: '#3085d6',
+        });
         return;
     }
 
@@ -385,18 +401,76 @@ const submitBalanceAdjustment = async () => {
                 showBalanceAdjustment.value = false;
                 adjustmentAmount.value = 0;
                 adjustmentReason.value = '';
+
+                Swal.fire({
+                    icon: 'success',
+                    title: t('Success'),
+                    text: t('Balance adjusted successfully'),
+                    confirmButtonColor: '#3085d6',
+                });
             },
+            onError: (errors) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: t('Error'),
+                    text: Object.values(errors).join('\n'),
+                    confirmButtonColor: '#3085d6',
+                });
+            }
         });
     } catch (error) {
         console.error('Error adjusting balance:', error);
+        Swal.fire({
+            icon: 'error',
+            title: t('Error'),
+            text: t('Failed to adjust balance'),
+            confirmButtonColor: '#3085d6',
+        });
     }
 };
 
-const approveSettlement = (request) => {
-    if (confirm(t('Are you sure you want to approve this settlement request?'))) {
-        router.put(route('admin.settlement.approve', request.id), {}, {
-            preserveScroll: true,
-        });
+const approveSettlement = async (request) => {
+    const result = await Swal.fire({
+        title: t('Are you sure?'),
+        text: t('You are about to approve this settlement request'),
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: t('Yes, approve it!'),
+        cancelButtonText: t('Cancel')
+    });
+
+    if (result.isConfirmed) {
+        try {
+            await router.put(route('admin.settlement.approve', request.id), {}, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: t('Approved!'),
+                        text: t('Settlement request has been approved.'),
+                        confirmButtonColor: '#3085d6',
+                    });
+                },
+                onError: () => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: t('Error'),
+                        text: t('Failed to approve settlement request'),
+                        confirmButtonColor: '#3085d6',
+                    });
+                }
+            });
+        } catch (error) {
+            console.error('Error approving settlement:', error);
+            Swal.fire({
+                icon: 'error',
+                title: t('Error'),
+                text: t('Failed to approve settlement request'),
+                confirmButtonColor: '#3085d6',
+            });
+        }
     }
 };
 
@@ -406,20 +480,62 @@ const showRejectDialog = (request) => {
     showRejectModal.value = true;
 };
 
-const rejectSettlement = () => {
-    router.put(route('admin.settlement.reject', currentRequest.value.id), {
-        reason: rejectReason.value
-    }, {
-        preserveScroll: true,
-        onSuccess: () => {
-            showRejectModal.value = false;
-        },
-    });
+const rejectSettlement = async () => {
+    if (!rejectReason.value) {
+        Swal.fire({
+            icon: 'error',
+            title: t('Error'),
+            text: t('Please provide a reason for rejection'),
+            confirmButtonColor: '#3085d6',
+        });
+        return;
+    }
+
+    try {
+        await router.put(route('admin.settlement.reject', currentRequest.value.id), {
+            reason: rejectReason.value
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                showRejectModal.value = false;
+                Swal.fire({
+                    icon: 'success',
+                    title: t('Rejected!'),
+                    text: t('Settlement request has been rejected.'),
+                    confirmButtonColor: '#3085d6',
+                });
+            },
+            onError: () => {
+                Swal.fire({
+                    icon: 'error',
+                    title: t('Error'),
+                    text: t('Failed to reject settlement request'),
+                    confirmButtonColor: '#3085d6',
+                });
+            }
+        });
+    } catch (error) {
+        console.error('Error rejecting settlement:', error);
+        Swal.fire({
+            icon: 'error',
+            title: t('Error'),
+            text: t('Failed to reject settlement request'),
+            confirmButtonColor: '#3085d6',
+        });
+    }
 };
 
 const showRequestDetails = (request) => {
-    // Implement details view logic
-    alert(t('Settlement request details') + `:\n\n${request.admin_notes || t('No additional details')}`);
+    Swal.fire({
+        title: t('Settlement Request Details'),
+        html: `<div class="text-left">
+            <p><strong>${t('Date')}:</strong> ${formatDateTime(request.created_at)}</p>
+            <p><strong>${t('Amount')}:</strong> ${request.amount} ${t('SAR')}</p>
+            <p><strong>${t('Status')}:</strong> ${t(request.status)}</p>
+            ${request.admin_notes ? `<p><strong>${t('Notes')}:</strong> ${request.admin_notes}</p>` : ''}
+        </div>`,
+        confirmButtonColor: '#3085d6',
+    });
 };
 </script>
 

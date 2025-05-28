@@ -14,40 +14,40 @@ use Illuminate\Support\Facades\DB;
 
 class WalletController extends Controller
 {
-   public function show(User $vendor)
-{
-    $wallet = $vendor->wallet;
+    public function show(User $vendor)
+    {
+        $wallet = $vendor->wallet;
 
-    // Initialize variables to avoid undefined variable errors
-    $transactions = null;
-    $settlementRequests = null;
+        // Initialize variables to avoid undefined variable errors
+        $transactions = null;
+        $settlementRequests = null;
 
-    if ($wallet) {
-        // Check if wallet has transactions
-        if ($wallet->transactions !== null) {
-            $transactions = $wallet->transactions()
+        if ($wallet) {
+            // Check if wallet has transactions
+            if ($wallet->transactions !== null) {
+                $transactions = $wallet->transactions()
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(10);
+            }
+
+            // Retrieve settlement requests
+            $settlementRequests = $wallet->settlementRequests()
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
+        } else {
+            // Handle case where wallet does not exist
+            // For example, set $transactions and $settlementRequests to empty collections or null
+            $transactions = collect();
+            $settlementRequests = collect();
         }
 
-        // Retrieve settlement requests
-        $settlementRequests = $wallet->settlementRequests()
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-    } else {
-        // Handle case where wallet does not exist
-        // For example, set $transactions and $settlementRequests to empty collections or null
-        $transactions = collect();
-        $settlementRequests = collect();
+        return inertia('Admin/Vendor-Wallet/Index', [
+            'wallet' => $wallet,
+            'vendor' => $vendor,
+            'transactions' => $transactions,
+            'settlementRequests' => $settlementRequests,
+        ]);
     }
-
-    return inertia('Admin/Vendor-Wallet/Index', [
-        'wallet' => $wallet,
-        'vendor' => $vendor,
-        'transactions' => $transactions,
-        'settlementRequests' => $settlementRequests,
-    ]);
-}
 
     public function adjustBalance(Request $request)
     {
@@ -88,35 +88,51 @@ class WalletController extends Controller
 
     public function approveSettlement(SettlementRequest $settlement)
     {
-        if ($settlement->status !== 'pending') {
-            return back()->with('error', __('This request has already been processed'));
-        }
-
         return DB::transaction(function () use ($settlement) {
-            $wallet = $settlement->wallet()->lockForUpdate()->first();
+            // Lock the wallet and settlement for update
+            $wallet = Wallet::lockForUpdate()->findOrFail($settlement->wallet_id);
+            $settlement = SettlementRequest::lockForUpdate()->findOrFail($settlement->id);
 
-            if ($wallet->balance < $settlement->amount) {
-                return back()->with('error', __('Vendor has insufficient balance for this settlement'));
+            // Check if settlement is already processed
+            if ($settlement->status !== 'pending') {
+                return response()->json([
+                    'message' => __('Settlement already processed'),
+                    'status' => $settlement->status
+                ], 400);
             }
 
+            // Check if wallet has sufficient balance
+            if ($wallet->balance < $settlement->amount) {
+                return response()->json([
+                    'message' => __('Insufficient wallet balance'),
+                    'balance' => $wallet->balance,
+                    'requested' => $settlement->amount
+                ], 400);
+            }
+
+            // Debit the wallet
             $wallet->decrement('balance', $settlement->amount);
+
+            // Create transaction record
+            $transaction = new WalletTransaction([
+                'amount' => $settlement->amount,
+                'type' => 'debit',
+                'description' => 'Settlement processed',
+                'admin_id' => auth()->id(),
+                'settlement_id' => $settlement->id,
+            ]);
+            $wallet->transactions()->save($transaction);
+
+            // Update settlement status
             $settlement->update([
                 'status' => 'approved',
                 'processed_at' => now(),
-                'admin_id' => auth()->id(),
+                'admin_id' => auth()->id()
             ]);
+            return back()->with('success', __('Settlement approved successfully'));
 
-            $wallet->transactions()->create([
-                'amount' => $settlement->amount,
-                'type' => 'debit',
-                'description' => __('Settlement request approved'),
-                'admin_id' => auth()->id(),
-            ]);
-
-            return back()->with('success', __('Settlement request approved successfully'));
         });
     }
-
     public function rejectSettlement(SettlementRequest $settlement, Request $request)
     {
         $request->validate([

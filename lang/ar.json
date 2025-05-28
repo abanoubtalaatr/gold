@@ -1288,5 +1288,17 @@
     "No transactions found": "لا توجد معاملات",
     "No settlement requests found": "لا توجد طلبات سحب",
     "Wallet not found": "المحفظة غير موجودة",
-    "Wallet Management": "ادارة المحفظة"
+    "Wallet Management": "ادارة المحفظة",
+    "Settlement request approved": "تمت الموافقة على طلب السحب",
+    "Settlement request rejected": "تم رفض طلب السحب",
+    "Settlement request": "طلب سحب",
+    "Settlement requests": "طلبات السحب",
+    "You are about to approve this settlement request": "انت على وشك الموافقة على طلب السحب",
+    "Yes, approve it!": "نعم، قبوله!",
+    "Settlement request has been approved.": "تمت الموافقة على طلب السحب.",
+    "Settlement request has been rejected.": "تم رفض طلب السحب.",
+    "Rejected!": "مرفوض!",
+    "Ok": "حسنا",
+    "Settlement request approved!": "تمت الموافقة على طلب السحب!",
+    "Settlement request rejected!": "تم رفض طلب السحب!"
 }
