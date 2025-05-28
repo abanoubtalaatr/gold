@@ -220,4 +220,11 @@ return [
     'Failed to verify and update phone number' => 'Failed to verify and update phone number',
     'OTP resent to your phone number' => 'OTP resent to your phone number',
     'Failed to resend OTP' => 'Failed to resend OTP',
+    'unauthenticated' => 'Unauthenticated',
+    'logout_success' => 'Logout successful',
+    'You have logged in successfully.' => 'You have logged in successfully.',
+    'your account has been deactivated.' => 'your account has been deactivated.',
+    'We have sent a confirmation email.' => 'We have sent a confirmation email.',
+    'failed' => 'failed',
+    
 ];

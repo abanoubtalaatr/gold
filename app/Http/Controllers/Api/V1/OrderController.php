@@ -124,4 +124,9 @@ class OrderController extends Controller
         $order->update(['is_suspended' => !$order->is_suspended]);
         return $this->successResponse($order, __("mobile.order_updated_success"));
     }
+
+    public function show(OrderRental $order)
+    {
+        return $this->successResponse(new OrderRentalResource($order), __("mobile.order_fetched_success"), 200);
+    }
 }

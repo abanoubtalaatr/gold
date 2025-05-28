@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\ContactRequest;
-use App\Http\Requests\Api\V1\UpdateContactRequest;
-use App\Http\Resources\Api\V1\ContactRsource;
-use App\Models\Contact;
-use Illuminate\Support\Facades\Log;
 use App\Models\User;
-use App\Notifications\Vendor\NewContactMessage;
-use App\Traits\ApiResponseTrait;
+use App\Models\Contact;
 use Illuminate\Http\Request;
+use App\Traits\ApiResponseTrait;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\Api\ContactResource;
+use App\Http\Requests\Api\V1\ContactRequest;
+use App\Http\Resources\Api\V1\ContactRsource;
+use App\Notifications\Vendor\NewContactMessage;
+use App\Http\Requests\Api\V1\UpdateContactRequest;
 
 class ContactController extends Controller
 {
@@ -61,7 +62,7 @@ class ContactController extends Controller
         // Send notification if vendor exists
         $this->notifyVendor($contact);
 
-        return $this->successResponse($contact, 'Contact message saved successfully.');
+        return $this->successResponse(new ContactResource($contact), 'Contact message saved successfully.');
     }
 
     public function update(UpdateContactRequest $request, $id)

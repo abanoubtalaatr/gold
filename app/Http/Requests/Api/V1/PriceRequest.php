@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ContactRequest extends FormRequest
+class PriceRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,9 @@ class ContactRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'message' => 'required|string',
-            'subject' => 'required|string',
-            'sale_order_id' => 'required_without:rental_order_id|integer|exists:order_sales,id',
-            'rental_order_id' => 'required_without:sale_order_id|integer|exists:order_rentals,id',
+            'carat' => 'required|numeric|in:21,22,24,18',
+            'weight' => 'required|numeric|min:1',
+            'number_rental_day' => 'nullable|numeric|min:1',
         ];
     }
 }

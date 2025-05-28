@@ -11,7 +11,7 @@ interface FormData {
     email: string
     password: string
     password_confirmation: string
-    mobile: string
+    // mobile: string
     store_name_en: string
     store_name_ar: string
     commercial_registration_number: string
@@ -24,7 +24,7 @@ const form = useForm<FormData>({
     email: '',
     password: '',
     password_confirmation: '',
-    mobile: '',
+    // mobile: '',
     store_name_en: '',
     store_name_ar: '',
     commercial_registration_number: '',
@@ -126,7 +126,7 @@ const submit = () => {
                                 <InputError class="mt-2" :message="form.errors.email" />
                             </div>
 
-                            <div>
+                            <!-- <div>
                                 <InputLabel for="mobile" :value="$t('Mobile Number')" class="text-gray-700" />
                                 <TextInput
                                     id="mobile"
@@ -136,7 +136,7 @@ const submit = () => {
                                     required
                                 />
                                 <InputError class="mt-2" :message="form.errors.mobile" />
-                            </div>
+                            </div> -->
 
                             <div>
                                 <InputLabel for="password" :value="$t('Password')" class="text-gray-700" />

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\StateController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\PageApiController;
 use App\Http\Controllers\Api\V1\OrderController;
+use App\Http\Controllers\Api\V1\PriceController;
 use App\Http\Controllers\Api\ContactUsController;
 use App\Http\Controllers\Api\V1\BannerController;
 use App\Http\Controllers\Api\V1\RatingController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\Wallet\WalletController;
 use App\Http\Controllers\Api\V1\LiquidationRequestController;
 use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\V1\NotificationSettingController;
@@ -120,7 +122,8 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders/{order}/toggle-suspend-rental', [OrderController::class, 'toggleSuspendRental']);
     Route::post('/orders/{order}/toggle-suspend-sale', [OrderController::class, 'toggleSuspendSale']);
-
+    Route::get('orders/{order}', [OrderController::class, 'show']);
+    
     /*
     |--------------------------------------------------------------------------
     |  Notification...
@@ -162,6 +165,21 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     */
 
     Route::apiResource('/contacts', ContactController::class); 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Price....
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post('/price', [PriceController::class, 'index']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Wallet....
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/wallet', [WalletController::class, 'index']);
 });
 
 Route::get('banners', [BannerController::class, 'index']);
