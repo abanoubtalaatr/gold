@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\StateController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\PageApiController;
 use App\Http\Controllers\Api\V1\OrderController;
+use App\Http\Controllers\Api\V1\PriceController;
 use App\Http\Controllers\Api\ContactUsController;
 use App\Http\Controllers\Api\V1\BannerController;
 use App\Http\Controllers\Api\V1\RatingController;
@@ -120,7 +121,8 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders/{order}/toggle-suspend-rental', [OrderController::class, 'toggleSuspendRental']);
     Route::post('/orders/{order}/toggle-suspend-sale', [OrderController::class, 'toggleSuspendSale']);
-
+    Route::get('orders/{order}', [OrderController::class, 'show']);
+    
     /*
     |--------------------------------------------------------------------------
     |  Notification...
@@ -162,6 +164,14 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     */
 
     Route::apiResource('/contacts', ContactController::class); 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Price....
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/price', [PriceController::class, 'index']);
 });
 
 Route::get('banners', [BannerController::class, 'index']);
