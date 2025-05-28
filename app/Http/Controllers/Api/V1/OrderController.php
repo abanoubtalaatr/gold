@@ -103,7 +103,7 @@ class OrderController extends Controller
 
             // broadcast(new OrderRentalEvent($orderRental, $branch->id))->toOthers();
 
-            return new OrderRentalResource($orderRental->load('goldPiece'));
+            return $this->successResponse(new OrderRentalResource($orderRental->load('goldPiece')), __("mobile.order_created_success"));
         } catch (\Exception $e) {
             Log::error('Error in store method:', [
                 'error' => $e->getMessage(),

@@ -20,8 +20,9 @@ class RatingResource extends JsonResource
             'comment' => $this->comment,
             'created_at' => $this->created_at,
             'user' => [
-                'id' => $this->user->id,
-                'name' => $this->user->name,
+                'id' => $this->user?->id,
+                'name' => $this->user?->name,
+                'avatar' => $this->user?->avatar,
             ],
             'gold_piece' => [
                 'id' => $this->goldPiece->id,

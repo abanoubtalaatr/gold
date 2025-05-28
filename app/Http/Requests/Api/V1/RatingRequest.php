@@ -35,23 +35,4 @@ class RatingRequest extends FormRequest
             ],
         ];
     }
-
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'rating.required' => __('messages.rating_required'),
-            'rating.integer' => __('messages.rating_required'),
-            'rating.min' => __('messages.rating_min'),
-            'rating.max' => __('messages.rating_max'),
-            'comment.max' => __('messages.comment_max'),
-            'gold_piece_id.required' => __('ratings.gold_piece_required'),
-            'gold_piece_id.exists' => __('ratings.gold_piece_exists'),
-            'gold_piece_id.unique' => __('ratings.already_rated'),
-        ];
-    }
 } 
