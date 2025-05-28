@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\User;
+use App\Notifications\Vendor\VendorApprovedNotification;
+use App\Notifications\Vendor\VendorRejectedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -121,7 +123,7 @@ class VendorController extends Controller
         ]);
 
         // Send approval notification
-        // $vendor->notify(new VendorApprovedNotification());
+        $vendor->notify(new VendorApprovedNotification());
 
         return back()->with('success', 'Vendor approved successfully');
     }
@@ -140,7 +142,7 @@ class VendorController extends Controller
         ]);
 
         // Send rejection notification
-        // $vendor->notify(new VendorRejectedNotification($validated['rejection_reason']));
+        $vendor->notify(new VendorRejectedNotification($validated['rejection_reason']));
 
         return back()->with('success', 'Vendor rejected successfully');
     }
