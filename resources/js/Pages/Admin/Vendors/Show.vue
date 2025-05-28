@@ -48,7 +48,8 @@
                                         </p>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Status') }}</label>
+                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Status')
+                                        }}</label>
                                         <p class="mt-1 text-sm text-gray-900">
                                             <span :class="{
                                                 'bg-green-100 text-green-800': vendor.vendor_status === 'approved',
@@ -64,7 +65,8 @@
                                         </p>
                                     </div>
                                     <div v-if="vendor.vendor_status === 'rejected' && vendor.rejection_reason">
-                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Rejection Reason') }}</label>
+                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Rejection Reason')
+                                        }}</label>
                                         <p class="mt-1 text-sm text-gray-900">{{ vendor.rejection_reason }}</p>
                                     </div>
                                 </div>
@@ -74,13 +76,12 @@
                                 <h4 class="mb-4 text-lg font-medium">{{ $t('Store Information') }}</h4>
                                 <div class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Commercial Registration') }}</label>
+                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Commercial Registration')}}</label>
                                         <p class="mt-1 text-sm text-gray-900">
                                             {{ vendor.commercial_registration_number }}
                                         </p>
-                                        <a v-if="vendor.media?.find(m => m.collection_name === 'commercial_registration')"
-                                            :href="vendor.media.find(m => m.collection_name === 'commercial_registration').original_url"
-                                            target="_blank"
+                                        <a v-if="vendor.commercial_registration_image"
+                                            :href="'/storage/' + vendor.commercial_registration_image" target="_blank"
                                             class="mt-2 inline-block text-sm text-indigo-600 hover:text-indigo-900">
                                             {{ $t('View Document') }}
                                         </a>
@@ -90,13 +91,13 @@
                                         <p class="mt-1 text-sm text-gray-900">{{ vendor.iban }}</p>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Location') }}</label>
+                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Location')
+                                        }}</label>
                                         <p class="mt-1 text-sm text-gray-900">{{ vendor.city?.name }}</p>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">{{ $t('Logo') }}</label>
-                                        <img v-if="vendor.media?.find(m => m.collection_name === 'logo')"
-                                            :src="vendor.media.find(m => m.collection_name === 'logo').original_url"
+                                        <img v-if="vendor.logo" :src="'/storage/' + vendor.logo"
                                             class="mt-2 h-20 w-20 rounded-full object-cover" />
                                     </div>
                                 </div>
@@ -165,27 +166,27 @@ const rejectionReason = ref('');
 
 const toggleStatus = async () => {
     const result = await Swal.fire({
-        title:t('Are you sure?'),
-        text:t('Do you want to change this vendor\'s status?'),
+        title: t('Are you sure?'),
+        text: t('Do you want to change this vendor\'s status?'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText:t('Yes, proceed'),
-        cancelButtonText:t('Cancel'),
+        confirmButtonText: t('Yes, proceed'),
+        cancelButtonText: t('Cancel'),
     });
 
     if (result.isConfirmed) {
         router.patch(route('vendors.toggle-status', props.vendor.id), {
             onSuccess: () => {
                 Swal.fire(
-                   t('Success'),
-                   t('Vendor status has been updated'),
+                    t('Success'),
+                    t('Vendor status has been updated'),
                     'success'
                 );
             },
             onError: () => {
                 Swal.fire(
-                   t('Error'),
-                   t('Failed to update vendor status'),
+                    t('Error'),
+                    t('Failed to update vendor status'),
                     'error'
                 );
             }
@@ -230,7 +231,7 @@ const rejectVendor = async () => {
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: t('Yes, reject'),
-        cancelButtonText:t('Cancel'),
+        cancelButtonText: t('Cancel'),
     });
 
     if (result.isConfirmed) {

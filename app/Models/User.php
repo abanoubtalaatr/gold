@@ -65,6 +65,8 @@ class User extends Authenticatable implements JWTSubject
         'vendor_status',
         'rejection_reason',
         'logo',
+        'city_id'
+
     ];
 
     protected $appends = ['avatar'];
@@ -260,4 +262,13 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Address::class)->where('user_id', Auth::id());
     }
+    public function getLogoUrlAttribute()
+    {
+        return $this->logo
+            ? Storage::url($this->logo)
+            : null;
+    }
+
+    // Make sure city is always included in serialization
+    protected $with = ['city'];
 }

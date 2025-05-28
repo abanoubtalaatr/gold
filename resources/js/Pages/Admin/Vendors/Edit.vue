@@ -118,12 +118,23 @@
                                             class="mt-1 text-sm text-red-600">
                                             {{ form.errors.commercial_registration_image }}
                                         </p>
-                                        <a v-if="vendor.media?.find(m => m.collection_name === 'commercial_registration')"
-                                            :href="vendor.media.find(m => m.collection_name === 'commercial_registration').original_url"
-                                            target="_blank"
-                                            class="inline-block mt-2 text-sm text-indigo-600 hover:text-indigo-900">
-                                            {{ $t('View Current Document') }}
-                                        </a>
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <!-- Show current image if exists -->
+                                            <a v-if="vendor.commercial_registration_image"
+                                                :href="'/storage/' + vendor.commercial_registration_image"
+                                                target="_blank"
+                                                class="inline-block text-sm text-indigo-600 hover:text-indigo-900">
+                                                {{ $t('View Current Document') }}
+                                            </a>
+                                            <!-- Show preview of new image if selected -->
+                                            <img v-if="commercialRegistrationPreview"
+                                                :src="commercialRegistrationPreview"
+                                                class="h-16 object-cover rounded-md" />
+                                            <!-- Show current image thumbnail -->
+                                            <img v-if="vendor.commercial_registration_image && !commercialRegistrationPreview"
+                                                :src="'/storage/' + vendor.commercial_registration_image"
+                                                class="h-16 object-cover rounded-md" />
+                                        </div>
                                     </div>
 
                                     <div>
@@ -138,9 +149,14 @@
                                         <p v-if="form.errors.logo" class="mt-1 text-sm text-red-600">
                                             {{ form.errors.logo }}
                                         </p>
-                                        <img v-if="vendor.media?.find(m => m.collection_name === 'logo')"
-                                            :src="vendor.media.find(m => m.collection_name === 'logo').original_url"
-                                            class="mt-2 h-16 w-16 rounded-full object-cover" />
+                                        <div class="flex items-center gap-4 mt-2">
+                                            <!-- Show current logo if exists -->
+                                            <img v-if="vendor.logo && !logoPreview" :src="'/storage/' + vendor.logo"
+                                                class="h-16 w-16 rounded-full object-cover" />
+                                            <!-- Show preview of new logo if selected -->
+                                            <img v-if="logoPreview" :src="logoPreview"
+                                                class="h-16 w-16 rounded-full object-cover" />
+                                        </div>
                                     </div>
 
                                     <div>
@@ -198,6 +214,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link, useForm } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
 import { useI18n } from 'vue-i18n';
+import { ref } from 'vue';
 
 const { t } = useI18n();
 
@@ -205,6 +222,9 @@ const props = defineProps({
     vendor: Object,
     cities: Array,
 });
+
+const logoPreview = ref(null);
+const commercialRegistrationPreview = ref(null);
 
 const form = useForm({
     name: props.vendor.name,
@@ -221,11 +241,32 @@ const form = useForm({
 });
 
 const handleFileUpload = (field, event) => {
-    form[field] = event.target.files[0];
+    const file = event.target.files[0];
+    form[field] = file;
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        if (field === 'logo') {
+            logoPreview.value = e.target.result;
+        } else if (field === 'commercial_registration_image') {
+            commercialRegistrationPreview.value = e.target.result;
+        }
+    };
+    reader.readAsDataURL(file);
 };
 
 const submit = () => {
-    form.put(route('vendors.update', props.vendor.id), {
+    // Create FormData to properly handle file uploads
+    const formData = new FormData();
+    for (const key in form) {
+        if (form.hasOwnProperty(key) && key !== 'errors' && key !== 'hasErrors' && key !== 'processing') {
+            formData.append(key, form[key]);
+        }
+    }
+
+    form.post(route('vendors.update', props.vendor.id), {
+        data: formData,
         forceFormData: true,
         onSuccess: () => {
             Swal.fire(

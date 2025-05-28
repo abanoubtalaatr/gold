@@ -118,7 +118,7 @@
             </li>
 
             <!-- Vendor sale orders -->
-<!-- 
+            <!--
             <li class="nav-item" v-if="hasPermission('vendor read orders')">
                 <Link class="nav-link" :href="route('vendor.orders.sale.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/sale-orders') }">
@@ -235,6 +235,16 @@
                 <span>{{ $t("Store Information") }}</span>
                 </Link>
             </li> -->
+
+            <!-- vendors -->
+            <li class="nav-item">
+                <Link class="nav-link" :href="route('vendors.index')" :class="{
+                    collapsed: !$page.url.startsWith('/admin/vendors'),
+                }">
+                <i class="bi bi-shop"></i>
+                <span>{{ $t("vendors") }}</span>
+                </Link>
+            </li>
         </ul>
     </aside>
 </template>
