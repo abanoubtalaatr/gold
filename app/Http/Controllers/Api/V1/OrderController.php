@@ -127,6 +127,6 @@ class OrderController extends Controller
 
     public function show(OrderRental $order)
     {
-        return $this->successResponse(new OrderRentalResource($order->load('goldPiece')));
+        return $this->successResponse(new OrderRentalResource($order), __("mobile.order_fetched_success"), 200);
     }
 }

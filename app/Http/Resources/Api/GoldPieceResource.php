@@ -41,8 +41,8 @@ class GoldPieceResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'user' => [
-                'id' => $this->user->id,
-                'name' => $this->user->name,
+                'id' => $this->user?->id,
+                'name' => $this->user?->name,
             ],
             'images' => $this->getMedia('images')->map(function ($media) {
                 return [

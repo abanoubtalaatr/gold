@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\Wallet\WalletController;
 use App\Http\Controllers\Api\V1\LiquidationRequestController;
 use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\V1\NotificationSettingController;
@@ -171,7 +172,14 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/price', [PriceController::class, 'index']);
+    Route::post('/price', [PriceController::class, 'index']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Wallet....
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/wallet', [WalletController::class, 'index']);
 });
 
 Route::get('banners', [BannerController::class, 'index']);

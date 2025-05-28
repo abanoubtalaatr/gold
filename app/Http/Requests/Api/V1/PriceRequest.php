@@ -24,6 +24,7 @@ class PriceRequest extends FormRequest
         return [
             'carat' => 'required|numeric|in:21,22,24,18',
             'weight' => 'required|numeric|min:1',
+            'number_rental_day' => 'nullable|numeric|min:1',
         ];
     }
 }

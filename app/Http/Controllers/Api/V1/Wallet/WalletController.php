@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1\Wallet;
 
-use App\Http\Controllers\Controller;
-use App\Http\Resources\WalletResource;
-use App\Http\Resources\WalletTransactionResource;
+use Illuminate\Http\Request;
 use App\Services\WalletService;
 use App\Traits\ApiResponseTrait;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\WalletResource;
+use App\Http\Resources\WalletTransactionResource;
 
 class WalletController extends Controller
 {
@@ -19,7 +20,7 @@ class WalletController extends Controller
 
     public function index(Request $request)
     {
-        $wallet = $this->walletService->getWallet($request->user());
+        $wallet = $this->walletService->getWallet(Auth::user());
         $transactions = $this->walletService->getTransactions($request->user(), $request->only(['type', 'status']));
 
         return $this->successResponse([

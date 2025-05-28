@@ -24,8 +24,8 @@ class ContactRequest extends FormRequest
         return [
             'message' => 'required|string',
             'subject' => 'required|string',
-            'sale_order_id' => 'nullable|integer|exists:order_sales,id',
-            'rental_order_id' => 'nullable|integer|exists:order_rentals,id',
+            'sale_order_id' => 'required_without:rental_order_id|integer|exists:order_sales,id',
+            'rental_order_id' => 'required_without:sale_order_id|integer|exists:order_rentals,id',
         ];
     }
 }

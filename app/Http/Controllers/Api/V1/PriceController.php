@@ -17,7 +17,7 @@ class PriceController extends Controller
 
     public function getTotalPrice(PriceRequest $request)
     {
-        //basic price 
+        //basic price this must calling api to get the basic price for today
         $arrayOfBasicPrice = [
             '21' => 100,
             '22' => 200,
@@ -28,7 +28,13 @@ class PriceController extends Controller
         $basicPrice = $arrayOfBasicPrice[$request->carat];
 
         $totalPrice = $basicPrice * $request->weight;
+        // if number_rental_day is not null, add the rental price to the total price
+      
+        if ($request->number_rental_day) {
+            $totalPrice += $basicPrice * $request->number_rental_day;
+        }
 
+        
         return $totalPrice;
     }
 }
