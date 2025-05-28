@@ -41,7 +41,7 @@ class RegisterController extends AppBaseController
     public function register(RegisterRequest $request)
     {
 
-        try {
+        // try {
 
             $data = $request->all();
 
@@ -55,7 +55,7 @@ class RegisterController extends AppBaseController
 
             $user = $this->create($data);
 
-            $user->unsetRelations(['media', 'roles']);
+            // $user->unsetRelations(['media', 'roles']);
 
             //event(new ApiRegistered($user));
 
@@ -80,10 +80,10 @@ class RegisterController extends AppBaseController
             }
 
             return response()->json(['data' => $user, 'success' => true, 'message' => __('mobile.registered_successfully')], 200);
-        } catch (\Exception $e) {
+        // } catch (\Exception $e) {
 
-            return $this->sendError($e->getMessage());
-        }
+        //     return $this->sendError($e->getMessage());
+        // }
     }
 
 
@@ -232,7 +232,7 @@ class RegisterController extends AppBaseController
 
             $user = User::create($data);
 
-            $user->assignRole('user');
+            // $user->assignRole('user');
             
         } catch (Exception $e) {
             DB::rollBack();

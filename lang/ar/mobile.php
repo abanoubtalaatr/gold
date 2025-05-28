@@ -171,6 +171,13 @@ return [
     'Failed to verify and update phone number' => 'فشل في التحقق وتحديث رقم الهاتف',
     'OTP resent to your phone number' => 'تم إعادة إرسال رمز التحقق إلى هاتفك المحمول',
     'Failed to resend OTP' => 'فشل في إعادة إرسال رمز التحقق',
+    'unauthenticated' => 'غير مصرح',
+    'logout_success' => 'تم تسجيل الخروج بنجاح',
+    'You have logged in successfully.' => 'لقد قمت بتسجيل الدخول بنجاح',
+    'your account has been deactivated.' => 'لقد تم إلغاء تفعيل حسابك',
+    'We have sent a confirmation email.' => 'لقد قمنا بإرسال بريد التحقق إلى بريدك الإلكتروني',
+    'failed' => 'البيانات المقدمة غير صالحة',
+    'not_verified' => 'لم يتم التحقق من البريد الإلكتروني'
     
 
 

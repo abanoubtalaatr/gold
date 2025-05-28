@@ -113,7 +113,7 @@ class LoginController extends AppBaseController
             return $this->errorResponse($e->getMessage(), 200);
         }
         // return $this->errorResponse($e->getMessage(), 422);
-        return $this->errorResponse(trans('auth.failed'));
+        return $this->errorResponse(trans('mobile.failed'));
     }
 
     /**
@@ -145,7 +145,7 @@ class LoginController extends AppBaseController
         // Check to see if the users account is confirmed and active
         if (null !== $user->email && !$user->isVerified()) {
             $user->sendEmailVerificationNotification();
-            return $this->errorResponse('not_verified', ['email' => $user->email, 'message' => __('We have sent a confirmation email.')], 200);
+            return $this->errorResponse(__('mobile.not_verified'), ['email' => $user->email, 'message' => __('mobile.We have sent a confirmation email.')], 200);
         }
 
         if (!$user->isMobileVerified()) {
