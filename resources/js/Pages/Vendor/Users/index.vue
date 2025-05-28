@@ -28,7 +28,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        
+
 
                         <DataTable :headers="headers" :data="users.data" :pagination-links="users.links"
                             noDataMessage="No users found." @update:page="handlePageChange">

@@ -1,40 +1,44 @@
 <?php
 
-use App\Models\User;
-use Inertia\Inertia;
-use App\Models\State;
-use App\Models\Country;
 use App\Events\NotificationSent;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\SystemSettingsController;
+use App\Http\Controllers\Admin\VendorController;
+use App\Http\Controllers\Banners\BannerController;
+use App\Http\Controllers\Contacts\ContactController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LangController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\ExportController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PageWebController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\Vendor\RoleController;
-use App\Http\Controllers\Vendor\UserController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\Vendor\OrderController;
-use App\Http\Controllers\Vendor\StoreController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\Vendor\Auth\RegisterController;
 use App\Http\Controllers\Vendor\BranchController;
-use App\Http\Controllers\Vendor\ReportController;
-use App\Http\Controllers\Vendor\VerifyController;
-use App\Http\Controllers\Vendor\WalletController;
-use App\Http\Controllers\Banners\BannerController;
-use App\Http\Controllers\Vendor\ServiceController;
-use App\Http\Controllers\Contacts\ContactController;
+use App\Http\Controllers\Vendor\ContactController as VendorContactController;
 use App\Http\Controllers\Vendor\GoldPieceController;
+use App\Http\Controllers\Vendor\OrderController;
+use App\Http\Controllers\Vendor\OrderRentalController;
 use App\Http\Controllers\Vendor\OrderSalesController;
+use App\Http\Controllers\Vendor\RentalRequestController;
+use App\Http\Controllers\Vendor\ReportController;
+use App\Http\Controllers\Vendor\RoleController;
+use App\Http\Controllers\Vendor\ServiceController;
 use App\Http\Controllers\Vendor\SettlementController;
 use App\Http\Controllers\Vendor\StatisticsController;
-use App\Http\Controllers\Vendor\OrderRentalController;
-use App\Http\Controllers\Vendor\Auth\RegisterController;
-use App\Http\Controllers\Vendor\RentalRequestController;
-use App\Http\Controllers\Vendor\ContactController as VendorContactController;
+use App\Http\Controllers\Vendor\StoreController;
+use App\Http\Controllers\Vendor\UserController;
+use App\Http\Controllers\Vendor\VerifyController;
+use App\Http\Controllers\Vendor\WalletController;
+use App\Models\Country;
+use App\Models\State;
+use App\Models\User;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+
 
 
 
@@ -133,6 +137,24 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/export-users', [ExportController::class, 'export'])->name('export.users');
 /************************************************************************ */
 
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // System Settings
+    Route::get('/system-settings', [SystemSettingsController::class, 'index'])->name('system-settings');
+    Route::put('/system-settings', [SystemSettingsController::class, 'updateSettings'])->name('system-settings.update');
+
+    // Slider Routes
+    Route::post('/system-settings/sliders', [SystemSettingsController::class, 'storeSlider'])->name('system-settings.sliders.store');
+    Route::put('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'updateSlider'])->name('system-settings.sliders.update');
+    Route::delete('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'destroySlider'])->name('system-settings.sliders.destroy');
+
+    Route::resource('admin/vendors', VendorController::class);
+
+    // Vendor status management
+    Route::post('/vendors/{vendor}/approve', [VendorController::class, 'approve'])->name('vendors.approve');
+    Route::post('/vendors/{vendor}/reject', [VendorController::class, 'reject'])->name('vendors.reject');
+    Route::patch('/vendors/{vendor}/toggle-status', [VendorController::class, 'toggleStatus'])->name('vendors.toggle-status');
+});
 Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('create-account', [RegisterController::class, 'create'])
