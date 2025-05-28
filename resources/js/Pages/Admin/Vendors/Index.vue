@@ -97,24 +97,30 @@
                                                     :id="`actions-menu-${vendor.id}`"
                                                     class="absolute right-0 z-10 w-48 py-1 mt-2 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none select">
                                                     <Link :href="route('vendors.show', vendor.id)"
-                                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 .select butto">
                                                     {{ $t('View Details') }}
                                                     </Link>
                                                     <Link :href="route('vendors.edit', vendor.id)"
-                                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 .select butto">
                                                     {{ $t('Edit') }}
                                                     </Link>
+
+                                                    <!-- Add Wallet Management Link -->
+                                                    <Link :href="route('admin.wallet.show', vendor.id)"
+                                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 .select butto">
+                                                    {{ $t('Wallet Management') }}
+                                                    </Link>
                                                     <button @click="toggleStatus(vendor)"
-                                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100">
+                                                        class="block w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 .select butto">
                                                         {{ vendor.is_active ? $t('Deactivate') : $t('Activate') }}
                                                     </button>
                                                     <template v-if="vendor.vendor_status === 'pending'">
                                                         <button @click="approveVendor(vendor)"
-                                                            class="block w-full px-4 py-2 text-sm text-left text-green-700 hover:bg-green-50">
+                                                            class="block w-full px-4 py-2 text-sm text-left text-green-700 hover:bg-green-50 .select butto">
                                                             {{ $t('Approve') }}
                                                         </button>
                                                         <button @click="showRejectForm(vendor)"
-                                                            class="block w-full px-4 py-2 text-sm text-left text-red-700 hover:bg-red-50">
+                                                            class="block w-full px-4 py-2 text-sm text-left text-red-700 hover:bg-red-50 .select butto">
                                                             {{ $t('Reject') }}
                                                         </button>
                                                     </template>
@@ -284,5 +290,6 @@ const showRejectForm = async (vendor) => {
 
 .select button:hover {
     background-color: rgb(226, 226, 226) !important;
+    color: black !important;
 }
 </style>

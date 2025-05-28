@@ -31,7 +31,7 @@ use App\Http\Controllers\Vendor\StatisticsController;
 use App\Http\Controllers\Vendor\StoreController;
 use App\Http\Controllers\Vendor\UserController;
 use App\Http\Controllers\Vendor\VerifyController;
-use App\Http\Controllers\Vendor\WalletController;
+use  App\Http\Controllers\Admin\WalletController as AdminWalletController;
 use App\Models\Country;
 use App\Models\State;
 use App\Models\User;
@@ -156,6 +156,31 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/vendors/{vendor}/reject', [VendorController::class, 'reject'])->name('vendors.reject');
     Route::patch('/vendors/{vendor}/toggle-status', [VendorController::class, 'toggleStatus'])->name('vendors.toggle-status');
 });
+
+
+
+
+Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+    // Vendor Wallet
+    Route::get('/vendors/{vendor}/wallet', action: [AdminWalletController::class, 'show'])
+        ->name('admin.wallet.show');
+
+    Route::post('/wallet/adjust', [AdminWalletController::class, 'adjustBalance'])
+        ->name('admin.wallet.adjust');
+
+    Route::get('/wallet/{wallet}/transactions', [AdminWalletController::class, 'transactions'])
+        ->name('admin.wallet.transactions');
+
+    // Settlement Requests
+    Route::put('/settlement/{settlement}/approve', [AdminWalletController::class, 'approveSettlement'])
+        ->name('admin.settlement.approve');
+
+    Route::put('/settlement/{settlement}/reject', [AdminWalletController::class, 'rejectSettlement'])
+        ->name('admin.settlement.reject');
+});
+
+
+
 Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('create-account', [RegisterController::class, 'create'])
