@@ -17,7 +17,7 @@ class OrderRentalResource extends JsonResource
             'total_price' => $this->total_price,
             'days_left_to_return' => number_format(now()->diffInDays($this->end_date, false), 0),
             'status' => $this->status,
-            'contact' => new ContactResource($this->contact),
+            'contacts' => ContactResource::collection($this->contacts),
         ];
     }
 }

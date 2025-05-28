@@ -62,7 +62,7 @@ class GoldPieceResource extends JsonResource
             'total_days' => $totalDays,
             'city' => SimpleCityResource::make($this->branchDetails()->city),
             'days_left_to_return' => number_format(now()->diffInDays($rental?->end_date, false), 0),
-            'contact' => new ContactResource($rental?->contact),
+            'contacts' => ContactResource::collection($rental?->contacts),
             'order_status' => $rental?->status,
             'start_date' => $rental?->start_date ?? Carbon::today(),
             'end_date' => $rental?->end_date ?? Carbon::today()->addDays(3),

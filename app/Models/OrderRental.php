@@ -85,8 +85,8 @@ class OrderRental extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function contact()
+    public function contacts()
     {
-        return $this->hasOne(Contact::class,'rental_order_id');
+        return $this->hasMany(Contact::class,'rental_order_id');
     }
 }
