@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Api;
 
 use DateTime;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +36,6 @@ class GoldPieceResource extends JsonResource
             'sale_price' => $this->sale_price,
             'deposit_amount' => $this->deposit_amount,
             'type' => $this->type,
-            'status' => $this->status,
             'description' => $this->description,
             'qr_code' => $this->qr_code,
             'created_at' => $this->created_at,
@@ -58,11 +58,15 @@ class GoldPieceResource extends JsonResource
             ],
             'is_favorited' => $request->user() ? $this->favoritedBy()->where('user_id', $request->user()->id)->exists() : false,
             'branch' => new BranchResource($this->branchDetails()),
-            'start_date' => $rental?->start_date,
-            'end_date' => $rental?->end_date,
             'remaining_days' => $remainingDays,
             'total_days' => $totalDays,
             'city' => SimpleCityResource::make($this->branchDetails()->city),
+            'days_left_to_return' => number_format(now()->diffInDays($rental?->end_date, false), 0),
+            'contact' => new ContactResource($rental?->contact),
+            'order_status' => $rental?->status,
+            'start_date' => $rental?->start_date ?? Carbon::today(),
+            'end_date' => $rental?->end_date ?? Carbon::today()->addDays(3),
+            'price_delay' => 200,
         ];
     }
 

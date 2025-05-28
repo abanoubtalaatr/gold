@@ -85,4 +85,8 @@ class OrderRental extends Model
         return $this->belongsTo(Branch::class);
     }
 
+    public function contact()
+    {
+        return $this->hasOne(Contact::class);
+    }
 }
