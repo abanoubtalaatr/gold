@@ -100,8 +100,6 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::post('/gold-pieces', [GoldPieceController::class, 'store']);
     Route::delete('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'destroy']);
     Route::post('/gold-pieces/{goldPiece}/update', [GoldPieceController::class, 'update']);
-    Route::post('orders/{order}/confirm-send-to-vendor', [ConfirmSendPieceToVendorController::class, 'index']);
-    Route::post('order/{order}/confirm-sold-to-vendor', [ConfirmSoldToVendorController::class, 'index']);
    
     /*
     |--------------------------------------------------------------------------
@@ -123,7 +121,9 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::post('/orders/{order}/toggle-suspend-rental', [OrderController::class, 'toggleSuspendRental']);
     Route::post('/orders/{order}/toggle-suspend-sale', [OrderController::class, 'toggleSuspendSale']);
     Route::get('orders/{order}', [OrderController::class, 'show']);
-    
+    Route::post('orders/{order}/confirm-send-to-vendor', [ConfirmSendPieceToVendorController::class, 'index']);
+    Route::post('order/{order}/confirm-sold-to-vendor', [ConfirmSoldToVendorController::class, 'index']);
+   
     /*
     |--------------------------------------------------------------------------
     |  Notification...
@@ -180,6 +180,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     |--------------------------------------------------------------------------
     */
     Route::get('/wallet', [WalletController::class, 'index']);
+    Route::post('wallet/charge', [WalletController::class, 'charge']);
 });
 
 Route::get('banners', [BannerController::class, 'index']);
