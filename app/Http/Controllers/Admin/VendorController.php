@@ -95,11 +95,19 @@ class VendorController extends Controller
     // Show vendor details
     public function show(User $vendor)
     {
-
-        $vendor->load(['city']);
+        // Eager load the city relationship
+        $vendor->load([
+            'city' => function ($query) {
+                $query->select('id', 'name'); // Only select needed columns
+            }
+        ]);
 
         return Inertia::render('Admin/Vendors/Show', [
-            'vendor' => $vendor,
+            'vendor' => $vendor->append([
+                'commercial_registration_image_url',
+                'logo_url',
+                'store_name'
+            ]),
         ]);
     }
 
@@ -181,31 +189,34 @@ class VendorController extends Controller
             'city_id' => 'required|exists:cities,id',
         ]);
 
-        // Prepare data for update
         $updateData = $validated;
 
         // Handle commercial registration image
         if ($request->hasFile('commercial_registration_image')) {
-            // Optionally delete old file
-            if ($vendor->commercial_registration_image_path) {
-                Storage::disk('public')->delete($vendor->commercial_registration_image_path);
+            if ($vendor->commercial_registration_image) {
+                Storage::disk('public')->delete($vendor->commercial_registration_image);
             }
             $file = $request->file('commercial_registration_image');
             $path = $file->store('uploads/commercial_registrations', 'public');
-            $updateData['commercial_registration_image_path'] = $path;
+            $updateData['commercial_registration_image'] = $path;
+        } else {
+            // Remove the key if exists to prevent overwriting
+            unset($updateData['commercial_registration_image']);
         }
 
         // Handle logo
         if ($request->hasFile('logo')) {
-            // Optionally delete old logo
-            if ($vendor->logo_path) {
-                Storage::disk('public')->delete($vendor->logo_path);
+            if ($vendor->logo) {
+                Storage::disk('public')->delete($vendor->logo);
             }
             $file = $request->file('logo');
             $path = $file->store('uploads/logos', 'public');
-            $updateData['logo_path'] = $path;
+            $updateData['logo'] = $path;
+        } else {
+            unset($updateData['logo']);
         }
 
+        // Final update
         $vendor->update($updateData);
 
         return redirect()->route('vendors.show', $vendor)

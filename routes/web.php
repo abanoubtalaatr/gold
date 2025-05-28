@@ -148,8 +148,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'updateSlider'])->name('system-settings.sliders.update');
     Route::delete('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'destroySlider'])->name('system-settings.sliders.destroy');
 
-    Route::resource('admin/vendors', VendorController::class);
+    Route::resource('admin/vendors', VendorController::class)->except('update');
 
+    Route::post('/vendors/{vendor}/update', [VendorController::class, 'update'])->name('vendors.update');
     // Vendor status management
     Route::post('/vendors/{vendor}/approve', [VendorController::class, 'approve'])->name('vendors.approve');
     Route::post('/vendors/{vendor}/reject', [VendorController::class, 'reject'])->name('vendors.reject');
