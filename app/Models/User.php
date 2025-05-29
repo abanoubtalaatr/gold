@@ -29,7 +29,7 @@ class User extends Authenticatable implements JWTSubject
         Notifiable,
         HasRoles,
         IsActive,
-        InteractsWithMedia,
+        // InteractsWithMedia,
         SoftDeletes;
 
     use CanResetPasswordTrait;
@@ -274,10 +274,21 @@ class User extends Authenticatable implements JWTSubject
     // Make sure city is always included in serialization
     protected $with = ['city'];
 
-    public function registerMediaCollections(): void
+    // public function registerMediaCollections(): void
+    // {
+    //     $this->addMediaCollection('avatar')
+    //         ->acceptsMimeTypes(['image/jpeg', 'image/png'])
+    //         ->useDisk('public');
+    // }
+
+    public function scopeExcludeUSereAndVendor($query)
     {
-        $this->addMediaCollection('avatar')
-            ->acceptsMimeTypes(['image/jpeg', 'image/png'])
-            ->useDisk('public');
+        return $query->whereNull('vendor_id')
+                     ->whereHas('roles', function ($q) {
+                         $q->where('name', '!=', 'user');
+                     })->
+                     where('id', '!=', Auth::id());
     }
+
+     
 }

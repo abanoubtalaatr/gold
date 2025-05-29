@@ -104,7 +104,7 @@
                 <Link class="nav-link" :href="route('users.index')"
                     :class="{ collapsed: !$page.url.startsWith('/users') }">
                 <i class="bi bi-person"></i>
-                <span>{{ $t("users") }}</span>
+                <span>{{ $t("Admins") }}</span>
                 </Link>
             </li>
 

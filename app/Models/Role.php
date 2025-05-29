@@ -22,6 +22,10 @@ class Role extends SpatieRole implements TranslatableContract
         'vendor_id',
     ];
 
+    public function roles(){
+        return $this->hasMany(Role::class, 'vendor_id');
+    }
+
     public function logs(): HasMany
     {
         return $this->hasMany(Log::class, 'by_user_id');
@@ -30,5 +34,13 @@ class Role extends SpatieRole implements TranslatableContract
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeSuperAdminRoles($query)
+    {
+        return $query->whereNull('vendor_id')
+                     ->whereHas('roles', function ($q) {
+                         $q->where('name', '!=', 'user');
+                     });
     }
 }

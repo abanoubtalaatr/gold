@@ -153,6 +153,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'updateSlider'])->name('system-settings.sliders.update');
     Route::delete('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'destroySlider'])->name('system-settings.sliders.destroy');
 
+
+    /************************************************************************ */
+
+
+
     Route::resource('admin/vendors', VendorController::class)->except('update');
 
     Route::post('/vendors/{vendor}/update', [VendorController::class, 'update'])->name('vendors.update');
@@ -162,6 +167,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/vendors/{vendor}/toggle-status', [VendorController::class, 'toggleStatus'])->name('vendors.toggle-status');
 });
 
+
+/************************************************************************ */
 
 
 
@@ -184,6 +191,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
         ->name('admin.settlement.reject');
 });
 
+/************************************************************************ */
 
 
 Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
@@ -191,6 +199,8 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     Route::post('/complaints/{complaint}/reply', [ComplaintController::class, 'reply'])->name('admin.complaints.reply');
     Route::patch('/complaints/{complaint}/status', [ComplaintController::class, 'updateStatus'])->name('admin.complaints.update-status');
 
+
+    /************************************************************************ */
 
 
     Route::resource('gold-pieces', AdminGoldPieceController::class)
@@ -204,6 +214,8 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
 
 });
 
+
+/************************************************************************ */
 
 Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::middleware('guest')->group(function () {
