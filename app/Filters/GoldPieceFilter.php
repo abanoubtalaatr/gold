@@ -2,8 +2,9 @@
 
 namespace App\Filters;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\OrderRental;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 
 class GoldPieceFilter
 {
@@ -21,7 +22,7 @@ class GoldPieceFilter
 
         // Base query for approved orders
         // $this->approvedOrders();
-        $this->rentalFilter();
+        // $this->rentalFilter();
 
         if ($this->request->filled('price_sort')) {
             $this->query->orderBy('rental_price_per_day', $this->request->price_sort);
@@ -78,12 +79,12 @@ class GoldPieceFilter
 
         return $this;
     }
-    protected function rentalFilter(): self
-    {
-        $this->query->whereHas('orderRentals');
+    // protected function rentalFilter(): self
+    // {
+    //     $this->query->whereHas('orderRentals');
 
-        return $this;
-    }
+    //     return $this;
+    // }
     protected function caratFilter(): self
     {
         if ($this->request->filled('carat')) {
@@ -155,7 +156,29 @@ class GoldPieceFilter
     protected function statusFilter(): self
     {
         if ($this->request->status) {
-            $this->query->where('status', $this->request->status);
+            switch ($this->request->status) {
+                case 'current':
+                    $this->query->whereHas('orderRentals', function ($query) {
+                        $query->where(function ($q) {
+                            $q->where('status', OrderRental::STATUS_PENDING_APPROVAL)
+                                ->orWhere(function ($q) {
+                                    $q->where('start_date', '<=', now())
+                                        ->where('end_date', '>=', now());
+                                });
+                        });
+                    });
+                    break;
+                case 'finished':
+                    $this->query->whereHas('orderRentals', function ($query) {
+                        $query->where('end_date', '<', now());
+                    });
+                    break;
+                case 'future':
+                    $this->query->whereHas('orderRentals', function ($query) {
+                        $query->where('start_date', '>', now());
+                    });
+                    break;
+            }
         }
 
         return $this;

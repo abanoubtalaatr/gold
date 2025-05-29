@@ -5,8 +5,6 @@ namespace App\Http\Resources\Api;
 use DateTime;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Http\Resources\UserResource;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\Api\V1\BranchResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,7 +12,8 @@ class GoldPieceResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $rental = $this->orderRentals()->first();
+        $rentals = $this->orderRentals ? $this->orderRentals() : null;
+        $rental = $rentals ? $rentals->first() : null;
         $remainingDays = 0;
         $totalDays = 0;
 
@@ -57,21 +56,24 @@ class GoldPieceResource extends JsonResource
                 'count' => $this->rating_count,
             ],
             'is_favorited' => $request->user() ? $this->favoritedBy()->where('user_id', $request->user()->id)->exists() : false,
-            'branch' => new BranchResource($this->branchDetails()),
+            'branch' => $this->branchDetails() ? new BranchResource($this->branchDetails()) : null,
             'remaining_days' => $remainingDays,
             'total_days' => $totalDays,
-            'city' => SimpleCityResource::make($this->branchDetails()->city),
+            'city' => $this->branchDetails() ? SimpleCityResource::make($this->branchDetails()->city) : null,
             'days_left_to_return' => number_format(now()->diffInDays($rental?->end_date, false), 0),
-            'contacts' => ContactResource::collection($rental?->contacts),
+            'contacts' => ContactResource::collection($rental?->contacts ?? collect()),
             'order_status' => $rental?->status,
             'start_date' => $rental?->start_date ?? Carbon::today(),
             'end_date' => $rental?->end_date ?? Carbon::today()->addDays(3),
             'price_delay' => 200,
+            'is_suspended' => $this->is_suspended,
         ];
     }
 
     public function branchDetails()
     {
-        return $this->orderRentals()->first()?->branch ?? $this->orderSales()->first()?->branch;
+        $rentalBranch = $this->orderRentals ? $this->orderRentals()->first()?->branch : null;
+        $saleBranch = $this->orderSales ? $this->orderSales()->first()?->branch : null;
+        return $rentalBranch ?? $saleBranch;
     }
 }
