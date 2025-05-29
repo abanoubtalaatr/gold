@@ -1,6 +1,6 @@
 <?php
 
-use  App\Http\Controllers\Admin\WalletController as AdminWalletController;
+use App\Http\Controllers\Admin\WalletController as AdminWalletController;
 use App\Events\NotificationSent;
 use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\SystemSettingsController;
@@ -21,6 +21,7 @@ use App\Http\Controllers\Vendor\Auth\RegisterController;
 use App\Http\Controllers\Vendor\BranchController;
 use App\Http\Controllers\Vendor\ContactController as VendorContactController;
 use App\Http\Controllers\Vendor\GoldPieceController;
+use App\Http\Controllers\Admin\GoldPieceController as AdminGoldPieceController;
 use App\Http\Controllers\Vendor\OrderController;
 use App\Http\Controllers\Vendor\OrderRentalController;
 use App\Http\Controllers\Vendor\OrderSalesController;
@@ -189,6 +190,18 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/complaints', [ComplaintController::class, 'index'])->name('admin.complaints.index');
     Route::post('/complaints/{complaint}/reply', [ComplaintController::class, 'reply'])->name('admin.complaints.reply');
     Route::patch('/complaints/{complaint}/status', [ComplaintController::class, 'updateStatus'])->name('admin.complaints.update-status');
+
+
+
+    Route::resource('gold-pieces', AdminGoldPieceController::class)
+        ->names('admin.gold-pieces')->except('update');
+
+    Route::post('gold-pieces/{goldPiece}/update', [AdminGoldPieceController::class, 'update'])
+        ->name('admin.gold-pieces.update');
+
+    Route::patch('gold-pieces/{goldPiece}/toggle-status', [AdminGoldPieceController::class, 'toggleStatus'])
+        ->name('admin.gold-pieces.toggle-status');
+
 });
 
 
