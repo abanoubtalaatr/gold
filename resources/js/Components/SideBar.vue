@@ -256,6 +256,16 @@
             </li>
 
 
+            <!--Admin gold pieces -->
+            <li class="nav-item">
+                <Link class="nav-link" :href="route('admin.gold-pieces.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/admin/gold-pieces') }">
+                <i class="bi bi-gem"></i>
+                <span>{{ $t("Gold Pieces") }}</span>
+                </Link>
+            </li>
+
+
         </ul>
     </aside>
 </template>

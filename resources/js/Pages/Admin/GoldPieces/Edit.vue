@@ -1,5 +1,4 @@
 <template>
-
     <Head :title="$t('Edit Gold Piece')" />
 
     <AuthenticatedLayout>
@@ -62,24 +61,6 @@
                                             <option value="for_rent">{{ $t('For Rent') }}</option>
                                             <option value="for_sale">{{ $t('For Sale') }}</option>
                                         </select>
-
-                                        <div v-if="activeDropdown === 'type'" ref="dropdown"
-                                            class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none z-50"
-                                            role="menu" aria-orientation="vertical" aria-labelledby="menu-button"
-                                            tabindex="-1">
-                                            <div class="py-1" role="none">
-                                                <button type="button" @click="form.type = 'for_rent'"
-                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                    role="menuitem" tabindex="-1">
-                                                    {{ $t('For Rent') }}
-                                                </button>
-                                                <button type="button" @click="form.type = 'for_sale'"
-                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                    role="menuitem" tabindex="-1">
-                                                    {{ $t('For Sale') }}
-                                                </button>
-                                            </div>
-                                        </div>
                                     </div>
                                     <InputError class="mt-2" :message="form.errors.type" />
                                 </div>
@@ -91,48 +72,25 @@
                                         <select id="status" v-model="form.status"
                                             class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                             required>
-                                            <option value="pending">{{ $t('Pending') }}</option>
-                                            <option value="available">{{ $t('Available') }}</option>
-                                            <option value="rented">{{ $t('Rented') }}</option>
+                                            <option v-if="form.type === 'for_rent'" value="pending">{{ $t('Pending') }}</option>
+                                            <option v-if="form.type === 'for_rent'" value="accepted">{{ $t('Accepted') }}</option>
+                                            <option v-if="form.type === 'for_rent'" value="rented">{{ $t('Rented') }}</option>
+                                            <option v-if="form.type === 'for_rent'" value="available">{{ $t('Available') }}</option>
+                                            <option v-if="form.type === 'for_sale'" value="pending">{{ $t('Pending') }}</option>
+                                            <option v-if="form.type === 'for_sale'" value="accepted">{{ $t('Accepted') }}</option>
                                             <option value="sold">{{ $t('Sold') }}</option>
-                                            <option value="unavailable">{{ $t('Unavailable') }}</option>
-                                            <option value="accepted">{{ $t('Accepted') }}</option>
-
                                         </select>
-                                        <div v-if="activeDropdown === 'status'" ref="dropdown"
-                                            class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none z-50"
-                                            role="menu" aria-orientation="vertical" aria-labelledby="menu-button"
-                                            tabindex="-1">
-                                            <div class="py-1" role="none">
-                                                <button type="button" @click="form.status = 'pending'"
-                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                    role="menuitem" tabindex="-1">
-                                                    {{ $t('Pending') }}
-                                                </button>
-                                                <button type="button" @click="form.status = 'available'"
-                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                    role="menuitem" tabindex="-1">
-                                                    {{ $t('Available') }}
-                                                </button>
-                                                <button type="button" @click="form.status = 'rented'"
-                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                    role="menuitem" tabindex="-1">
-                                                    {{ $t('Rented') }}
-                                                </button>
-                                                <button type="button" @click="form.status = 'sold'"
-                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                    role="menuitem" tabindex="-1">
-                                                    {{ $t('Sold') }}
-                                                </button>
-                                                <button type="button" @click="form.status = 'unavailable'"
-                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                                                    role="menuitem" tabindex="-1">
-                                                    {{ $t('Unavailable') }}
-                                                </button>
-                                            </div>
-                                        </div>
                                     </div>
                                     <InputError class="mt-2" :message="form.errors.status" />
+                                </div>
+
+                                <!-- Including Lobes Checkbox -->
+                                <div class="flex items-center">
+                                    <input id="is_including_lobes" v-model="form.is_including_lobes" type="checkbox"
+                                        class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
+                                    <label for="is_including_lobes" class="block ml-2 text-sm text-gray-900">
+                                        {{ $t('Including Lobes') }}
+                                    </label>
                                 </div>
 
                                 <!-- Rental Price -->
@@ -169,10 +127,17 @@
                                             <template v-if="!form.deleted_images.includes(image.id)">
                                                 <img :src="image.url" class="object-cover w-full h-full rounded-lg" />
                                                 <button type="button" @click="deleteImage(image.id)"
-                                                    class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full opacity-0 group-hover:opacity-100">
+                                                    class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:opacity-100"
+                                                    >
                                                     <TrashIcon class="w-4 h-4" />
                                                 </button>
                                             </template>
+                                            <div v-else class="flex items-center justify-center w-full h-full bg-gray-100 rounded-lg">
+                                                <button type="button" @click="restoreImage(image.id)"
+                                                    class="p-2 text-indigo-600 bg-white rounded-full shadow">
+                                                    <ArrowPathIcon class="w-5 h-5" />
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <!-- Newly uploaded images preview -->
@@ -219,7 +184,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import InputError from '@/Components/InputError.vue';
@@ -228,8 +193,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import TextArea from '@/Components/TextArea.vue';
-import SelectInput from '@/Components/Select.vue';
-import { PlusIcon, TrashIcon, EyeIcon, PencilIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { PlusIcon, TrashIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     goldPiece: {
@@ -248,14 +212,22 @@ const form = useForm({
     rental_price_per_day: props.goldPiece.rental_price_per_day,
     sale_price: props.goldPiece.sale_price,
     deposit_amount: props.goldPiece.deposit_amount,
+    is_including_lobes: props.goldPiece.is_including_lobes || false,
     images: [],
     deleted_images: [],
 });
 
 const previewImages = ref([]);
 const selectedFiles = ref([]);
-const activeDropdown = ref(null);
-const dropdown = ref(null);
+
+// Watch for type changes to reset status if needed
+watch(() => form.type, (newType) => {
+    if (newType === 'for_rent' && !['pending', 'accepted', 'rented', 'available', 'sold'].includes(form.status)) {
+        form.status = 'pending';
+    } else if (newType === 'for_sale' && !['pending', 'accepted', 'sold'].includes(form.status)) {
+        form.status = 'pending';
+    }
+}, { immediate: true });
 
 const handleImages = (event) => {
     const files = Array.from(event.target.files);
@@ -278,44 +250,51 @@ const handleImages = (event) => {
             reader.readAsDataURL(file);
         });
     }
+
+    // Reset the input to allow selecting the same files again
+    event.target.value = '';
 };
 
 const deleteImage = (imageId) => {
     if (!form.deleted_images.includes(imageId)) {
-        form.deleted_images.push(imageId);
+        form.deleted_images = [...form.deleted_images, imageId];
     }
+};
+
+const restoreImage = (imageId) => {
+    form.deleted_images = form.deleted_images.filter(id => id !== imageId);
 };
 
 const removePreview = (index) => {
     // Remove from previews
-    previewImages.value.splice(index, 1);
+    const removed = previewImages.value.splice(index, 1);
 
-    // Update selected files
-    selectedFiles.value = previewImages.value.map(p => p.file);
+    // Remove from selected files
+    selectedFiles.value = selectedFiles.value.filter(file => file !== removed[0].file);
     form.images = selectedFiles.value;
 };
 
-const toggleDropdown = (dropdownName) => {
-    activeDropdown.value = activeDropdown.value === dropdownName ? null : dropdownName;
-};
-
-// Close dropdown when clicking outside
-const handleClickOutside = (event) => {
-    if (dropdown.value && !dropdown.value.contains(event.target)) {
-        activeDropdown.value = null;
-    }
-};
-
-// Set up event listener
-onMounted(() => {
-    document.addEventListener('click', handleClickOutside);
-});
-
-onBeforeUnmount(() => {
-    document.removeEventListener('click', handleClickOutside);
-});
-
 const submit = () => {
+    // Prepare form data for file upload
+    const formData = new FormData();
+
+    // Append all form fields
+    Object.keys(form.data()).forEach(key => {
+        if (key === 'images') {
+            // Append each file individually
+            form.images.forEach(file => {
+                formData.append('images[]', file);
+            });
+        } else if (key === 'deleted_images') {
+            // Append each deleted image ID individually
+            form.deleted_images.forEach(id => {
+                formData.append('deleted_images[]', id);
+            });
+        } else if (form[key] !== null && form[key] !== undefined) {
+            formData.append(key, form[key]);
+        }
+    });
+
     form.post(route('admin.gold-pieces.update', props.goldPiece.id), {
         preserveScroll: true,
         onSuccess: () => {

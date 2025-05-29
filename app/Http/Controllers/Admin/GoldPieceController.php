@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\GoldPicesUpdateRequest;
 use App\Http\Requests\Api\V1\UpdateGoldPieceRequest;
 use App\Models\GoldPiece;
 use App\Models\User;
@@ -119,10 +120,9 @@ class GoldPieceController extends Controller
         ]);
     }
 
-    public function update(UpdateGoldPieceRequest $request, GoldPiece $goldPiece)
+    public function update(GoldPicesUpdateRequest $request, GoldPiece $goldPiece)
     {
         $goldPiece->update($request->validated());
-        return $goldPiece;
 
         // Handle image uploads
         if ($request->hasFile('images')) {

@@ -1,4 +1,5 @@
 <template>
+
     <Head title="Manage Gold Pieces" />
 
     <AuthenticatedLayout>
@@ -161,16 +162,16 @@
                                                             <PencilIcon class="mr-3 h-4 w-4" />
                                                             {{ $t('Edit') }}
                                                             </Link>
-                                                            <button @click="toggleStatus(piece)"
+                                                            <!-- <button @click="toggleStatus(piece)"
                                                                 class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                                                                 role="menuitem" tabindex="-1">
                                                                 <ArrowPathIcon class="mr-3 h-4 w-4" />
                                                                 {{ piece.status === 'available' ? $t('Mark as Unavailable') : $t('Mark as Available') }}
-                                                            </button>
+                                                            </button> -->
                                                         </div>
                                                         <div class="py-1" role="none">
                                                             <button @click="confirmDelete(piece)"
-                                                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                                                                class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 delete-button"
                                                                 role="menuitem" tabindex="-1">
                                                                 <TrashIcon class="mr-3 h-4 w-4" />
                                                                 {{ $t('Delete') }}
@@ -327,3 +328,16 @@ const debouncedSearch = debounce(() => {
     });
 }, 300);
 </script>
+<style scoped>
+.delete-button {
+    color: red;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    color: darkred;
+    background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+}
+</style>
