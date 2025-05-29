@@ -21,27 +21,27 @@ class DashboardController extends Controller
         $period = $request->input('period', 'all');
         $fromDate = $request->input('from_date');
         $toDate = $request->input('to_date');
-        
+
         // Apply date filters
         $dateFilter = function ($query) use ($period, $fromDate, $toDate) {
             if ($period !== 'all') {
                 $this->applyPeriodFilter($query, $period);
             }
-            
+
             if ($fromDate && $toDate) {
                 $query->whereBetween('created_at', [$fromDate, $toDate]);
             }
         };
-        
+
         // Get counts with filters
         $roles = Role::where('vendor_id', Auth::id())->count();
         $admins = User::where('vendor_id', Auth::id())->whereHas('roles')->count();
         $branches = Branch::where('vendor_id', Auth::id())->count();
-        
+
         $rentalRequests = OrderRental::when($period !== 'all' || ($fromDate && $toDate), $dateFilter)->count();
         $salesOrders = OrderSale::when($period !== 'all' || ($fromDate && $toDate), $dateFilter)->count();
         $rentalOrders = OrderRental::when($period !== 'all' || ($fromDate && $toDate), $dateFilter)->count();
-        
+
         return Inertia::render('Vendor/Dashboard', [
             'roles' => $roles,
             'admins' => $admins,
@@ -56,11 +56,11 @@ class DashboardController extends Controller
             ],
         ]);
     }
-    
+
     protected function applyPeriodFilter($query, $period)
     {
         $now = Carbon::now();
-        
+
         switch ($period) {
             case 'daily':
                 $query->whereDate('created_at', $now->toDateString());

@@ -1300,5 +1300,7 @@
     "Rejected!": "مرفوض!",
     "Ok": "حسنا",
     "Settlement request approved!": "تمت الموافقة على طلب السحب!",
-    "Settlement request rejected!": "تم رفض طلب السحب!"
+    "Settlement request rejected!": "تم رفض طلب السحب!",
+    "total_branches": "عدد الفروع",
+    "total_vendors": "عدد المتاجر"
 }

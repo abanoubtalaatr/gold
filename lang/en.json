@@ -808,12 +808,22 @@
     "dont_have_account": "Don't have an account?",
     "create_account": "Create Account as vendor",
     "orders": "Orders",
-    "rental_orders": "Rental Orders",
-    "sales_orders": "Sales Orders",
-    "rental_requests": "Rental Requests",
     "Mark as Rented": "Mark as Rented",
     "Mark as Available": "Mark as Available",
-    "Mark as Sold": "Mark as Sold"
-
-
+    "Mark as Sold": "Mark as Sold",
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "semiannually": "Semi-Annually",
+    "yearly": "Yearly",
+    "apply": "Apply",
+    "rating_distribution": "Rating Distribution",
+    "sales_orders": "Sales Orders",
+    "rental_requests": "Rental Requests",
+    "rental_orders": "Rental Orders",
+    "total_branches": "Total Branches",
+    "total_vendors": "Total Vendors",
+    "faqs": "FAQs",
+    "vendors": "Vendors"
 }

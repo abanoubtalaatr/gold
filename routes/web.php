@@ -1,5 +1,6 @@
 <?php
 
+use  App\Http\Controllers\Admin\WalletController as AdminWalletController;
 use App\Events\NotificationSent;
 use App\Http\Controllers\Admin\SystemSettingsController;
 use App\Http\Controllers\Admin\VendorController;
@@ -31,12 +32,13 @@ use App\Http\Controllers\Vendor\StatisticsController;
 use App\Http\Controllers\Vendor\StoreController;
 use App\Http\Controllers\Vendor\UserController;
 use App\Http\Controllers\Vendor\VerifyController;
-use  App\Http\Controllers\Admin\WalletController as AdminWalletController;
+use App\Http\Controllers\Vendor\WalletController;
 use App\Models\Country;
 use App\Models\State;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
 
 
 
