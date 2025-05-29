@@ -18,6 +18,7 @@ class OrderRentalResource extends JsonResource
             'days_left_to_return' => number_format(now()->diffInDays($this->end_date, false), 0),
             'status' => $this->status,
             'contacts' => ContactResource::collection($this->contacts),
+            'is_suspended'=> $this->is_suspended,
         ];
     }
 }

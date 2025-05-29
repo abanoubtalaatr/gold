@@ -46,9 +46,11 @@ class GoldPieceController extends Controller
         $query = GoldPiece::query()->where('user_id', Auth::id());
 
         $filter = new GoldPieceFilter($request);
+
         $filteredQuery = $filter->apply($query)->with('user');
 
         $perPage = $request->per_page ?? 15;
+
         $goldPieces = $filteredQuery->paginate($perPage);
 
         return $this->successResponse(GoldPieceResource::collection($goldPieces)->response()->getData(true), __("mobile.fetch_gold_pieces_success"));
