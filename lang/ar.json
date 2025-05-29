@@ -1302,5 +1302,15 @@
     "Settlement request approved!": "تمت الموافقة على طلب السحب!",
     "Settlement request rejected!": "تم رفض طلب السحب!",
     "total_branches": "عدد الفروع",
-    "total_vendors": "عدد المتاجر"
+    "total_vendors": "عدد المتاجر",
+    "New": "جديد",
+    "Pending": "قيد المراجعة",
+    "Rejected": "مرفوض",
+    "In Progress": "قيد التنفيذ",
+    "Resolved": "محلول",
+    "Related Order": "الطلب المرتبط",
+    "Related Order ID": "رقم الطلب المرتبط",
+    "Related Order Type": "نوع الطلب المرتبط",
+    "Complainant": "المشتكي",
+    "Search by name, subject...": "البحث بالاسم، الموضوع..."
 }
