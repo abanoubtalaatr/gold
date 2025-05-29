@@ -67,7 +67,7 @@ class GoldPieceResource extends JsonResource
             'start_date' => $order?->start_date ?? Carbon::today(),
             'end_date' => $order?->end_date ?? Carbon::today()->addDays(3),
             'price_delay' => 200,
-            'is_suspended' => $this->is_suspended,
+            'is_suspended' => $order?->is_suspended,
         ];
     }
 

@@ -118,7 +118,7 @@ class OrderRentalController extends Controller
         $order = OrderRental::findOrFail($orderId);
         $this->authorizeVendor($order);
         $request->validate([
-            'data.status' => 'required|in:piece_sent,available,sold,rented,pending-approval,approved',
+            'data.status' => 'required|in:' . implode(',', OrderRental::statuses()),
         ]);
 
         $newStatus = match ($request->input('data.status')) {
@@ -126,7 +126,7 @@ class OrderRentalController extends Controller
             'available' => OrderRental::STATUS_AVAILABLE,
             'sold' => OrderRental::STATUS_SOLD,
             'rented' => OrderRental::STATUS_RENTED,
-            'pending-approval' => OrderRental::STATUS_PENDING_APPROVAL,
+            'pending_approval' => OrderRental::STATUS_PENDING_APPROVAL,
             'approved' => OrderRental::STATUS_APPROVED,
 
             default => throw new \Exception('Invalid status'),

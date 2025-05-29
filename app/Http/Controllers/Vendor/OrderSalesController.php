@@ -115,12 +115,12 @@ class OrderSalesController extends Controller
 
         // Validate the incoming status to be one of the allowed statuses
         $request->validate([
-            'status' => 'required|in:pending-approval,approved,sold',
+            'status' => 'required|in:pending_approval,approved,sold',
         ]);
 
         // Map the input status to the internal constants
         $newStatus = match ($request->status) {
-            'pending-approval' => OrderSale::STATUS_PENDING_APPROVAL,
+            'pending_approval' => OrderSale::STATUS_PENDING_APPROVAL,
             'approved' => OrderSale::STATUS_APPROVED,
             'sold' => OrderSale::STATUS_SOLD,
             default => throw new \Exception('Invalid status'),
