@@ -24,6 +24,7 @@ class Contact extends Model
         'reply',
         'sale_order_id',
         'rental_order_id',
+        'status',
     ];
 
 
@@ -54,31 +55,38 @@ class Contact extends Model
     }
 
     public function scopeFilter($query, array $filters)
-{
-    $query->when($filters['search'] ?? null, function ($query, $search) {
-        $query->where(function ($query) use ($search) {
-            $query->where('name', 'like', '%'.$search.'%')
-                  ->orWhere('email', 'like', '%'.$search.'%')
-                  ->orWhere('phone', 'like', '%'.$search.'%')
-                  ->orWhere('subject', 'like', '%'.$search.'%')
-                  ->orWhere('message', 'like', '%'.$search.'%');
+    {
+        $query->when($filters['search'] ?? null, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('phone', 'like', '%' . $search . '%')
+                    ->orWhere('subject', 'like', '%' . $search . '%')
+                    ->orWhere('message', 'like', '%' . $search . '%');
+            });
+        })->when($filters['type'] ?? null, function ($query, $type) {
+            if ($type === 'rental') {
+                $query->whereNotNull('rental_order_id');
+            } elseif ($type === 'sale') {
+                $query->whereNotNull('sale_order_id');
+            } else {
+                $query->whereNull('rental_order_id')->whereNull('sale_order_id');
+            }
+        })->when($filters['status'] ?? null, function ($query, $status) {
+            // Handle multiple status filters here
+            if ($status === 'read') {
+                $query->where('read', true);
+            } elseif ($status === 'unread') {
+                $query->where('read', false);
+            } elseif ($status === 'replied') {
+                $query->whereNotNull('reply');
+            } elseif ($status === 'new') {
+                $query->where('status', 'new');
+            } elseif ($status === 'in_progress') {
+                $query->where('status', 'in_progress');
+            } elseif ($status === 'resolved') {
+                $query->where('status', 'resolved');
+            }
         });
-    })->when($filters['type'] ?? null, function ($query, $type) {
-        if ($type === 'rental') {
-            $query->whereNotNull('rental_order_id');
-        } elseif ($type === 'sale') {
-            $query->whereNotNull('sale_order_id');
-        } else {
-            $query->whereNull('rental_order_id')->whereNull('sale_order_id');
-        }
-    })->when($filters['status'] ?? null, function ($query, $status) {
-        if ($status === 'read') {
-            $query->where('read', true);
-        } elseif ($status === 'unread') {
-            $query->where('read', false);
-        } elseif ($status === 'replied') {
-            $query->whereNotNull('reply');
-        }
-    });
-}
+    }
 }

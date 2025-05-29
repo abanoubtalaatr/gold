@@ -236,7 +236,7 @@
                 </Link>
             </li> -->
 
-            <!-- vendors -->
+            <!-- Admin vendors -->
             <li class="nav-item">
                 <Link class="nav-link" :href="route('vendors.index')" :class="{
                     collapsed: !$page.url.startsWith('/admin/vendors'),
@@ -245,6 +245,17 @@
                 <span>{{ $t("vendors") }}</span>
                 </Link>
             </li>
+
+            <!--Admin Complaints -->
+            <li class="nav-item">
+                <Link class="nav-link" :href="route('admin.complaints.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/admin/complaints') }">
+                <i class="bi bi-person-lines-fill"></i>
+                <span>{{ $t("Complaints") }}</span>
+                </Link>
+            </li>
+
+
         </ul>
     </aside>
 </template>

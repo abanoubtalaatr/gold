@@ -2,6 +2,7 @@
 
 use  App\Http\Controllers\Admin\WalletController as AdminWalletController;
 use App\Events\NotificationSent;
+use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\SystemSettingsController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Banners\BannerController;
@@ -38,6 +39,7 @@ use App\Models\State;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
 
 
 
@@ -181,6 +183,13 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
         ->name('admin.settlement.reject');
 });
 
+
+
+Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
+    Route::get('/complaints', [ComplaintController::class, 'index'])->name('admin.complaints.index');
+    Route::post('/complaints/{complaint}/reply', [ComplaintController::class, 'reply'])->name('admin.complaints.reply');
+    Route::patch('/complaints/{complaint}/status', [ComplaintController::class, 'updateStatus'])->name('admin.complaints.update-status');
+});
 
 
 Route::prefix('vendor')->name('vendor.')->group(function () {
