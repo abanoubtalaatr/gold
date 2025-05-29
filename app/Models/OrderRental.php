@@ -23,6 +23,10 @@ class OrderRental extends Model
         
     ];
 
+    protected $casts = [
+        'is_suspended' => 'boolean',
+    ];
+
 
     /**
      * Order Types Constants

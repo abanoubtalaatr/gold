@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources\Api;
 
-use DateTime;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use App\Http\Resources\Api\V1\BranchResource;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -12,18 +12,19 @@ class GoldPieceResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $rentals = $this->orderRentals ? $this->orderRentals() : null;
-        $rental = $rentals ? $rentals->first() : null;
+        $rental = $this->orderRentals ? $this->orderRentals()->first() : null;
+        $sale = $this->orderSales ? $this->orderSales()->first() : null;
+        $order = $rental ?? $sale; // Use rental or sale, whichever exists
         $remainingDays = 0;
         $totalDays = 0;
 
-        if ($rental && $rental->end_date) {
-            $diff = (new DateTime())->diff(new DateTime($rental->end_date));
+        if ($order && $order->end_date) {
+            $diff = (new DateTime())->diff(new DateTime($order->end_date));
             $remainingDays = $diff->invert ? 0 : $diff->days;
         }
 
-        if ($rental && $rental->start_date && $rental->end_date) {
-            $totalDays = (new DateTime($rental->start_date))->diff(new DateTime($rental->end_date))->days;
+        if ($order && $order->start_date && $order->end_date) {
+            $totalDays = (new DateTime($order->start_date))->diff(new DateTime($order->end_date))->days;
         }
 
         return [
@@ -60,11 +61,11 @@ class GoldPieceResource extends JsonResource
             'remaining_days' => $remainingDays,
             'total_days' => $totalDays,
             'city' => $this->branchDetails() ? SimpleCityResource::make($this->branchDetails()->city) : null,
-            'days_left_to_return' => number_format(now()->diffInDays($rental?->end_date, false), 0),
-            'contacts' => ContactResource::collection($rental?->contacts ?? collect()),
-            'order_status' => $rental?->status,
-            'start_date' => $rental?->start_date ?? Carbon::today(),
-            'end_date' => $rental?->end_date ?? Carbon::today()->addDays(3),
+            'days_left_to_return' => number_format(now()->diffInDays($order?->end_date, false), 0),
+            'contacts' => ContactResource::collection($order?->contacts ?? collect()),
+            'order_status' => $order?->status,
+            'start_date' => $order?->start_date ?? Carbon::today(),
+            'end_date' => $order?->end_date ?? Carbon::today()->addDays(3),
             'price_delay' => 200,
             'is_suspended' => $this->is_suspended,
         ];
