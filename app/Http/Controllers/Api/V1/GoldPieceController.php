@@ -204,17 +204,17 @@ class GoldPieceController extends Controller
     public function destroy(GoldPiece $goldPiece)
     {
         try {
-            if ($goldPiece->user_id !== Auth::id()) {
-                return $this->errorResponse(__('mobile.Unauthorized. You can only delete your own gold pieces.'), [], 403);
-            }
+            // if ($goldPiece->user_id !== Auth::id()) {
+            //     return $this->errorResponse(__('mobile.Unauthorized. You can only delete your own gold pieces.'), [], 403);
+            // }
 
-            // Check if the gold piece has any active rentals or sales
-            if (
-                $goldPiece->orderRentals()->whereIn('status', ['pending', 'active'])->exists() ||
-                $goldPiece->orderSales()->whereIn('status', ['pending', 'processing'])->exists()
-            ) {
-                return $this->errorResponse(__('mobile.Cannot delete gold piece with active orders.'), [], 400);
-            }
+            // // Check if the gold piece has any active rentals or sales
+            // if (
+            //     $goldPiece->orderRentals()->whereIn('status', ['pending', 'active'])->exists() ||
+            //     $goldPiece->orderSales()->whereIn('status', ['pending', 'processing'])->exists()
+            // ) {
+            //     return $this->errorResponse(__('mobile.Cannot delete gold piece with active orders.'), [], 400);
+            // }
 
             DB::beginTransaction();
 

@@ -12,8 +12,8 @@ class GoldPieceResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $rental = $this->orderRentals ? $this->orderRentals()->first() : null;
-        $sale = $this->orderSales ? $this->orderSales()->first() : null;
+        $rental = $this->orderRentals ? $this->orderRentals()->where('user_id', $request->user()->id)->first() : null;
+        $sale = $this->orderSales ? $this->orderSales()->where('user_id', $request->user()->id)->first() : null;
         $order = $rental ?? $sale; // Use rental or sale, whichever exists
         $remainingDays = 0;
         $totalDays = 0;
@@ -68,6 +68,7 @@ class GoldPieceResource extends JsonResource
             'end_date' => $order?->end_date ?? Carbon::today()->addDays(3),
             'price_delay' => 200,
             'is_suspended' => $order?->is_suspended,
+            'order_id'=>  $order?->id,
         ];
     }
 

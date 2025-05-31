@@ -13,20 +13,26 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Step 1: Update any existing invalid status values
+        DB::table('order_rentals')->whereNotIn('status', [
+            'pending-approval',
+            'approved',
+            'piece_sent',
+            'rented',
+            'available',
+            'sold'
+        ])->update(['status' => 'pending_approval']);
+
+        // Step 2: Change the ENUM definition
         Schema::table('order_rentals', function (Blueprint $table) {
-            DB::table('order_rentals')->whereNotIn('status', [
-                'pending-approval',
+            $table->enum('status', [
+                'pending_approval',
                 'approved',
-                'sold',
-                'rejected'
-            ])->update(['status' => 'pending_approval']);
-    
-            // Step 2: Change the ENUM definition
-            Schema::table('order_rentals', function (Blueprint $table) {
-                $table->enum('status', [
-                    OrderRental::statuses()
-                ])->nullable()->default('pending_approval')->change();
-            });
+                'piece_sent',
+                'rented',
+                'available',
+                'sold'
+            ])->nullable()->default('pending_approval')->change();
         });
     }
 
@@ -36,7 +42,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('order_rentals', function (Blueprint $table) {
-            //
+            $table->enum('status', [
+                'pending',
+                'accepted', 
+                'active',
+                'completed',
+                'cancelled'
+            ])->nullable()->default('pending')->change();
         });
     }
 };

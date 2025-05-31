@@ -71,7 +71,7 @@ class OrderRentalController extends Controller
     public function accept(Request $request, $orderId)
     {
 
-        $order = OrderRental::findOrFail($orderId);
+        $order = OrderRental::with(['goldPiece', 'goldPiece.user'])->findOrFail($orderId);
         $this->authorizeVendor($order);
 
         $request->validate([
@@ -84,8 +84,9 @@ class OrderRentalController extends Controller
         ]);
 
         // Notify gold piece owner
-        if ($order->goldPiece->user) {
-            $order->goldPiece->user->notify(
+        $goldPieceUser = $order->goldPiece?->user;
+        if ($goldPieceUser) {
+            $goldPieceUser->notify(
                 new GoldPieceAcceptedNotification($order, auth()->user()->name)
             );
         }
@@ -96,14 +97,15 @@ class OrderRentalController extends Controller
 
     public function reject(Request $request, $orderId)
     {
-        $order = OrderRental::findOrFail($orderId);
+        $order = OrderRental::with(['goldPiece', 'goldPiece.user'])->findOrFail($orderId);
         $this->authorizeVendor($order);
 
         $order->update(['status' => 'rejected']);
 
         // Notify gold piece owner
-        if ($order->goldPiece->user) {
-            $order->goldPiece->user->notify(
+        $goldPieceUser = $order->goldPiece?->user;
+        if ($goldPieceUser) {
+            $goldPieceUser->notify(
                 new GoldPieceRejectedNotification($order, auth()->user()->name)
             );
         }

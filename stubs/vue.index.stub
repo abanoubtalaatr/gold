@@ -1,0 +1,145 @@
+<template>
+    <AuthenticatedLayout>
+        <!-- Breadcrumb -->
+        <div class="pagetitle row">
+            <BreadcrumbComponent 
+                :pageTitle="$t('{{ modelPlural }}')" 
+                createRoute="{{ modelPlural }}.create" 
+                createPermission="create {{ modelPlural }}"
+                :homeLabel="$t('home')" 
+                :createButtonLabel="$t('create')" 
+            />
+        </div>
+
+        <section class="section dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="col-md-12 px-2">
+                            <FilterComponent 
+                                :filter-fields="filterFields" 
+                                :initial-filters="filterForm"
+                                @update:filters="handleFilterUpdate" 
+                            />
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <DataTable 
+                            :headers="headers" 
+                            :data="{{ modelVariablePlural }}.data" 
+                            :pagination-links="{{ modelVariablePlural }}.links"
+                            :noDataMessage="$t('no_data_found')" 
+                            @update:page="handlePageChange"
+                        >
+                            <!-- Custom column slots -->
+                            <template #is_active="{ data }">
+                                <ActivateToggle 
+                                    :id="data.id"
+                                    :is-active="data.is_active == 1" 
+                                    :activate-url="`/{{ modelPlural }}/${data.id}/activate`"
+                                    @update:is-active="(newStatus) => updateStatus(data.id, newStatus)" 
+                                />
+                            </template>
+
+                            <template #edit="{ data }">
+                                <EditButton 
+                                    @click="router.get(route('{{ modelPlural }}.edit', { {{ modelVariable }}: data.id }))" 
+                                />
+                            </template>
+
+                            <template #delete="{ data }">
+                                <DeleteAction 
+                                    :id="data.id" 
+                                    :delete-url="route('{{ modelPlural }}.destroy', { {{ modelVariable }}: data.id })" 
+                                />
+                            </template>
+                        </DataTable>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </AuthenticatedLayout>
+</template>
+
+<script setup>
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { router } from "@inertiajs/vue3";
+import { reactive } from "vue";
+import { useI18n } from "vue-i18n";
+import FilterComponent from "@/Components/FilterComponent.vue";
+import BreadcrumbComponent from "@/Components/BreadcrumbComponent.vue";
+import DataTable from "@/Components/DataTable.vue";
+import ActivateToggle from "@/Components/ActivateToggle.vue";
+import EditButton from "@/Components/EditButton.vue";
+import DeleteAction from "@/Components/DeleteAction.vue";
+
+const { t } = useI18n();
+
+// Props
+const props = defineProps({
+    {{ modelVariablePlural }}: Object,
+    filters: Object,
+});
+
+// Filter configuration
+const filterFields = [
+    {
+        name: 'search',
+        type: 'text',
+        placeholder: t('search'),
+        value: props.filters?.search || ''
+    },
+    {
+        name: 'is_active',
+        type: 'select',
+        placeholder: t('status'),
+        options: [
+            { value: '', label: t('all') },
+            { value: '1', label: t('active') },
+            { value: '0', label: t('inactive') }
+        ],
+        value: props.filters?.is_active || ''
+    }
+];
+
+const filterForm = reactive({
+    search: props.filters?.search || '',
+    is_active: props.filters?.is_active || '',
+});
+
+// Table headers
+const headers = [
+    { key: 'id', label: '#', sortable: true },
+    { key: 'name', label: t('name'), sortable: true },
+    { key: 'created_at', label: t('created_at'), sortable: true },
+    { key: 'is_active', label: t('status'), slot: true },
+    { key: 'edit', label: t('edit'), slot: true, permission: 'update {{ modelPlural }}' },
+    { key: 'delete', label: t('delete'), slot: true, permission: 'delete {{ modelPlural }}' }
+];
+
+// Methods
+const handleFilterUpdate = (filters) => {
+    Object.assign(filterForm, filters);
+    router.get(route('{{ modelPlural }}.index'), filterForm, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
+const handlePageChange = (url) => {
+    router.get(url, filterForm, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
+
+const updateStatus = (id, newStatus) => {
+    const item = props.{{ modelVariablePlural }}.data.find(item => item.id === id);
+    if (item) {
+        item.is_active = newStatus ? 1 : 0;
+    }
+};
+</script> 

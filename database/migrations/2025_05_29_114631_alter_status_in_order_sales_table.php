@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\OrderRental;
+use App\Models\OrderSale;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,20 +13,20 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Step 1: Update any existing invalid status values
+        DB::table('order_sales')->whereNotIn('status', [
+            'pending-approval',
+            'approved',
+            'sold'
+        ])->update(['status' => 'pending_approval']);
+
+        // Step 2: Change the ENUM definition
         Schema::table('order_sales', function (Blueprint $table) {
-            DB::table('order_sales')->whereNotIn('status', [
-                'pending-approval',
-                'approved',
-                'sold',
-                'rejected'
-            ])->update(['status' => 'pending_approval']);
-    
-            // Step 2: Change the ENUM definition
-            Schema::table('order_sales', function (Blueprint $table) {
-                $table->enum('status', [
-                    OrderRental::statuses()
-                ])->nullable()->default('pending_approval')->change();
-            });
+            $table->enum('status', [
+                'pending_approval',
+                'approved', 
+                'sold'
+            ])->nullable()->default('pending_approval')->change();
         });
     }
 
@@ -36,7 +36,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('order_sales', function (Blueprint $table) {
-            //
+            $table->enum('status', [
+                'pending',
+                'accepted', 
+                'active',
+                'completed',
+                'cancelled'
+            ])->nullable()->default('pending')->change();
         });
     }
 };

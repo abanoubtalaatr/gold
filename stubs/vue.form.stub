@@ -1,0 +1,147 @@
+<template>
+    <AuthenticatedLayout>
+        <!-- Breadcrumb -->
+        <div class="pagetitle row">
+            <BreadcrumbComponent 
+                :pageTitle="isEdit ? $t('edit_{{ modelVariable }}') : $t('create_{{ modelVariable }}')" 
+                :homeLabel="$t('home')" 
+                :breadcrumbs="breadcrumbs"
+            />
+        </div>
+
+        <section class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        {{ isEdit ? $t('edit_{{ modelVariable }}') : $t('create_{{ modelVariable }}') }}
+                    </h5>
+                </div>
+                
+                <div class="card-body">
+                    <form @submit.prevent="submit" class="row g-3">
+                        <!-- Form fields -->
+                        <div class="col-md-6">
+                            <label class="form-label">{{ $t('name') }} *</label>
+                            <input 
+                                v-model="form.name"
+                                type="text" 
+                                class="form-control"
+                                :class="{ 'is-invalid': form.errors.name }"
+                                required
+                            />
+                            <div v-if="form.errors.name" class="invalid-feedback">
+                                {{ form.errors.name }}
+                            </div>
+                        </div>
+
+                        <!-- Multi-language fields if needed -->
+                        <div v-if="hasTranslations" class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>{{ $t('translations') }}</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div v-for="locale in locales" :key="locale" class="mb-3">
+                                        <label class="form-label">
+                                            {{ $t('name') }} ({{ locale.toUpperCase() }}) *
+                                        </label>
+                                        <input 
+                                            v-model="form.translations[locale].name"
+                                            type="text" 
+                                            class="form-control"
+                                            :class="{ 'is-invalid': form.errors[`translations.${locale}.name`] }"
+                                            required
+                                        />
+                                        <div v-if="form.errors[`translations.${locale}.name`]" class="invalid-feedback">
+                                            {{ form.errors[`translations.${locale}.name`] }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status field -->
+                        <div class="col-md-6">
+                            <label class="form-label">{{ $t('status') }}</label>
+                            <select v-model="form.is_active" class="form-select">
+                                <option value="1">{{ $t('active') }}</option>
+                                <option value="0">{{ $t('inactive') }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Submit buttons -->
+                        <div class="col-12">
+                            <div class="d-flex gap-2">
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-primary"
+                                    :disabled="form.processing"
+                                >
+                                    <span v-if="form.processing" class="spinner-border spinner-border-sm me-2"></span>
+                                    {{ isEdit ? $t('update') : $t('create') }}
+                                </button>
+                                
+                                <Link 
+                                    :href="route('{{ modelPlural }}.index')" 
+                                    class="btn btn-secondary"
+                                >
+                                    {{ $t('cancel') }}
+                                </Link>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </AuthenticatedLayout>
+</template>
+
+<script setup>
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import BreadcrumbComponent from "@/Components/BreadcrumbComponent.vue";
+import { Link, useForm } from "@inertiajs/vue3";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+
+// Props
+const props = defineProps({
+    {{ modelVariable }}: {
+        type: Object,
+        default: null
+    }
+});
+
+// Computed
+const isEdit = computed(() => !!props.{{ modelVariable }});
+const hasTranslations = true; // Set based on your model
+const locales = ['en', 'ar']; // Your supported locales
+
+const breadcrumbs = [
+    { label: t('{{ modelPlural }}'), route: '{{ modelPlural }}.index' },
+    { label: isEdit.value ? t('edit') : t('create'), route: null }
+];
+
+// Form setup
+const form = useForm({
+    name: props.{{ modelVariable }}?.name || '',
+    is_active: props.{{ modelVariable }}?.is_active ?? 1,
+    translations: hasTranslations ? 
+        locales.reduce((acc, locale) => {
+            acc[locale] = {
+                name: props.{{ modelVariable }}?.translations?.find(t => t.locale === locale)?.name || ''
+            };
+            return acc;
+        }, {}) : {}
+});
+
+// Methods
+const submit = () => {
+    if (isEdit.value) {
+        form.put(route('{{ modelPlural }}.update', props.{{ modelVariable }}.id));
+    } else {
+        form.post(route('{{ modelPlural }}.store'));
+    }
+};
+</script> 
