@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Services\VerificationCode as VerificationCodeService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens,
@@ -28,6 +29,7 @@ class User extends Authenticatable implements JWTSubject
         Notifiable,
         HasRoles,
         IsActive,
+        // InteractsWithMedia,
         SoftDeletes;
 
     use CanResetPasswordTrait;
@@ -271,4 +273,22 @@ class User extends Authenticatable implements JWTSubject
 
     // Make sure city is always included in serialization
     protected $with = ['city'];
+
+    // public function registerMediaCollections(): void
+    // {
+    //     $this->addMediaCollection('avatar')
+    //         ->acceptsMimeTypes(['image/jpeg', 'image/png'])
+    //         ->useDisk('public');
+    // }
+
+    public function scopeExcludeUSereAndVendor($query)
+    {
+        return $query->whereNull('vendor_id')
+                     ->whereHas('roles', function ($q) {
+                         $q->where('name', '!=', 'user');
+                     })->
+                     where('id', '!=', Auth::id());
+    }
+
+     
 }

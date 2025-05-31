@@ -1,6 +1,6 @@
 <?php
 
-use  App\Http\Controllers\Admin\WalletController as AdminWalletController;
+use App\Http\Controllers\Admin\WalletController as AdminWalletController;
 use App\Events\NotificationSent;
 use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\SystemSettingsController;
@@ -21,6 +21,7 @@ use App\Http\Controllers\Vendor\Auth\RegisterController;
 use App\Http\Controllers\Vendor\BranchController;
 use App\Http\Controllers\Vendor\ContactController as VendorContactController;
 use App\Http\Controllers\Vendor\GoldPieceController;
+use App\Http\Controllers\Admin\GoldPieceController as AdminGoldPieceController;
 use App\Http\Controllers\Vendor\OrderController;
 use App\Http\Controllers\Vendor\OrderRentalController;
 use App\Http\Controllers\Vendor\OrderSalesController;
@@ -152,6 +153,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'updateSlider'])->name('system-settings.sliders.update');
     Route::delete('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'destroySlider'])->name('system-settings.sliders.destroy');
 
+
+    /************************************************************************ */
+
+
+
     Route::resource('admin/vendors', VendorController::class)->except('update');
 
     Route::post('/vendors/{vendor}/update', [VendorController::class, 'update'])->name('vendors.update');
@@ -161,6 +167,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/vendors/{vendor}/toggle-status', [VendorController::class, 'toggleStatus'])->name('vendors.toggle-status');
 });
 
+
+/************************************************************************ */
 
 
 
@@ -183,14 +191,31 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
         ->name('admin.settlement.reject');
 });
 
+/************************************************************************ */
 
 
 Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/complaints', [ComplaintController::class, 'index'])->name('admin.complaints.index');
     Route::post('/complaints/{complaint}/reply', [ComplaintController::class, 'reply'])->name('admin.complaints.reply');
     Route::patch('/complaints/{complaint}/status', [ComplaintController::class, 'updateStatus'])->name('admin.complaints.update-status');
+
+
+    /************************************************************************ */
+
+
+    Route::resource('gold-pieces', AdminGoldPieceController::class)
+        ->names('admin.gold-pieces')->except('update');
+
+    Route::post('gold-pieces/{goldPiece}/update', [AdminGoldPieceController::class, 'update'])
+        ->name('admin.gold-pieces.update');
+
+    Route::patch('gold-pieces/{goldPiece}/toggle-status', [AdminGoldPieceController::class, 'toggleStatus'])
+        ->name('admin.gold-pieces.toggle-status');
+
 });
 
+
+/************************************************************************ */
 
 Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::middleware('guest')->group(function () {

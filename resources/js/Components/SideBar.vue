@@ -104,7 +104,7 @@
                 <Link class="nav-link" :href="route('users.index')"
                     :class="{ collapsed: !$page.url.startsWith('/users') }">
                 <i class="bi bi-person"></i>
-                <span>{{ $t("users") }}</span>
+                <span>{{ $t("Admins") }}</span>
                 </Link>
             </li>
 
@@ -252,6 +252,16 @@
                     :class="{ collapsed: !$page.url.startsWith('/admin/complaints') }">
                 <i class="bi bi-person-lines-fill"></i>
                 <span>{{ $t("Complaints") }}</span>
+                </Link>
+            </li>
+
+
+            <!--Admin gold pieces -->
+            <li class="nav-item">
+                <Link class="nav-link" :href="route('admin.gold-pieces.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/admin/gold-pieces') }">
+                <i class="bi bi-gem"></i>
+                <span>{{ $t("Gold Pieces") }}</span>
                 </Link>
             </li>
 

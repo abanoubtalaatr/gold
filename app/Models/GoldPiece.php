@@ -13,8 +13,19 @@ class GoldPiece extends Model implements HasMedia
     use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
-        'name', 'weight', 'carat', 'rental_price_per_day', 'sale_price', 'deposit_amount',
-        'branch_id', 'user_id', 'type', 'status', 'qr_code', 'description','is_including_lobes'
+        'name',
+        'weight',
+        'carat',
+        'rental_price_per_day',
+        'sale_price',
+        'deposit_amount',
+        'branch_id',
+        'user_id',
+        'type',
+        'status',
+        'qr_code',
+        'description',
+        'is_including_lobes'
     ];
 
     public function user()

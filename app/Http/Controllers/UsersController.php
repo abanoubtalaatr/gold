@@ -36,7 +36,7 @@ class UsersController extends Controller
             'is_active' => $request->is_active,
         ];
 
-        $UsersQuery = User::with('roles')->where('vendor_id', auth()->user()->id)->latest();
+        $UsersQuery = User::with('roles')->excludeUsereAndVendor()->latest();
 
 
         $UsersQuery->when($filters['name'], function ($query, $name) {
@@ -66,7 +66,11 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $roles = Role::where('vendor_id', auth()->user()->id)->pluck('name')->toArray();
+        $roles = Role::whereNull('vendor_id')
+        ->where('name', '!=', 'user')
+        ->where('name', '!=', 'superadmin')
+
+            ->pluck('name')->toArray();
         return Inertia('Users/Create', ['roles' => $roles]);
     }
 
@@ -80,7 +84,7 @@ class UsersController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
             'avatar' => 'avatars/default_avatar.png', // القيمة الافتراضية
-            'vendor_id' => auth()->user()->id
+            // 'vendor_id' => auth()->user()->id
         ];
 
         if ($request->hasFile('avatar')) {
@@ -113,7 +117,10 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
-        $roles = Role::where('vendor_id', auth()->user()->id)->pluck('name', 'name')->all();
+        $roles = Role::whereNull('vendor_id')
+        ->where('name', '!=', 'user')
+        ->where('name', '!=', 'superadmin')
+            ->pluck('name')->toArray();
         $userRoles = $user->roles->pluck('name')->all();
         return Inertia('Users/Edit', [
             'user' => $user,
@@ -191,10 +198,26 @@ class UsersController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
-    {
-        $user->delete();
-        return redirect()->route('users.index')
-        ->with('success',  __('messages.data_deleted_successfully'));
+   public function destroy(User $user)
+{
+    // Remove avatar file if exists
+    if ($user->avatar) {
+        Storage::delete($user->avatar);
     }
+
+    // Remove logo file if exists
+    if ($user->logo) {
+        Storage::delete($user->logo);
+    }
+
+    // Remove commercial registration image if exists
+    if ($user->commercial_registration_image) {
+        Storage::delete($user->commercial_registration_image);
+    }
+
+    $user->delete();
+
+    return redirect()->route('users.index')
+        ->with('success', __('messages.data_deleted_successfully'));
+}
 }
