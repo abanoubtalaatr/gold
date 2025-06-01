@@ -31,11 +31,13 @@ class OrderSale extends Model
      * Flow:
      * - User adds piece for sale: pending_approval
      * - Store approves: approved
+     * - Store rejects: rejected
      * - After sale: sold
      */
     const STATUS_PENDING_APPROVAL = 'pending_approval'; // في انتظار المتجر
     const STATUS_APPROVED = 'approved'; // تم القبول من المتجر
     const STATUS_SOLD = 'sold'; // تم بيعها
+    const STATUS_REJECTED = 'rejected'; // تم رفضها
 
     /**
      * Get all possible order statuses.
@@ -48,6 +50,7 @@ class OrderSale extends Model
             self::STATUS_PENDING_APPROVAL,
             self::STATUS_APPROVED,
             self::STATUS_SOLD,
+            self::STATUS_REJECTED,
         ];
     }
 

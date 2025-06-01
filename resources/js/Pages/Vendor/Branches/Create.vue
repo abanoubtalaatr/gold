@@ -41,6 +41,37 @@
                                     class="mt-1 text-xs text-red-500 font-medium" />
                             </div>
 
+                            <!-- Branch Logo -->
+                            <div class="col-span-1 md:col-span-6">
+                                <InputLabel for="logo" :value="$t('Branch Logo')"
+                                    class="text-sm font-semibold text-gray-800" />
+                                <input id="logo" type="file" @input="form.logo = $event.target.files[0]"
+                                    class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+                                    :class="{ 'border-red-500 focus:border-red-500': form.errors.logo }"
+                                    accept="image/*" />
+                                <p class="mt-1 text-xs text-gray-500 font-medium">
+                                    {{ $t('Max 2MB (JPG, PNG)') }}
+                                </p>
+                                <InputError :message="form.errors.logo" class="mt-1 text-xs text-red-500 font-medium" />
+                                
+                                <!-- Logo Preview -->
+                                <div v-if="logoPreview" class="mt-4">
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">{{ $t('Logo Preview') }}</h4>
+                                    <div class="relative">
+                                        <img :src="logoPreview" class="h-20 w-20 object-cover rounded border">
+                                        <button 
+                                            type="button"
+                                            @click="removeLogo"
+                                            class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Working Days and Hours -->
                             <div class="col-span-1 md:col-span-6">
                                 <InputLabel :value="$t('Working Days and Hours')"
@@ -202,11 +233,26 @@ const form = useForm({
         props.branch?.working_days,
         props.branch?.working_hours || {}
     ),
+    logo: null,
     images: [],
     deleted_images: [],
 });
 
 const existingImages = ref(props.branch?.images || []);
+const logoPreview = ref(null);
+
+// Watch for logo file changes to generate preview
+watch(() => form.logo, (newLogo) => {
+    if (newLogo) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            logoPreview.value = e.target.result;
+        };
+        reader.readAsDataURL(newLogo);
+    } else {
+        logoPreview.value = null;
+    }
+});
 
 const handleDaySelection = (dayValue) => {
     // Ensure working_days is always treated as an array
@@ -231,6 +277,16 @@ const removeExistingImage = (index) => {
     const image = existingImages.value[index];
     form.deleted_images.push(image.id);
     existingImages.value.splice(index, 1);
+};
+
+const removeLogo = () => {
+    form.logo = null;
+    logoPreview.value = null;
+    // Clear the file input
+    const fileInput = document.getElementById('logo');
+    if (fileInput) {
+        fileInput.value = '';
+    }
 };
 
 const submit = () => {

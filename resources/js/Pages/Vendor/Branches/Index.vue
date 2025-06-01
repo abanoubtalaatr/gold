@@ -55,7 +55,13 @@
                       <div class="flex items-center gap-2">
                         <div class="flex-shrink-0 h-10 w-10">
                           <img
-                            v-if="branch.images?.length > 0"
+                            v-if="branch.logo"
+                            :src="'/storage/' + branch.logo"
+                            class="h-10 w-10 rounded-full object-cover"
+                            alt="Branch logo"
+                          />
+                          <img
+                            v-else-if="branch.images?.length > 0"
                             :src="'/storage/' + branch.images[0].path"
                             class="h-10 w-10 rounded-full object-cover"
                             alt="Branch image"

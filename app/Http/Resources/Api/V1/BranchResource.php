@@ -54,7 +54,9 @@ class BranchResource extends JsonResource
             'name' => $this->name,
             'city' => SimpleCityResource::make($this->city),
             'working_schedule' => $workingSchedule,
-            'image' => asset('banner.png'),
+            'image' => $this->logo 
+                ? asset('storage/' . $this->logo) 
+                : asset('banner.png'),
         ];
     }
 }

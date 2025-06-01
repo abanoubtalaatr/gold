@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call([FaqSeeder::class]);
         $this->call([VendorSeeder::class]);
         $this->call([NotificationSeeder::class]);
+        $this->call([VendorOrderSeeder::class]);
 
         // User::factory(10)->create();
 

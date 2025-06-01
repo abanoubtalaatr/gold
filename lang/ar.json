@@ -948,6 +948,7 @@
     "Rented": "مستأجر",
     "Available": "متاح",
     "Sold": "مباع",
+    "Rejected": "مرفوض",
     "Pending Approval": "قيد الموافقة",
     "Piece Sent": "تم إرسال القطعة",
     "Sale Orders": "طلبات البيع",
@@ -1329,5 +1330,8 @@
     "Accepted": "مقبول",
     "Weight (grams)": "الوزن (جرام)",
     "Gold Pieces": "قطع الذهب",
-    "Admins":"المشرفين"
+    "Admins":"المشرفين",
+    "No complaints found.": "لا يوجد شكاوي",
+    "Logo Preview": "معاينة الشعار",
+    "Branch Logo": "شعار الفرع"
 }

@@ -129,7 +129,7 @@ class OrderController extends Controller
         $order = OrderRental::findOrFail($orderId);
         $this->authorizeVendor($order);
 
-        $order->update(['status' => 'rejected']);
+        $order->update(['status' => OrderRental::STATUS_REJECTED]);
 
         Log::info('Order rejected', ['order_id' => $order->id, 'vendor_id' => $request->user()->id]);
 

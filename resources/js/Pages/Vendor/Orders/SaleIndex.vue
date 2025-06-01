@@ -39,6 +39,7 @@
                                     <option value="rented">{{ $t('Rented') }}</option>
                                     <option value="available">{{ $t('Available') }}</option>
                                     <option value="sold">{{ $t('Sold') }}</option>
+                                    <option value="rejected">{{ $t('Rejected') }}</option>
                                 </select>
                                 <button @click="resetFilters"
                                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
@@ -323,6 +324,8 @@ const getStatusClass = (status) => {
             return 'bg-purple-100 text-purple-800';
         case 'sold':
             return 'bg-gray-100 text-gray-800';
+        case 'rejected':
+            return 'bg-red-100 text-red-800';
         default:
             return 'bg-gray-100 text-gray-800';
     }
@@ -336,7 +339,7 @@ const formatStatus = (status) => {
         'rented': t('Rented'),
         'available': t('Available'),
         'sold': t('Sold'),
-        'rejected': t('rejected'),
+        'rejected': t('Rejected'),
     };
 
     return statusMap[status] || status
@@ -366,13 +369,6 @@ const acceptOrder = () => {
     });
 };
 
-// const rejectOrder = (orderId) => {
-//     if (confirm($t('Are you sure you want to reject this order?'))) {
-//         form.post(route('vendor.orders.sales.reject', orderId), {
-//             preserveScroll: true,
-//         });
-//     }
-
 const rejectOrder = (orderId) => {
     if (confirm(t('Are you sure you want to reject this order?'))) {
         router.post(route('vendor.orders.sales.reject', orderId), {
@@ -385,7 +381,6 @@ const rejectOrder = (orderId) => {
             }
         });
     }
-
 };
 
 const showDetails = (order) => {

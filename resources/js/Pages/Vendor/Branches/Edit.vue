@@ -58,6 +58,52 @@
                 />
               </div>
 
+              <!-- Branch Logo -->
+              <div class="col-span-1 md:col-span-6">
+                <InputLabel for="logo" :value="$t('Branch Logo')"
+                  class="text-sm font-semibold text-gray-800" />
+                <input id="logo" type="file" @input="form.logo = $event.target.files[0]"
+                  class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+                  :class="{ 'border-red-500 focus:border-red-500': form.errors.logo }"
+                  accept="image/*" />
+                <p class="mt-1 text-xs text-gray-500 font-medium">
+                  {{ $t('Max 2MB (JPG, PNG)') }}
+                </p>
+                <InputError :message="form.errors.logo" class="mt-1 text-xs text-red-500 font-medium" />
+
+                <!-- Display existing logo -->
+                <div v-if="existingLogo && !form.logo" class="mt-4">
+                  <h4 class="text-sm font-medium text-gray-700 mb-2">{{ $t('Current Logo') }}</h4>
+                  <div class="relative">
+                    <img :src="'/storage/' + existingLogo" class="h-20 w-20 object-cover rounded border">
+                    <button 
+                      type="button"
+                      @click="removeExistingLogo"
+                      class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div v-if="form.logo" class="mt-4">
+                  <h4 class="text-sm font-medium text-gray-700 mb-2">{{ $t('New Logo Preview') }}</h4>
+                  <div class="relative">
+                    <img :src="previewUrl" class="h-20 w-20 object-cover rounded border" v-if="previewUrl">
+                    <button 
+                      type="button"
+                      @click="removeNewLogo"
+                      class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <!-- Working Days and Hours -->
               <div class="col-span-1 md:col-span-6">
                 <InputLabel
@@ -78,14 +124,8 @@
                       <div class="w-1/3">
                         <label class="flex items-center group">
                           <Checkbox
-                            :value="day.value"
-                            :modelValue="form.working_days"
-                            @update:modelValue="(newValue) => {
-                              form.working_days = Array.isArray(newValue) ? newValue : 
-                                (newValue ? [...(Array.isArray(form.working_days) ? form.working_days : []), day.value] : 
-                                (Array.isArray(form.working_days) ? form.working_days.filter(d => d !== day.value) : []));
-                              handleDaySelection(day.value);
-                            }"
+                            :checked="form.working_days.includes(day.value)"
+                            @update:modelValue="(checked) => toggleWorkingDay(day.value, checked)"
                             class="h-4 w-4 px-3 text-indigo-600 border-gray-300 rounded focus:ring-0 group-hover:border-indigo-400 transition-all duration-200"
                             :class="{ 'border-red-500': form.errors.working_days }"
                           />
@@ -233,16 +273,35 @@ const initializeWorkingHours = (workingDays = [], existingHours = {}) => {
 const form = useForm({
   name: props.branch.name,
   city_id: props.branch.city_id,
-  working_days: props.branch.working_days || [], // Ensure this is always an array
+  working_days: Array.isArray(props.branch.working_days) 
+    ? props.branch.working_days.map(day => parseInt(day))
+    : [], // Ensure this is always an array of integers
   working_hours: initializeWorkingHours(
-    props.branch.working_days, 
+    props.branch.working_days,
     props.branch.working_hours || {}
   ),
+  logo: null,
+  removeLogo: false, // Flag to indicate logo should be removed
+  _method: 'PUT', // Inertia expects _method for PUT requests with FormData
   images: [],
   deleted_images: [],
 })
 
 const existingImages = ref(props.branch.images || [])
+const existingLogo = ref(props.branch.logo || null)
+const previewUrl = ref(null);
+
+watch(() => form.logo, (newLogo) => {
+  if (newLogo) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewUrl.value = e.target.result;
+    };
+    reader.readAsDataURL(newLogo);
+  } else {
+    previewUrl.value = null;
+  }
+});
 
 const handleDaySelection = (dayValue) => {
   // Ensure working_days is always treated as an array
@@ -259,15 +318,45 @@ const handleDaySelection = (dayValue) => {
   }
 }
 
+const toggleWorkingDay = (dayValue, checked) => {
+  if (checked) {
+    form.working_days.push(dayValue);
+  } else {
+    form.working_days = form.working_days.filter(day => day !== dayValue);
+  }
+  handleDaySelection(dayValue);
+}
+
 const removeExistingImage = (index) => {
   const imageToRemove = existingImages.value[index]
   form.deleted_images.push(imageToRemove.id)
   existingImages.value.splice(index, 1)
 }
 
+const removeExistingLogo = () => {
+  existingLogo.value = null;
+  form.removeLogo = true; // Signal to backend that logo should be removed
+  form.logo = null;
+  // Clear the file input
+  const fileInput = document.getElementById('logo');
+  if (fileInput) {
+    fileInput.value = '';
+  }
+};
+
+const removeNewLogo = () => {
+  form.logo = null;
+  previewUrl.value = null;
+  // Clear the file input
+  const fileInput = document.getElementById('logo');
+  if (fileInput) {
+    fileInput.value = '';
+  }
+};
+
 const submit = () => {
-  form.put(route('vendor.branches.update', props.branch.id), {
-    _method: 'PUT',
+  form.post(route('vendor.branches.update', props.branch.id), {
+    // _method: 'PUT', // This is now handled by adding _method to the form itself when dealing with FormData
     onSuccess: () => {
       // Handle success
     },

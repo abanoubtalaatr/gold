@@ -34,6 +34,9 @@ class UserRolePermissionSeeder extends Seeder
             'contacts' => ['read', 'update'],
             'static_pages' => ['read', 'update'],
             'branches' => ['create', 'read', 'update', 'delete', 'view'],
+            'gold-pieces' => ['create', 'read', 'update', 'delete', 'view'],
+            'companies' => ['create', 'read', 'update', 'delete', 'view'],
+            'complaints' => ['create', 'read', 'update', 'delete', 'view'],
             'dashboard' => ['view'],
             // Vendor-prefixed permissions
             'vendor' => [

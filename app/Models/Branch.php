@@ -22,6 +22,7 @@ class Branch extends Model
         'services',
         'is_active',
         'address',
+        'logo',
     ];
 
     protected $casts = [
