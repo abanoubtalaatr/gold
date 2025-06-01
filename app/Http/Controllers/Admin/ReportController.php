@@ -10,6 +10,7 @@ use App\Models\Rating;
 use App\Models\User;
 use App\Models\Contact;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
 

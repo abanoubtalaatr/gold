@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Illuminate\Http\JsonResponse;
-use App\Models\LiquidationRequest;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Google\Cloud\Core\ApiHelperTrait;
-use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Api\V1\LiquidationRequestResource;
 use App\Http\Requests\Api\V1\LiquidationRequest\StoreLiquidationRequest;
+use App\Http\Resources\Api\V1\LiquidationRequestResource;
+use App\Models\LiquidationRequest;
+use App\Models\User;
+use App\Notifications\Admin\NewLiquidationRequest;
 use App\Traits\ApiResponseTrait;
+use Google\Cloud\Core\ApiHelperTrait;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 class LiquidationRequestController extends Controller
 {
@@ -40,6 +42,16 @@ class LiquidationRequestController extends Controller
             'status' => 'pending',
             ...$request->validated(),
         ]);
+
+        // Notify all admins
+        $admins = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin')
+                ->orWhere('name', 'superadmin')
+                ->whereNull('vendor_id');
+        })->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new NewLiquidationRequest($liquidationRequest));
+        }
 
         return $this->successResponse(
             new LiquidationRequestResource($liquidationRequest),
@@ -74,4 +86,4 @@ class LiquidationRequestController extends Controller
             __('mobile.Liquidation request deleted successfully')
         );
     }
-} 
+}

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Notifications\Admin\NewVendorRegistrationNotification;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -54,10 +55,10 @@ class RegisterController extends Controller
         // Assign vendor role
         $user->assignRole('vendor');
 
-        
+
         // Generate OTP for email verification
         $otp = rand(100000, 999999);
-        $otp=123456;
+        $otp = 123456;
         $expiresAt = now()->addMinutes(10);
 
         // Store OTP in cache
@@ -69,6 +70,17 @@ class RegisterController extends Controller
 
         // Send verification OTP email
         $this->sendOtpEmail($user->email, $otp);
+
+
+        // Notify all admin users
+        $admins = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin')
+                ->orWhere('name', 'superadmin')
+                ->whereNull('vendor_id');
+        })->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new NewVendorRegistrationNotification($user));
+        }
 
         return redirect()->route('vendor.verify')->with([
             'email' => $user->email,

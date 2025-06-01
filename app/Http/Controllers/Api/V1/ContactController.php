@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\User;
-use App\Models\Contact;
-use Illuminate\Http\Request;
-use App\Traits\ApiResponseTrait;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Resources\Api\ContactResource;
 use App\Http\Requests\Api\V1\ContactRequest;
-use App\Http\Resources\Api\V1\ContactRsource;
-use App\Notifications\Vendor\NewContactMessage;
 use App\Http\Requests\Api\V1\UpdateContactRequest;
+use App\Http\Resources\Api\ContactResource;
+use App\Http\Resources\Api\V1\ContactRsource;
+use App\Models\Contact;
+use App\Models\User;
+use App\Notifications\Admin\NewContactMessageAdmin;
+use App\Notifications\Vendor\NewContactMessage;
+use App\Traits\ApiResponseTrait;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ContactController extends Controller
 {
@@ -131,5 +132,16 @@ class ContactController extends Controller
             return;
         }
         $vendor->notify(new NewContactMessage($contact));
+
+
+        // Always notify admins
+        $admins = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin')
+                ->orWhere('name', 'superadmin')
+                ->whereNull('vendor_id');
+        })->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new NewContactMessageAdmin($contact));
+        }
     }
 }
