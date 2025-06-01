@@ -24,7 +24,6 @@ class OrderSalesController extends Controller
         $branches = Branch::where('vendor_id', $vendorId)->select('id', 'name')->get();
 
         $filters = $request->only(['search', 'branch_id', 'status']);
-        $statusFilter = $filters['status'] ?? null;
 
         $saleOrdersQuery = OrderSale::query()
             ->whereIn('branch_id', $branchIds)
@@ -39,10 +38,11 @@ class OrderSalesController extends Controller
             ->when($filters['branch_id'] ?? null, function ($query, $branchId) {
                 $query->where('branch_id', $branchId);
             })
-            ->when($statusFilter === 'pending', function ($query) {
-                $query->where('status', 'pending_approval');
+            ->when($filters['status'] ?? null, function ($query, $status) {
+                // Handle all possible status values from the frontend
+                $query->where('status', $status);
             })
-            ->with(['user', 'goldPiece', 'branch'])
+            ->with(['user', 'goldPiece.user', 'branch'])
             ->orderBy('created_at', 'desc');
 
         $saleOrders = $saleOrdersQuery->paginate(10)->appends($filters);
@@ -79,12 +79,14 @@ class OrderSalesController extends Controller
             'branch_id' => $request->branch_id,
             'status' => OrderSale::STATUS_APPROVED,
         ]);
-        // Notify gold piece owner
-        if ($order->goldPiece->user) {
+        
+        // Notify gold piece owner - Fix the relationship call
+        if ($order->goldPiece && $order->goldPiece->user) {
             $order->goldPiece->user->notify(
                 new GoldPieceAcceptedNotification($order, auth()->user()->name)
             );
         }
+        
         Log::info('Order accepted', ['order_id' => $order->id, 'vendor_id' => $request->user()->id]);
 
         return back()->with('success', __('Order accepted successfully'));
@@ -97,12 +99,13 @@ class OrderSalesController extends Controller
 
         $order->update(['status' => OrderSale::STATUS_REJECTED]);
 
-        // Notify gold piece owner
-        if ($order->goldPiece->user) {
+        // Notify gold piece owner - Fix the relationship call
+        if ($order->goldPiece && $order->goldPiece->user) {
             $order->goldPiece->user->notify(
                 new GoldPieceRejectedNotification($order, auth()->user()->name)
             );
         }
+        
         Log::info('Order rejected', ['order_id' => $order->id, 'vendor_id' => $request->user()->id]);
 
         return back()->with('success', __('Order rejected successfully'));
@@ -113,25 +116,16 @@ class OrderSalesController extends Controller
         $order = OrderSale::findOrFail($orderId);
         $this->authorizeVendor($order);
 
-        // Validate the incoming status to be one of the allowed statuses
+        // Validate the incoming status to be one of the allowed statuses for OrderSale
         $request->validate([
             'status' => 'required|in:pending_approval,approved,sold,rejected',
         ]);
 
-        // Map the input status to the internal constants
-        $newStatus = match ($request->status) {
-            'pending_approval' => OrderSale::STATUS_PENDING_APPROVAL,
-            'approved' => OrderSale::STATUS_APPROVED,
-            'sold' => OrderSale::STATUS_SOLD,
-            'rejected' => OrderSale::STATUS_REJECTED,
-            default => throw new \Exception('Invalid status'),
-        };
-
-        // Update the order with the new status
-        $order->update(['status' => $newStatus]);
+        // Update the order with the new status directly (no need for mapping since we're using the same values)
+        $order->update(['status' => $request->status]);
 
         // Log the status update
-        Log::info('Order status updated', ['order_id' => $order->id, 'status' => $newStatus]);
+        Log::info('Order status updated', ['order_id' => $order->id, 'status' => $request->status]);
 
         return back()->with('success', __('Order status updated successfully'));
     }

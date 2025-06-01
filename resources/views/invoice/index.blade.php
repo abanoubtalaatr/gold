@@ -32,7 +32,7 @@
             <!-- QR Code -->
             <div class="flex justify-center mb-6">
                 <div class="w-40 h-40">
-                    <img src="{{ asset('qrcode.png') }}" alt="QR Code" class="w-full h-full">
+                    <img src="{{ asset('public/qrcode.png') }}" alt="QR Code" class="w-full h-full">
                 </div>
             </div>
             
@@ -55,7 +55,7 @@
                 
                 <div class="flex justify-between">
                     <div class="font-bold">@lang('mobile.store')</div>
-                    <div>{{ $order->goldPiece?->branch?->vendor?->name }}</div>
+                    <div>{{ $order?->vendor?->name }}</div>
                 </div>
                 
                 <div class="flex justify-between">

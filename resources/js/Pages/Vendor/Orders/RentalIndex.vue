@@ -525,7 +525,8 @@ const updateStatus = (orderId, status) => {
     activeDropdown.value = null;
 
     router.patch(route('vendor.orders.rental.updateStatus', orderId), {
-        data: { status: status },  // Explicitly send status in data object
+        status: status
+    }, {
         preserveScroll: true,
         onSuccess: () => {
             // Optional: Add any success handling

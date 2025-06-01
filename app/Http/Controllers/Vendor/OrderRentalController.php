@@ -9,6 +9,7 @@ use App\Models\OrderRental;
 use App\Models\OrderSale;
 use App\Notifications\Client\GoldPieceAcceptedNotification;
 use App\Notifications\Client\GoldPieceRejectedNotification;
+use App\Services\RentalWorkflowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -17,14 +18,20 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class OrderRentalController extends Controller
 {
+    protected $rentalWorkflowService;
+
+    public function __construct(RentalWorkflowService $rentalWorkflowService)
+    {
+        $this->rentalWorkflowService = $rentalWorkflowService;
+    }
+
     public function index(Request $request)
     {
-        $vendorId = $request->user()->id;
+        $vendorId = Auth::id();
         $branchIds = Branch::where('vendor_id', $vendorId)->pluck('id');
         $branches = Branch::where('vendor_id', $vendorId)->select('id', 'name')->get();
 
         $filters = $request->only(['search', 'branch_id', 'status']);
-        $statusFilter = $filters['status'] ?? null;
 
         $rentalOrdersQuery = OrderRental::query()->where('type', OrderRental::RENT_TYPE)
             ->whereIn('branch_id', $branchIds)
@@ -39,13 +46,11 @@ class OrderRentalController extends Controller
             ->when($filters['branch_id'] ?? null, function ($query, $branchId) {
                 $query->where('branch_id', $branchId);
             })
-            ->when($statusFilter === 'pending', function ($query) {
-                $query->where('status', OrderRental::STATUS_PENDING_APPROVAL);
+            ->when($filters['status'] ?? null, function ($query, $status) {
+                // Handle all possible status values from the frontend
+                $query->where('status', $status);
             })
-            ->when($statusFilter === 'available', function ($query) {
-                $query->whereIn('status', [OrderRental::STATUS_AVAILABLE, OrderRental::STATUS_RENTED]);
-            })
-            ->with(['user', 'goldPiece', 'branch'])
+            ->with(['user', 'goldPiece', 'goldPiece.user', 'branch'])
             ->orderBy('created_at', 'desc');
 
         $rentalOrders = $rentalOrdersQuery->paginate(10)->appends($filters);
@@ -90,7 +95,7 @@ class OrderRentalController extends Controller
                 new GoldPieceAcceptedNotification($order, auth()->user()->name)
             );
         }
-        Log::info('Order accepted', ['order_id' => $order->id, 'vendor_id' => $request->user()->id]);
+        Log::info('Order accepted', ['order_id' => $order->id, 'vendor_id' => Auth::id()]);
 
         return back()->with('success', __('Order accepted successfully'));
     }
@@ -109,35 +114,45 @@ class OrderRentalController extends Controller
                 new GoldPieceRejectedNotification($order, auth()->user()->name)
             );
         }
-        Log::info('Order rejected', ['order_id' => $order->id, 'vendor_id' => $request->user()->id]);
+        Log::info('Order rejected', ['order_id' => $order->id, 'vendor_id' => Auth::id()]);
 
         return back()->with('success', __('Order rejected successfully'));
     }
 
     public function updateStatus(Request $request, $orderId)
     {
+        try {
+            $order = OrderRental::with(['user', 'branch', 'goldPiece'])->findOrFail($orderId);
+            $this->authorizeVendor($order);
+            
+            // Validate the incoming status
+            $request->validate([
+                'status' => 'required|in:pending_approval,approved,piece_sent,rented,available,sold,rejected',
+            ]);
 
-        $order = OrderRental::findOrFail($orderId);
-        $this->authorizeVendor($order);
-        $request->validate([
-            'data.status' => 'required|in:' . implode(',', OrderRental::statuses()),
-        ]);
+            $newStatus = $request->status;
+            $oldStatus = $order->status;
+            
+            // Use workflow service for proper status management and notifications
+            $this->rentalWorkflowService->updateStatus($order, $newStatus, Auth::user());
 
-        $newStatus = match ($request->input('data.status')) {
-            'piece_sent' => OrderRental::STATUS_PIECE_SENT,
-            'available' => OrderRental::STATUS_AVAILABLE,
-            'sold' => OrderRental::STATUS_SOLD,
-            'rented' => OrderRental::STATUS_RENTED,
-            'pending_approval' => OrderRental::STATUS_PENDING_APPROVAL,
-            'approved' => OrderRental::STATUS_APPROVED,
+            Log::info('Order status updated via workflow service', [
+                'order_id' => $order->id, 
+                'old_status' => $oldStatus,
+                'new_status' => $newStatus,
+                'vendor_id' => Auth::id()
+            ]);
 
-            default => throw new \Exception('Invalid status'),
-        };
+            return back()->with('success', __('Order status updated successfully'));
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to update order status', [
+                'order_id' => $orderId,
+                'error' => $e->getMessage(),
+            ]);
 
-        $order->update(['status' => $newStatus]);
-
-
-        return back()->with('success', __('Order status updated successfully'));
+            return back()->with('error', __('Failed to update order status. Please try again.'));
+        }
     }
 
     protected function authorizeVendor($order)
