@@ -26,7 +26,7 @@ class Banner extends Model implements TranslatableContract
 
     public function getImageAttribute()
     {
-        return asset("{$this->attributes['image']}");
+        return asset("/public/{$this->attributes['image']}");
     }
 
     public function scopeActive($query)

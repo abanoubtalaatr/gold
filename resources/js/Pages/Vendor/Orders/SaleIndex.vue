@@ -35,9 +35,6 @@
                                     <option value="">{{ $t('All Statuses') }}</option>
                                     <option value="pending_approval">{{ $t('Pending Approval') }}</option>
                                     <option value="approved">{{ $t('Approved') }}</option>
-                                    <option value="piece_sent">{{ $t('Piece Sent') }}</option>
-                                    <option value="rented">{{ $t('Rented') }}</option>
-                                    <option value="available">{{ $t('Available') }}</option>
                                     <option value="sold">{{ $t('Sold') }}</option>
                                     <option value="rejected">{{ $t('Rejected') }}</option>
                                 </select>
@@ -121,6 +118,11 @@
                                                     @click="openRejectModal(order)"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors duration-200">
                                                     {{ $t('Reject') }}
+                                                </button>
+                                                <button v-if="order.status === 'approved'"
+                                                    @click="updateStatus(order.id, 'sold')"
+                                                    class="px-3 py-1 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700 transition-colors duration-200">
+                                                    {{ $t('Mark as Sold') }}
                                                 </button>
                                             </div>
                                         </td>
@@ -359,12 +361,6 @@ const getStatusClass = (status) => {
             return 'bg-yellow-100 text-yellow-800';
         case 'approved':
             return 'bg-green-100 text-green-800';
-        case 'piece_sent':
-            return 'bg-blue-100 text-blue-800';
-        case 'available':
-            return 'bg-indigo-100 text-indigo-800';
-        case 'rented':
-            return 'bg-purple-100 text-purple-800';
         case 'sold':
             return 'bg-gray-100 text-gray-800';
         case 'rejected':
@@ -378,9 +374,6 @@ const formatStatus = (status) => {
     const statusMap = {
         'pending_approval': t('Pending Approval'),
         'approved': t('Approved'),
-        'piece_sent': t('Piece Sent'),
-        'rented': t('Rented'),
-        'available': t('Available'),
         'sold': t('Sold'),
         'rejected': t('Rejected'),
     };
@@ -442,6 +435,20 @@ const showDetails = (order) => {
 const closeDetailsModal = () => {
     showDetailsModal.value = false;
     selectedOrder.value = null;
+};
+
+const updateStatus = (orderId, newStatus) => {
+    router.patch(route('vendor.orders.sales.updateStatus', orderId), {
+        status: newStatus
+    }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Handle success
+        },
+        onError: (errors) => {
+            console.error('Error updating status:', errors);
+        }
+    });
 };
 </script>
 

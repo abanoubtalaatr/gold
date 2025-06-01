@@ -64,7 +64,7 @@
             </li>
 
             <!-- Vendor sale orders -->
-            
+
             <li class="nav-item" v-if="hasPermission('vendor read orders')">
                 <Link class="nav-link" :href="route('vendor.orders.sale.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/sale-orders') }">
@@ -93,7 +93,7 @@
                 </Link>
             </li>
 
-            
+
 
             <li class="nav-item" v-if="hasPermission('vendor read branches')">
                 <Link class="nav-link" :href="route('vendor.branches.index')"
@@ -200,6 +200,14 @@
                     :class="{ collapsed: !$page.url.startsWith('admin/reports') }">
                 <i class="bi bi-file-earmark-bar-graph"></i>
                 <span>{{ $t("Reports") }}</span>
+                </Link>
+            </li>
+
+            <li class="nav-item">
+                <Link class="nav-link" :href="route('admin.orders.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/admin/orders') }">
+                <i class="bi bi-cart"></i>
+                <span>{{ $t("orders") }}</span>
                 </Link>
             </li>
 

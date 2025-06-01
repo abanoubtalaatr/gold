@@ -60,7 +60,6 @@ use Inertia\Inertia;
 
 
 Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('lang/change', [LangController::class, 'change'])->name('changeLang');
 
@@ -324,6 +323,11 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
 
     });
     Route::get('/rental-requests', [RentalRequestController::class, 'index'])->name('rental-requests.index');
+    Route::post('/rental-requests/{order}/accept', [RentalRequestController::class, 'accept'])->name('rental-requests.accept');
+    Route::post('/rental-requests/{order}/reject', [RentalRequestController::class, 'reject'])->name('rental-requests.reject');
+    Route::post('/rental-requests/{order}/mark-sent', [RentalRequestController::class, 'markAsSent'])->name('rental-requests.mark-sent');
+    Route::post('/rental-requests/{order}/confirm-rental', [RentalRequestController::class, 'confirmRental'])->name('rental-requests.confirm-rental');
+    Route::post('/rental-requests/{order}/complete-rental', [RentalRequestController::class, 'completeRental'])->name('rental-requests.complete-rental');
 
     Route::resource('roles', \App\Http\Controllers\Vendor\RoleController::class);
     Route::get('roles/{role}/delete', [\App\Http\Controllers\Vendor\RoleController::class, 'destroy']);
@@ -333,7 +337,7 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
 
     Route::resource('users', UserController::class);
     Route::post('users/{user}/activate', [UserController::class, 'activate'])->name('activate');
-    Route::post('users/{user}', [UserController::class, 'update'])->name('users.update'); //  inertia does not support send files using put request
+    Route::post('users/{user}', [UserController::class, 'update'])->name('vendor.users.update'); //  inertia does not support send files using put request
 
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
     Route::get('/wallet/transactions', [WalletController::class, 'transactions'])->name('wallet.transactions');
