@@ -177,8 +177,15 @@ return [
     'your account has been deactivated.' => 'لقد تم إلغاء تفعيل حسابك',
     'We have sent a confirmation email.' => 'لقد قمنا بإرسال بريد التحقق إلى بريدك الإلكتروني',
     'failed' => 'البيانات المقدمة غير صالحة',
-    'not_verified' => 'لم يتم التحقق من البريد الإلكتروني'
-    
-
-
+    'not_verified' => 'لم يتم التحقق من البريد الإلكتروني',
+    'invoice_electronic' => 'الفاتورة الإلكترونية',
+    'name_of_the_piece' => 'اسم القطعة',
+    'weight_of_the_piece' => 'وزن القطعة',
+    'karat' => 'العيار',
+    'store' => 'المتجر',
+    'sale_price' => 'سعر البيع',
+    'sale_date' => 'تاريخ البيع',
+    'print_the_invoice_pdf' => 'طباعة الفاتورة PDF',
+    'gram' => 'جرام',
+    'sar' => 'ريال',
 ];

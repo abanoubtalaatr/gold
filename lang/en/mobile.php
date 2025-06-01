@@ -226,5 +226,14 @@ return [
     'your account has been deactivated.' => 'your account has been deactivated.',
     'We have sent a confirmation email.' => 'We have sent a confirmation email.',
     'failed' => 'failed',
-    
+    'invoice_electronic' => 'Invoice Electronic',
+    'name_of_the_piece' => 'Name of the piece',
+    'weight_of_the_piece' => 'Weight of the piece',
+    'karat' => 'Karat',
+    'store' => 'Store',
+    'sale_price' => 'Sale price',
+    'sale_date' => 'Sale date',
+    'print_the_invoice_pdf' => 'Print the invoice PDF',
+    'gram' => 'Gram',
+    'sar' => 'SAR',
 ];
