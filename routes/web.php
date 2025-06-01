@@ -217,6 +217,19 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
 
 /************************************************************************ */
 
+
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    // ... other admin routes
+
+    Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])
+        ->name('admin.reports.index');
+
+    Route::post('/reports/generate', [\App\Http\Controllers\Admin\ReportController::class, 'generate'])
+        ->name('admin.reports.generate');
+});
+
+/************************************************************************ */
+
 Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('create-account', [RegisterController::class, 'create'])

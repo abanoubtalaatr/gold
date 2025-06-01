@@ -194,6 +194,16 @@
             </li>
 
 
+            <!-- Reports -->
+            <li class="nav-item">
+                <Link class="nav-link" :href="route('admin.reports.index')"
+                    :class="{ collapsed: !$page.url.startsWith('admin/reports') }">
+                <i class="bi bi-file-earmark-bar-graph"></i>
+                <span>{{ $t("Reports") }}</span>
+                </Link>
+            </li>
+
+
             <li class="nav-item" v-if="hasPermission('read static_pages')">
                 <a class="nav-link collapsed" data-bs-target="#pages-dropdown" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-file-earmark"></i>
