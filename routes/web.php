@@ -230,6 +230,16 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
 /************************************************************************ */
 
+
+
+Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+    // Orders
+    Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/orders/{id}/{type}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('admin.orders.show');
+});
+
+/************************************************************************ */
+
 Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('create-account', [RegisterController::class, 'create'])
