@@ -266,6 +266,17 @@
             </li>
 
 
+            <!-- Reports -->
+            <li class="nav-item">
+                <Link class="nav-link" :href="route('admin.reports.index')"
+                    :class="{ collapsed: !$page.url.startsWith('admin/reports') }">
+                <i class="bi bi-file-earmark-bar-graph"></i>
+                <span>{{ $t("Reports") }}</span>
+                </Link>
+            </li>
+
+
+
         </ul>
     </aside>
 </template>
