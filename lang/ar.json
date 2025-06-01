@@ -1306,7 +1306,6 @@
     "total_vendors": "عدد المتاجر",
     "New": "جديد",
     "Pending": "قيد المراجعة",
-    "Rejected": "مرفوض",
     "In Progress": "قيد التنفيذ",
     "Resolved": "محلول",
     "Related Order": "الطلب المرتبط",
@@ -1330,14 +1329,10 @@
     "Accepted": "مقبول",
     "Weight (grams)": "الوزن (جرام)",
     "Gold Pieces": "قطع الذهب",
-<<<<<<< HEAD
-    "Admins": "المشرفين"
-=======
-    "Admins":"المشرفين",
+    "Admins": "المشرفين",
     "No complaints found.": "لا يوجد شكاوي",
     "Logo Preview": "معاينة الشعار",
     "Branch Logo": "شعار الفرع",
     "Reject Order": "رفض الطلب",
     "Are you sure you want to reject this order? This action cannot be undone.": "هل أنت متأكد من رفض هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء."
->>>>>>> 3d17f7aeb2c239d015e644d7c0c2fc0207dfc054
 }
