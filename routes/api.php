@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\BannerController;
 use App\Http\Controllers\Api\V1\RatingController;
 use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\ContactController;
+use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\SettingsApiController;
 use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\GoldPieceController;
@@ -184,3 +185,5 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
 });
 
 Route::get('banners', [BannerController::class, 'index']);
+
+Route::get('invoice/{order}', [InvoiceController::class, 'index'])->name('invoice.show');

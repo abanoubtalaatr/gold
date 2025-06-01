@@ -160,7 +160,7 @@ class GoldPieceFilter
                 case 'current':
                     $this->query->whereHas('orderRentals', function ($query) {
                         $query->where(function ($q) {
-                            $q->where('status', OrderRental::STATUS_PENDING_APPROVAL)
+                            $q->where('type',OrderRental::LEASE_TYPE)
                                 ->orWhere(function ($q) {
                                     $q->where('start_date', '<=', now())
                                         ->where('end_date', '>=', now());
@@ -170,12 +170,41 @@ class GoldPieceFilter
                     break;
                 case 'finished':
                     $this->query->whereHas('orderRentals', function ($query) {
-                        $query->where('end_date', '<', now());
+                        $query->where('type',OrderRental::LEASE_TYPE)->where('end_date', '<', now());
                     });
                     break;
                 case 'future':
                     $this->query->whereHas('orderRentals', function ($query) {
-                        $query->where('start_date', '>', now());
+                        $query->where('type',OrderRental::LEASE_TYPE)->where('start_date', '>', now());
+                    });
+                case OrderRental::STATUS_PENDING_APPROVAL:
+                    $this->query->whereHas('orderRentals', function ($query) {
+                        $query->where('status', OrderRental::STATUS_PENDING_APPROVAL);
+                    });
+                    break;
+                case OrderRental::STATUS_APPROVED:
+                    $this->query->whereHas('orderRentals', function ($query) {
+                        $query->where('is_suspended', OrderRental::STATUS_APPROVED);
+                    });
+                    break;
+                case OrderRental::STATUS_PIECE_SENT:
+                    $this->query->whereHas('orderRentals', function ($query) {
+                        $query->where('status', OrderRental::STATUS_PIECE_SENT);
+                    });
+                    break;
+                case OrderRental::STATUS_RENTED:
+                    $this->query->whereHas('orderRentals', function ($query) {
+                        $query->where('status', OrderRental::STATUS_RENTED);
+                    });
+                    break;
+                case OrderRental::STATUS_AVAILABLE:
+                    $this->query->whereHas('orderRentals', function ($query) {
+                        $query->where('status', OrderRental::STATUS_AVAILABLE);
+                    });
+                    break;
+                case OrderRental::STATUS_SOLD:
+                    $this->query->whereHas('orderRentals', function ($query) {
+                        $query->where('status', OrderRental::STATUS_SOLD);
                     });
                     break;
             }

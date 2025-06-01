@@ -1,0 +1,175 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\{{ model }};
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class {{ class }}Service
+{
+    /**
+     * Get paginated {{ modelVariablePlural }} with filters
+     */
+    public function getPaginated(array $filters = [])
+    {
+        $query = {{ model }}::query();
+
+        // Apply filters
+        if (!empty($filters['search'])) {
+            $query->where('name', 'like', '%' . $filters['search'] . '%');
+        }
+
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+
+        // Apply vendor scope if needed
+        if (auth()->user()->hasRole('vendor')) {
+            $query->where('vendor_id', auth()->id());
+        }
+
+        return $query->latest()
+            ->with(['translations']) // Load relationships
+            ->paginate($filters['per_page'] ?? 10);
+    }
+
+    /**
+     * Create a new {{ modelVariable }}
+     */
+    public function create(array $data): {{ model }}
+    {
+        DB::beginTransaction();
+        
+        try {
+            ${{ modelVariable }} = {{ model }}::create([
+                'name' => $data['name'],
+                'is_active' => $data['is_active'] ?? 1,
+                'vendor_id' => auth()->id(), // If applicable
+            ]);
+
+            // Handle translations if applicable
+            if (isset($data['translations'])) {
+                $this->saveTranslations(${{ modelVariable }}, $data['translations']);
+            }
+
+            DB::commit();
+            
+            return ${{ modelVariable }};
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error creating {{ modelVariable }}', [
+                'error' => $e->getMessage(),
+                'data' => $data
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Update an existing {{ modelVariable }}
+     */
+    public function update({{ model }} ${{ modelVariable }}, array $data): {{ model }}
+    {
+        DB::beginTransaction();
+        
+        try {
+            ${{ modelVariable }}->update([
+                'name' => $data['name'],
+                'is_active' => $data['is_active'] ?? ${{ modelVariable }}->is_active,
+            ]);
+
+            // Handle translations if applicable
+            if (isset($data['translations'])) {
+                $this->saveTranslations(${{ modelVariable }}, $data['translations']);
+            }
+
+            DB::commit();
+            
+            return ${{ modelVariable }};
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating {{ modelVariable }}', [
+                'error' => $e->getMessage(),
+                'id' => ${{ modelVariable }}->id,
+                'data' => $data
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Delete a {{ modelVariable }}
+     */
+    public function delete({{ model }} ${{ modelVariable }}): bool
+    {
+        try {
+            return ${{ modelVariable }}->delete();
+        } catch (\Exception $e) {
+            Log::error('Error deleting {{ modelVariable }}', [
+                'error' => $e->getMessage(),
+                'id' => ${{ modelVariable }}->id
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Toggle {{ modelVariable }} status
+     */
+    public function toggleStatus({{ model }} ${{ modelVariable }}): {{ model }}
+    {
+        ${{ modelVariable }}->update(['is_active' => !${{ modelVariable }}->is_active]);
+        return ${{ modelVariable }};
+    }
+
+    /**
+     * Get {{ modelVariable }} data for editing
+     */
+    public function getForEdit({{ model }} ${{ modelVariable }}): array
+    {
+        ${{ modelVariable }}->load('translations');
+        
+        return [
+            'id' => ${{ modelVariable }}->id,
+            'name' => ${{ modelVariable }}->name,
+            'is_active' => ${{ modelVariable }}->is_active,
+            'translations' => ${{ modelVariable }}->translations,
+        ];
+    }
+
+    /**
+     * Get {{ modelVariable }} data for showing
+     */
+    public function getForShow({{ model }} ${{ modelVariable }}): array
+    {
+        ${{ modelVariable }}->load('translations');
+        
+        return [
+            'id' => ${{ modelVariable }}->id,
+            'name' => ${{ modelVariable }}->name,
+            'is_active' => ${{ modelVariable }}->is_active,
+            'created_at' => ${{ modelVariable }}->created_at,
+            'updated_at' => ${{ modelVariable }}->updated_at,
+            'translations' => ${{ modelVariable }}->translations,
+        ];
+    }
+
+    /**
+     * Save translations for the {{ modelVariable }}
+     */
+    private function saveTranslations({{ model }} ${{ modelVariable }}, array $translations): void
+    {
+        foreach ($translations as $locale => $translation) {
+            DB::table('{{ modelSnake }}_translations')->updateOrInsert(
+                [
+                    '{{ modelSnake }}_id' => ${{ modelVariable }}->id,
+                    'locale' => $locale
+                ],
+                [
+                    'name' => $translation['name']
+                ]
+            );
+        }
+    }
+} 

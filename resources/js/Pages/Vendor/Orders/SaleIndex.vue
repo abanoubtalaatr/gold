@@ -33,7 +33,7 @@
                                     class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     @change="applyFilters">
                                     <option value="">{{ $t('All Statuses') }}</option>
-                                    <option value="pending-approval">{{ $t('Pending Approval') }}</option>
+                                    <option value="pending_approval">{{ $t('Pending Approval') }}</option>
                                     <option value="approved">{{ $t('Approved') }}</option>
                                     <option value="piece_sent">{{ $t('Piece Sent') }}</option>
                                     <option value="rented">{{ $t('Rented') }}</option>
@@ -111,12 +111,12 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex items-center space-x-2">
-                                                <button v-if="order.status === 'pending-approval'"
+                                                <button v-if="order.status === 'pending_approval'"
                                                     @click="openAcceptModal(order)"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors duration-200">
                                                     {{ $t('Accept') }}
                                                 </button>
-                                                <button v-if="order.status === 'pending-approval'"
+                                                <button v-if="order.status === 'pending_approval'"
                                                     @click="rejectOrder(order.id)"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors duration-200">
                                                     {{ $t('Reject') }}
@@ -311,7 +311,7 @@ const resetFilters = () => {
 
 const getStatusClass = (status) => {
     switch (status) {
-        case 'pending-approval':
+        case 'pending_approval':
             return 'bg-yellow-100 text-yellow-800';
         case 'approved':
             return 'bg-green-100 text-green-800';
@@ -330,7 +330,7 @@ const getStatusClass = (status) => {
 
 const formatStatus = (status) => {
     const statusMap = {
-        'pending-approval': t('Pending Approval'),
+        'pending_approval': t('Pending Approval'),
         'approved': t('Approved'),
         'piece_sent': t('Piece Sent'),
         'rented': t('Rented'),

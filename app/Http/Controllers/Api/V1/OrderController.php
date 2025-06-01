@@ -22,9 +22,14 @@ class OrderController extends Controller
     use ApiResponseTrait;
     public function index(Request $request)
     {
-        $query = OrderRental::where('user_id', Auth::id())->where('type', OrderRental::LEASE_TYPE)
+        $query = OrderRental::where('user_id', Auth::id())
+            ->where('type', OrderRental::LEASE_TYPE)
             ->with('goldPiece');
 
+        // Apply status filter if provided
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
         // Get sort parameters from request with defaults
         $orderColumn = $request->input('order_column', 'status');
         $orderType = $request->input('order_type', 'asc');
