@@ -186,4 +186,4 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
 
 Route::get('banners', [BannerController::class, 'index']);
 
-Route::get('invoice/{order}', [InvoiceController::class, 'index'])->name('invoice.show');
+Route::get('invoice/{order}', [InvoiceController::class, 'index'])->name('api.v1.invoice.show');

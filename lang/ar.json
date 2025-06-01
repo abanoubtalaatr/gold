@@ -1333,5 +1333,7 @@
     "Admins":"المشرفين",
     "No complaints found.": "لا يوجد شكاوي",
     "Logo Preview": "معاينة الشعار",
-    "Branch Logo": "شعار الفرع"
+    "Branch Logo": "شعار الفرع",
+    "Reject Order": "رفض الطلب",
+    "Are you sure you want to reject this order? This action cannot be undone.": "هل أنت متأكد من رفض هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء."
 }

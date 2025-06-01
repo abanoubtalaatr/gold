@@ -15,13 +15,13 @@ class BannerController extends Controller
     use ApiResponseTrait;
     public function index(Request $request)
     {
-        $home_sliders = HomeSlider::query()
+        $banners = Banner::query()
             ->where('is_active', true)
             ->latest()
             ->get();
 
         return $this->successResponse(
-            $home_sliders,
+            BannerResource::collection($banners),
             __('mobile.banners_fetched_success')
         );
 
