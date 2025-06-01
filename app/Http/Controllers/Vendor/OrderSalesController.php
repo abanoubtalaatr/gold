@@ -95,7 +95,7 @@ class OrderSalesController extends Controller
         $order = OrderSale::findOrFail($orderId);
         $this->authorizeVendor($order);
 
-        $order->update(['status' => 'rejected']);
+        $order->update(['status' => OrderSale::STATUS_REJECTED]);
 
         // Notify gold piece owner
         if ($order->goldPiece->user) {
@@ -115,7 +115,7 @@ class OrderSalesController extends Controller
 
         // Validate the incoming status to be one of the allowed statuses
         $request->validate([
-            'status' => 'required|in:pending_approval,approved,sold',
+            'status' => 'required|in:pending_approval,approved,sold,rejected',
         ]);
 
         // Map the input status to the internal constants
@@ -123,6 +123,7 @@ class OrderSalesController extends Controller
             'pending_approval' => OrderSale::STATUS_PENDING_APPROVAL,
             'approved' => OrderSale::STATUS_APPROVED,
             'sold' => OrderSale::STATUS_SOLD,
+            'rejected' => OrderSale::STATUS_REJECTED,
             default => throw new \Exception('Invalid status'),
         };
 

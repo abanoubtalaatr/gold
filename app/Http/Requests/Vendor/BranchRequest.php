@@ -14,6 +14,8 @@ class BranchRequest extends FormRequest
             'working_days' => ['required', 'array'],
             'working_days.*' => ['required', 'integer', 'between:0,6'],
             'working_hours' => ['required', 'array'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'removeLogo' => ['nullable', 'boolean'],
             'images' => ['nullable', 'array', 'max:5'],
             'images.*' => ['image', 'mimes:jpg,png', 'max:5120'],
         ];

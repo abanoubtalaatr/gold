@@ -39,6 +39,7 @@
                                     <option value="rented">{{ $t('Rented') }}</option>
                                     <option value="available">{{ $t('Available') }}</option>
                                     <option value="sold">{{ $t('Sold') }}</option>
+                                    <option value="rejected">{{ $t('Rejected') }}</option>
                                 </select>
                                 <button @click="resetFilters"
                                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
@@ -117,7 +118,7 @@
                                                     {{ $t('Accept') }}
                                                 </button>
                                                 <button v-if="order.status === 'pending_approval'"
-                                                    @click="rejectOrder(order.id)"
+                                                    @click="openRejectModal(order)"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors duration-200">
                                                     {{ $t('Reject') }}
                                                 </button>
@@ -260,6 +261,48 @@
             </div>
         </Modal>
 
+        <!-- Reject Order Modal -->
+        <Modal :show="showRejectModal" @close="closeRejectModal">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
+                <div class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg w-full">
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                                <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h2 class="text-lg font-medium text-gray-900 mb-2">{{ $t('Reject Order') }}</h2>
+                            <p class="mb-4 text-sm text-gray-600">
+                                {{ $t('Are you sure you want to reject this order? This action cannot be undone.') }}
+                            </p>
+                            <div v-if="selectedOrder" class="bg-gray-50 rounded-lg p-4 mb-4">
+                                <div class="text-sm text-gray-600">
+                                    <p><strong>{{ $t('Order ID') }}:</strong> {{ selectedOrder.id }}</p>
+                                    <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || 'N/A' }}</p>
+                                    <p><strong>{{ $t('Gold Piece') }}:</strong> {{ selectedOrder.gold_piece?.name || 'N/A' }}</p>
+                                    <p><strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR') }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 pt-4">
+                            <button type="button" @click="closeRejectModal"
+                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                                {{ $t('Cancel') }}
+                            </button>
+                            <button @click="rejectOrder"
+                                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors duration-200">
+                                {{ $t('Reject Order') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Modal>
+
         <!-- Piece Details Modal -->
         <Modal :show="showDetailsModal" @close="closeDetailsModal">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
@@ -364,6 +407,7 @@ const acceptForm = useForm({
     branch_id: '',
 });
 
+const showRejectModal = ref(false);
 const showDetailsModal = ref(false);
 const activeDropdown = ref(null);
 
@@ -407,6 +451,8 @@ const getStatusClass = (status) => {
             return 'bg-purple-100 text-purple-800';
         case 'sold':
             return 'bg-gray-100 text-gray-800';
+        case 'rejected':
+            return 'bg-red-100 text-red-800';
         default:
             return 'bg-gray-100 text-gray-800';
     }
@@ -420,7 +466,7 @@ const formatStatus = (status) => {
         'rented': t('Rented'),
         'available': t('Available'),
         'sold': t('Sold'),
-        'rejected': t('rejected'),
+        'rejected': t('Rejected'),
     };
 
     return statusMap[status] || status
@@ -450,18 +496,26 @@ const acceptOrder = () => {
     });
 };
 
-const rejectOrder = (orderId) => {
-    if (confirm(t('Are you sure you want to reject this order?'))) {
-        router.post(route('vendor.orders.rental.reject', orderId), {
-            preserveScroll: true,
-            onSuccess: () => {
-                router.reload();
-            },
-            onError: (errors) => {
-                console.error('Error rejecting order:', errors);
-            }
-        });
-    }
+const openRejectModal = (order) => {
+    selectedOrder.value = order;
+    showRejectModal.value = true;
+};
+
+const closeRejectModal = () => {
+    showRejectModal.value = false;
+    selectedOrder.value = null;
+};
+
+const rejectOrder = () => {
+    router.post(route('vendor.orders.rental.reject', selectedOrder.value.id), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeRejectModal();
+        },
+        onError: (errors) => {
+            console.error('Error rejecting order:', errors);
+        }
+    });
 };
 
 const updateStatus = (orderId, status) => {

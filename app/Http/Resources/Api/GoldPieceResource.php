@@ -70,7 +70,7 @@ class GoldPieceResource extends JsonResource
             'is_suspended' => $order?->is_suspended,
             'order_id'=>  $order?->id,
 
-            'invoice_url' => $order?->id ? route('invoice.show', $order->id) : null,
+            'invoice_url' => $order?->id ? route('api.v1.invoice.show', $order->id) : null,
         ];
     }
 

@@ -46,6 +46,7 @@ class OrderRental extends Model
      * Flow:
      * - User adds piece for rent: pending_approval
      * - Store approves: approved
+     * - Store rejects: rejected
      * - Piece sent to store: piece_sent
      * - Store approves rental: rented
      * - After rental ends: available
@@ -56,6 +57,7 @@ class OrderRental extends Model
     const STATUS_RENTED = 'rented'; // مؤجرة حاليا
     const STATUS_AVAILABLE = 'available'; // متاحة للإيجار مرة أخرى
     const STATUS_SOLD = 'sold'; // تم بيعها (if needed for rental orders)
+    const STATUS_REJECTED = 'rejected'; // تم رفضها
 
 
     /**
@@ -72,6 +74,7 @@ class OrderRental extends Model
             self::STATUS_RENTED,            // مؤجرة حاليا
             self::STATUS_AVAILABLE,         // متاحة للإيجار مرة أخرى
             self::STATUS_SOLD,              // تم بيعها
+            self::STATUS_REJECTED,          // تم رفضها
         ];
     }
     public function user(): BelongsTo
