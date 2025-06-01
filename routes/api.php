@@ -101,7 +101,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::post('/gold-pieces', [GoldPieceController::class, 'store']);
     Route::delete('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'destroy']);
     Route::post('/gold-pieces/{goldPiece}/update', [GoldPieceController::class, 'update']);
-   
+
     /*
     |--------------------------------------------------------------------------
     | Favorites
@@ -124,7 +124,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::get('orders/{order}', [OrderController::class, 'show']);
     Route::post('orders/{order}/confirm-send-to-vendor', [ConfirmSendPieceToVendorController::class, 'index']);
     Route::post('order/{order}/confirm-sold-to-vendor', [ConfirmSoldToVendorController::class, 'index']);
-   
+
     /*
     |--------------------------------------------------------------------------
     |  Notification...
@@ -151,7 +151,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::post('ratings/{rating}', [RatingController::class, 'update'])->name('ratings.update');
     Route::delete('ratings/{rating}', [RatingController::class, 'destroy'])->name('ratings.destroy');
     Route::get('gold-pieces-will-finish-rental-soon', [GoldPieceController::class, 'goldPiecesWillFinishRentalSoon']);
-    
+
     /*
     |--------------------------------------------------------------------------
     | Liquidation-requests....
@@ -165,7 +165,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     |--------------------------------------------------------------------------
     */
 
-    Route::apiResource('/contacts', ContactController::class); 
+    Route::apiResource('/contacts', ContactController::class);
 
     /*
     |--------------------------------------------------------------------------

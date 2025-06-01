@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\SettlementRequest;
+use App\Models\User;
 use App\Models\Wallet;
 use App\Models\WalletTransaction;
-use App\Models\SettlementRequest;
+use App\Notifications\Admin\NewSettlementRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+
 class WalletController extends Controller
 {
- public function index()
+    public function index()
     {
         $wallet = auth()->user()->wallet()->firstOrCreate([
             'user_id' => auth()->id()
@@ -25,7 +29,7 @@ class WalletController extends Controller
             'transactions' => $wallet->transactions()
                 ->latest()
                 ->paginate(10)
-                ->through(fn ($transaction) => [
+                ->through(fn($transaction) => [
                     'id' => $transaction->id,
                     'type' => $transaction->type,
                     'amount' => $transaction->amount,
@@ -44,7 +48,7 @@ class WalletController extends Controller
 
         return Inertia::render('Vendor/Wallet/Transactions', [
             'transactions' => $transactions
-                ->through(fn ($transaction) => [
+                ->through(fn($transaction) => [
                     'id' => $transaction->id,
                     'type' => $transaction->type,
                     'amount' => $transaction->amount,
@@ -67,12 +71,22 @@ class WalletController extends Controller
             return back()->with('error', 'Insufficient balance');
         }
 
-        SettlementRequest::create([
+        $settlementRequest = SettlementRequest::create([
             'wallet_id' => $wallet->id,
             'amount' => $request->amount,
             'status' => 'pending',
         ]);
 
+        // Notify all admins
+        $admins = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin')
+                ->orWhere('name',  'superadmin')
+                ->whereNull('vendor_id');
+        })->get();
+        foreach ($admins as $admin) {
+            Log::info('Admin notified', ['admin_id' => $admin->id, 'settlement_request_id' => $settlementRequest->id]);
+            $admin->notify(new NewSettlementRequest($settlementRequest));
+        }
         return back()->with('success', 'Settlement request submitted successfully');
     }
 }
