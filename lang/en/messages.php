@@ -271,4 +271,10 @@ return [
         'created' => 'Liquidation request created successfully.',
         'deleted' => 'Liquidation request deleted successfully.',
     ],
+
+    // Contact form translations
+    "Sending..." => "Sending...",
+    "Success!" => "Success!",
+    "Error!" => "Error!",
+    "OK" => "OK",
 ];

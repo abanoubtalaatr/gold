@@ -1428,5 +1428,7 @@
     "State": "الولاية",
     "Country": "البلد",
     "Save": "حفظ",
-    "Cities": "المدن"
+    "Cities": "المدن",
+    "Success!": "نجاح!",
+    "Your message has been sent successfully.": "تم ارسال رسالتك بنجاح."
 }

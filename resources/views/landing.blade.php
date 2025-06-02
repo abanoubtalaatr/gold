@@ -23,6 +23,9 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
     @if(app()->isLocale('ar'))
     <!-- RTL CSS for Arabic -->
     <link rel="stylesheet" href="{{asset('css/rtl.css')}}" />
@@ -131,70 +134,7 @@
         <!-- ***** Preloader End ***** -->
 
         <!-- ***** Header Start ***** -->
-        <header id="header">
-            <!-- Navbar -->
-            <nav data-aos="zoom-out" data-aos-delay="800" class="navbar gameon-navbar navbar-expand">
-                <div class="container header">
-                    <!-- Logo -->
-                    <a class="navbar-brand" href="/"></a>
-                        <img src="assets/images/logo.svg" alt="{{ __('landing.site_name') }}" width="100" />
-                    </a>
-
-                    <div class="ms-auto"></div>
-
-                    <!-- Navbar Nav -->
-                    <ul class="navbar-nav items ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link smooth-anchor" href="#home">{{ __('landing.nav.home') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link smooth-anchor" href="#about">{{ __('landing.nav.about') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{url('terms')}}">{{ __('landing.nav.terms') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{url('privacy')}}">{{ __('landing.nav.privacy') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link smooth-anchor" href="#contact">{{ __('landing.nav.contact') }}</a>
-                        </li>
-                        <li class="nav-item d-flex align-items-center">
-                            <div class="dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="languageDropdown">
-                                    <i class="fas fa-globe {{ app()->isLocale('ar') ? 'ms-2' : 'me-2' }}"></i>
-                                    {{ app()->isLocale('ar') ? 'العربية' : 'English' }}
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-{{ app()->isLocale('ar') ? 'start' : 'end' }}" aria-labelledby="languageDropdown">
-                                    <li class="dropdown-header">{{ __('landing.nav.language') ?? 'Choose Language' }}</li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item text-black {{ app()->isLocale('en') ? 'active' : '' }}" href="{{ route('changeLang', ['lang' => 'en']) }}">
-                                            <i class="fas fa-flag-usa me-2"></i> English
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item text-black {{ app()->isLocale('ar') ? 'active' : '' }}" href="{{ route('changeLang', ['lang' => 'ar']) }}">
-                                            <i class="fas fa-flag me-2"></i> العربية
-                                        </a>
-                                    </li>
-                                   
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
-
-                    <!-- Navbar Toggler -->
-                    <ul class="navbar-nav toggle">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#menu">
-                                <i class="icon-menu m-0"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </header>
+        @include('header')
         <!-- ***** Header End ***** -->
 
         <!-- ***** Hero Section Start ***** -->
@@ -498,7 +438,7 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-6 mt-4 mt-md-0">
-                        <form id="contact-form" class="contact-form outlined" method="POST">
+                        <form id="contact-form" class="contact-form outlined" method="POST" action="{{ route('landing.contact') }}">
                             @csrf
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control" name="name" id="name" placeholder="{{ __('landing.contact.form.name') }}" required />
@@ -623,20 +563,7 @@
         <!--====== Footer Area End ======-->
 
         <!--====== Modal Responsive Menu Area Start ======-->
-        <div id="menu" class="modal fade p-0">
-            <div class="modal-dialog modal-dialog-slideout">
-                <div class="modal-content full">
-                    <div class="modal-header" data-bs-dismiss="modal">{{ __('landing.menu.title') }} <i class="icon-close"></i></div>
-                    <div class="menu modal-body">
-                        <div class="row w-100">
-                            <div class="items p-0 col-12 text-center">
-                                <!-- Append [navbar] -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @include('footer')
         <!--====== Modal Responsive Menu Area End ======-->
 
         <!--====== Scroll To Top Area Start ======-->
@@ -669,6 +596,82 @@
 
     <!-- Main js -->
     <script src="{{asset('assets/js/main.js')}}"></script>
+    
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    
+    <!-- Contact Form Handler -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const contactForm = document.getElementById('contact-form');
+            
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Get form data
+                    const formData = new FormData(this);
+                    const submitButton = this.querySelector('button[type="submit"]');
+                    const originalButtonText = submitButton.textContent;
+                    
+                    // Disable submit button and show loading
+                    submitButton.disabled = true;
+                    submitButton.textContent = '{{ __("Sending...") }}';
+                    
+                    // Send AJAX request
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success alert
+                            Swal.fire({
+                                icon: 'success',
+                                title: '{{ __("Success!") }}',
+                                text: data.message,
+                                confirmButtonColor: '#006ce7',
+                                confirmButtonText: '{{ __("OK") }}'
+                            });
+                            
+                            // Reset form
+                            contactForm.reset();
+                        } else {
+                            // Show error alert
+                            Swal.fire({
+                                icon: 'error',
+                                title: '{{ __("Error!") }}',
+                                text: data.message || '{{ __("landing.contact.error_message") }}',
+                                confirmButtonColor: '#006ce7',
+                                confirmButtonText: '{{ __("OK") }}'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Show error alert
+                        Swal.fire({
+                            icon: 'error',
+                            title: '{{ __("Error!") }}',
+                            text: '{{ __("landing.contact.error_message") }}',
+                            confirmButtonColor: '#006ce7',
+                            confirmButtonText: '{{ __("OK") }}'
+                        });
+                    })
+                    .finally(() => {
+                        // Re-enable submit button
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalButtonText;
+                    });
+                });
+            }
+        });
+    </script>
     
     <!-- Initialize Bootstrap Dropdowns -->
     <script>
