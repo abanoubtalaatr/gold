@@ -239,6 +239,22 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 
 /************************************************************************ */
 
+
+
+Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+    // Cities
+    Route::get('/cities', [\App\Http\Controllers\Admin\CityController::class, 'index'])->name('admin.cities.index');
+    Route::get('/cities/create', [\App\Http\Controllers\Admin\CityController::class, 'create'])->name('admin.cities.create');
+    Route::post('/cities', [\App\Http\Controllers\Admin\CityController::class, 'store'])->name('admin.cities.store');
+    Route::get('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'show'])->name('admin.cities.show');
+    Route::get('/cities/{city}/edit', [\App\Http\Controllers\Admin\CityController::class, 'edit'])->name('admin.cities.edit');
+    Route::put('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'update'])->name('admin.cities.update');
+    Route::delete('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'destroy'])->name('admin.cities.destroy');
+    Route::patch('/cities/{city}/toggle-status', [\App\Http\Controllers\Admin\CityController::class, 'toggleStatus'])->name('admin.cities.toggle-status');
+});
+
+/************************************************************************ */
+
 Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::middleware('guest')->group(function () {
         Route::get('create-account', [RegisterController::class, 'create'])
