@@ -27,6 +27,7 @@ class LandingController extends Controller
      */
     public function index()
     {
+        
         try {
             // Get current gold prices for display
             $goldPrices = $this->goldPriceService->getMobileFormattedPrices();
@@ -100,10 +101,10 @@ class LandingController extends Controller
             ], 422);
         }
 
-        try {
+        // try {
             // Create contact entry
             $contact = Contact::create([
-                'name' => $request->name,
+                
                 'email' => $request->email,
                 'subject' => $request->subject,
                 'message' => $request->message,
@@ -112,28 +113,28 @@ class LandingController extends Controller
             ]);
 
             // Notify admins about new contact message
-            $admins = User::whereHas('roles', function ($query) {
-                $query->where('name', 'admin')
-                    ->orWhere('name', 'superadmin');
-            })->get();
+            // $admins = User::whereHas('roles', function ($query) {
+            //     $query->where('name', 'admin')
+            //         ->orWhere('name', 'superadmin');
+            // })->get();
 
-            foreach ($admins as $admin) {
-                $admin->notify(new NewContactMessageAdmin($contact));
-            }
+            // foreach ($admins as $admin) {
+            //     $admin->notify(new NewContactMessageAdmin($contact));
+            // }
 
             return response()->json([
                 'success' => true,
                 'message' => __('landing.contact.success_message', [], app()->getLocale())
             ]);
 
-        } catch (\Exception $e) {
-            Log::error('Contact form error: ' . $e->getMessage());
+        // } catch (\Exception $e) {
+        //     Log::error('Contact form error: ' . $e->getMessage());
             
-            return response()->json([
-                'success' => false,
-                'message' => __('landing.contact.error_message', [], app()->getLocale())
-            ], 500);
-        }
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => __('landing.contact.error_message', [], app()->getLocale())
+        //     ], 500);
+        // }
     }
 
     /**

@@ -26,85 +26,7 @@
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     
-    @if(app()->isLocale('ar'))
-    <!-- RTL CSS for Arabic -->
-    <link rel="stylesheet" href="{{asset('css/rtl.css')}}" />
-    @endif
-    
-    @if(app()->isLocale('ar'))
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .navbar-nav {
-            flex-direction: row-reverse;
-        }
-        .text-end-ar {
-            text-align: right !important;
-        }
-        .text-start-ar {
-            text-align: left !important;
-        }
-        
-        /* Language Dropdown Styles */
-        .dropdown-menu {
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            min-width: 150px;
-        }
-        
-        .dropdown-item {
-            padding: 8px 16px;
-            transition: all 0.2s ease;
-        }
-        
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #495057;
-        }
-        
-        .dropdown-item.active {
-            background-color: #007bff;
-            color: white;
-        }
-        
-        .dropdown-toggle::after {
-            margin-right: 0.5rem;
-        }
-        
-        /* RTL Support */
-        [dir="rtl"] .dropdown-toggle::after {
-            margin-left: 0.5rem;
-            margin-right: 0;
-        }
-    </style>
-    @else
-    <style>
-        /* Language Dropdown Styles */
-        .dropdown-menu {
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            min-width: 150px;
-        }
-        
-        .dropdown-item {
-            padding: 8px 16px;
-            transition: all 0.2s ease;
-        }
-        
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #495057;
-        }
-        
-        .dropdown-item.active {
-            background-color: #007bff;
-            color: white;
-        }
-    </style>
-    @endif
+
 </head>
 
 <body>
@@ -229,8 +151,6 @@
             </div>
         </section>
         <!-- ***** Content Section End ***** -->
-
-       
 
          <!-- ***** Counter Area Start ***** -->
         <section class="counter-area">

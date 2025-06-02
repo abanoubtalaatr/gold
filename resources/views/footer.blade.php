@@ -119,7 +119,7 @@
     height: 100vh;
     border-radius: 0;
     border: none;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #d68d2e;
     color: white;
     overflow: hidden;
 }
