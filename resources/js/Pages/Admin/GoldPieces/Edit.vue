@@ -192,7 +192,7 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import TextArea from '@/Components/TextArea.vue';
+import TextArea from '@/Components/Textarea.vue';
 import { PlusIcon, TrashIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({

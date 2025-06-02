@@ -40,26 +40,15 @@ use App\Models\State;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\LandingController;
 
 
 
+// Landing page route (accessible to everyone)
+Route::get('/', [LandingController::class, 'index'])->name('landing');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+// Dashboard route for authenticated users
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('lang/change', [LangController::class, 'change'])->name('changeLang');
 
@@ -79,7 +68,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('users', UsersController::class);
     Route::post('users/{user}/activate', [UsersController::class, 'activate'])->name('activate');
-    Route::post('users/{user}', [UsersController::class, 'update'])->name('users.update'); //  inertia does not support send files using put request
+    Route::post('users/{user}/update', [UsersController::class, 'update'])->name('users.update'); //  inertia does not support send files using put request
 
 
     /************************************************************************ */
@@ -353,7 +342,7 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
 
     Route::resource('users', UserController::class);
     Route::post('users/{user}/activate', [UserController::class, 'activate'])->name('activate');
-    Route::post('users/{user}', [UserController::class, 'update'])->name('vendor.users.update'); //  inertia does not support send files using put request
+    Route::post('users/{user}/vendor-update', [UserController::class, 'update'])->name('vendor.users.update'); //  inertia does not support send files using put request
 
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
     Route::get('/wallet/transactions', [WalletController::class, 'transactions'])->name('wallet.transactions');
@@ -391,3 +380,4 @@ require __DIR__ . '/auth.php';
 
 //     return response()->json(['message' => 'Notification sent successfully']);
 // });
+
