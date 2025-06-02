@@ -28,7 +28,7 @@
             </li>
 
             <!--Admin gold pieces -->
-            <li class="nav-item" v-if="hasPermission('read gold-pieces')">
+            <li class="nav-item" >
                 <Link class="nav-link" :href="route('admin.gold-pieces.index')"
                     :class="{ collapsed: !$page.url.startsWith('/admin/gold-pieces') }">
                 <i class="bi bi-gem"></i>
@@ -172,7 +172,7 @@
 
 
             <!--Admin Complaints -->
-            <li class="nav-item" v-if="hasPermission('read complaints')">
+            <li class="nav-item">
                 <Link class="nav-link" :href="route('admin.complaints.index')"
                     :class="{ collapsed: !$page.url.startsWith('/admin/complaints') }">
                 <i class="bi bi-person-lines-fill"></i>
@@ -184,7 +184,7 @@
 
 
             <!-- banners -->
-            <li class="nav-item" v-if="hasPermission('read banners')">
+            <li class="nav-item" >
                 <Link class="nav-link" :href="route('banners.index')" :class="{
                     collapsed: !$page.url.startsWith('/banners'),
                 }">
