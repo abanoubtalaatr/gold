@@ -56,8 +56,10 @@ class GoldPicesUpdateRequest extends FormRequest
             'is_including_lobes' => 'boolean',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'deleted_images' => 'nullable|array',
-            'deleted_images.*' => 'exists:images,id'
+            // 'deleted_images' => 'nullable|array',
+            // 'deleted_images.*' => 'exists:images,id',
+            'delete_commercial_registration_image' => 'nullable|boolean',
+            'delete_logo' => 'nullable|boolean',
         ];
     }
 

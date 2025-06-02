@@ -45,11 +45,9 @@
                                             {{ $t('Mobile Number') }}
                                         </label>
                                         <div class="flex mt-1 rounded-md shadow-sm">
-                                            <select v-model="form.dialling_code"
+                                            <select v-model="form.dialling_code" disabled
                                                 class="flex-shrink-0 w-24 px-3 py-2 text-gray-500 bg-gray-100 border-gray-300 rounded-l-md focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                                 <option value="+966">+966 (SA)</option>
-                                                <option value="+971">+971 (UAE)</option>
-                                                <option value="+20">+20 (EG)</option>
                                             </select>
                                             <input id="mobile" v-model="form.mobile" type="tel"
                                                 class="block w-full min-w-0 border-gray-300 rounded-none rounded-r-md focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"

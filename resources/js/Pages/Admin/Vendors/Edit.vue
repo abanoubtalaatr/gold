@@ -10,7 +10,7 @@
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
-                        <form @submit.prevent="submit">
+                        <form @submit.prevent="submit" enctype="multipart/form-data">
                             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                                 <!-- Personal Information -->
                                 <div class="space-y-6">
@@ -45,11 +45,9 @@
                                             {{ $t('Mobile Number') }}
                                         </label>
                                         <div class="flex mt-1 rounded-md shadow-sm">
-                                            <select v-model="form.dialling_code"
+                                            <select v-model="form.dialling_code" disabled
                                                 class="flex-shrink-0 w-24 px-3 py-2 text-gray-500 bg-gray-100 border-gray-300 rounded-l-md focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                                 <option value="+966">+966 (SA)</option>
-                                                <option value="+971">+971 (UAE)</option>
-                                                <option value="+20">+20 (EG)</option>
                                             </select>
                                             <input id="mobile" v-model="form.mobile" type="tel"
                                                 class="block w-full min-w-0 border-gray-300 rounded-none rounded-r-md focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -120,20 +118,28 @@
                                         </p>
                                         <div class="flex items-center gap-4 mt-2">
                                             <!-- Show current image if exists -->
-                                            <a v-if="vendor.commercial_registration_image"
-                                                :href="'/storage/' + vendor.commercial_registration_image"
-                                                target="_blank"
-                                                class="inline-block text-sm text-indigo-600 hover:text-indigo-900">
-                                                {{ $t('View Current Document') }}
-                                            </a>
+                                            <div v-if="vendor.commercial_registration_image && !deletedCommercialRegistration && !commercialRegistrationPreview" class="relative">
+                                                <a :href="'/storage/' + vendor.commercial_registration_image"
+                                                    target="_blank"
+                                                    class="inline-block text-sm text-indigo-600 hover:text-indigo-900">
+                                                    {{ $t('View Current Document') }}
+                                                </a>
+                                                <img :src="'/storage/' + vendor.commercial_registration_image"
+                                                    class="h-16 object-cover rounded-md" />
+                                                <button type="button" @click="deleteFile('commercial_registration_image')"
+                                                    class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-600">
+                                                    &times;
+                                                </button>
+                                            </div>
                                             <!-- Show preview of new image if selected -->
-                                            <img v-if="commercialRegistrationPreview"
-                                                :src="commercialRegistrationPreview"
-                                                class="h-16 object-cover rounded-md" />
-                                            <!-- Show current image thumbnail -->
-                                            <img v-if="vendor.commercial_registration_image && !commercialRegistrationPreview"
-                                                :src="'/storage/' + vendor.commercial_registration_image"
-                                                class="h-16 object-cover rounded-md" />
+                                            <div v-if="commercialRegistrationPreview" class="relative">
+                                                <img :src="commercialRegistrationPreview"
+                                                    class="h-16 object-cover rounded-md" />
+                                                <button type="button" @click="deleteFile('commercial_registration_image')"
+                                                    class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-600">
+                                                    &times;
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -151,11 +157,23 @@
                                         </p>
                                         <div class="flex items-center gap-4 mt-2">
                                             <!-- Show current logo if exists -->
-                                            <img v-if="vendor.logo && !logoPreview" :src="'/storage/' + vendor.logo"
-                                                class="h-16 w-16 rounded-full object-cover" />
+                                            <div v-if="vendor.logo && !deletedLogo && !logoPreview" class="relative">
+                                                <img :src="'/storage/' + vendor.logo"
+                                                    class="h-16 w-16 rounded-full object-cover" />
+                                                <button type="button" @click="deleteFile('logo')"
+                                                    class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-600">
+                                                    &times;
+                                                </button>
+                                            </div>
                                             <!-- Show preview of new logo if selected -->
-                                            <img v-if="logoPreview" :src="logoPreview"
-                                                class="h-16 w-16 rounded-full object-cover" />
+                                            <div v-if="logoPreview" class="relative">
+                                                <img :src="logoPreview"
+                                                    class="h-16 w-16 rounded-full object-cover" />
+                                                <button type="button" @click="deleteFile('logo')"
+                                                    class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-600">
+                                                    &times;
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -225,6 +243,8 @@ const props = defineProps({
 
 const logoPreview = ref(null);
 const commercialRegistrationPreview = ref(null);
+const deletedCommercialRegistration = ref(false);
+const deletedLogo = ref(false);
 
 const form = useForm({
     name: props.vendor.name,
@@ -238,33 +258,78 @@ const form = useForm({
     logo: null,
     iban: props.vendor.iban,
     city_id: props.vendor.city_id,
+    delete_commercial_registration_image: false,
+    delete_logo: false,
 });
 
 const handleFileUpload = (field, event) => {
-    const file = event.target.files[0];
-    form[field] = file;
+    if (event.target.files.length > 0) {
+        const file = event.target.files[0];
+        form[field] = file;
 
-    // Create preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
+        // Reset deletion flags if new file is uploaded
         if (field === 'logo') {
-            logoPreview.value = e.target.result;
+            form.delete_logo = false;
+            deletedLogo.value = false;
         } else if (field === 'commercial_registration_image') {
-            commercialRegistrationPreview.value = e.target.result;
+            form.delete_commercial_registration_image = false;
+            deletedCommercialRegistration.value = false;
         }
-    };
-    reader.readAsDataURL(file);
+
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (field === 'logo') {
+                logoPreview.value = e.target.result;
+            } else if (field === 'commercial_registration_image') {
+                commercialRegistrationPreview.value = e.target.result;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+const deleteFile = (field) => {
+    if (field === 'logo') {
+        form.logo = null;
+        form.delete_logo = true;
+        deletedLogo.value = true;
+        logoPreview.value = null;
+    } else if (field === 'commercial_registration_image') {
+        form.commercial_registration_image = null;
+        form.delete_commercial_registration_image = true;
+        deletedCommercialRegistration.value = true;
+        commercialRegistrationPreview.value = null;
+    }
 };
 
 const submit = () => {
-    // Create FormData to properly handle file uploads
     const formData = new FormData();
-    for (const key in form) {
-        if (form.hasOwnProperty(key) && key !== 'errors' && key !== 'hasErrors' && key !== 'processing') {
+
+    // Append all form data except files
+    Object.keys(form.data()).forEach(key => {
+        // Skip null files but keep deletion flags
+        if ((key === 'logo' || key === 'commercial_registration_image') && form[key] === null) {
+            return;
+        }
+
+        // Convert boolean values to 1/0 for FormData
+        if (key === 'delete_logo' || key === 'delete_commercial_registration_image') {
+            formData.append(key, form[key] ? '1' : '0');
+        } else {
             formData.append(key, form[key]);
         }
+    });
+
+    // Append files if they exist
+    if (form.logo instanceof File) {
+        formData.append('logo', form.logo);
+    }
+    if (form.commercial_registration_image instanceof File) {
+        formData.append('commercial_registration_image', form.commercial_registration_image);
     }
 
+    // Send the request
     form.post(route('vendors.update', props.vendor.id), {
         data: formData,
         forceFormData: true,
