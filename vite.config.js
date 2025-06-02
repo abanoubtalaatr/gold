@@ -17,4 +17,22 @@ export default defineConfig({
             },
         }),
     ],
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: undefined,
+            },
+        },
+        assetsInlineLimit: 0,
+    },
+    server: {
+        hmr: {
+            host: 'localhost',
+        },
+    },
+    resolve: {
+        alias: {
+            '@': '/resources/js',
+        },
+    },
 });

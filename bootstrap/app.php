@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('web', [
             Illuminate\Session\Middleware\StartSession::class,
             App\Http\Middleware\LanguageManager::class,
+            App\Http\Middleware\SetLocale::class,
             App\Http\Middleware\HandleInertiaRequests::class,
             Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);

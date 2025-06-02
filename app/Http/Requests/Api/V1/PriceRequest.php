@@ -22,7 +22,7 @@ class PriceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'carat' => 'required|numeric|in:21,22,24,18',
+            'carat' => 'required|numeric|in:10,14,16,18,20,21,22,24',
             'weight' => 'required|numeric|min:1',
             'number_rental_day' => 'nullable|numeric|min:1',
         ];
