@@ -20,6 +20,9 @@
     <!-- Style css -->
     <link rel="stylesheet" href="{{asset('assets/css/style.css')}}" />
     
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    
     @if(app()->isLocale('ar'))
     <!-- RTL CSS for Arabic -->
     <link rel="stylesheet" href="{{asset('css/rtl.css')}}" />
@@ -38,6 +41,64 @@
         }
         .text-start-ar {
             text-align: left !important;
+        }
+        
+        /* Language Dropdown Styles */
+        .dropdown-menu {
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 150px;
+        }
+        
+        .dropdown-item {
+            padding: 8px 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+        
+        .dropdown-item.active {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .dropdown-toggle::after {
+            margin-right: 0.5rem;
+        }
+        
+        /* RTL Support */
+        [dir="rtl"] .dropdown-toggle::after {
+            margin-left: 0.5rem;
+            margin-right: 0;
+        }
+    </style>
+    @else
+    <style>
+        /* Language Dropdown Styles */
+        .dropdown-menu {
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 150px;
+        }
+        
+        .dropdown-item {
+            padding: 8px 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+        
+        .dropdown-item.active {
+            background-color: #007bff;
+            color: white;
         }
     </style>
     @endif
@@ -75,7 +136,7 @@
             <nav data-aos="zoom-out" data-aos-delay="800" class="navbar gameon-navbar navbar-expand">
                 <div class="container header">
                     <!-- Logo -->
-                    <a class="navbar-brand" href="index.html">
+                    <a class="navbar-brand" href="/"></a>
                         <img src="assets/images/logo.svg" alt="{{ __('landing.site_name') }}" width="100" />
                     </a>
 
@@ -90,22 +151,34 @@
                             <a class="nav-link smooth-anchor" href="#about">{{ __('landing.nav.about') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="terms.html">{{ __('landing.nav.terms') }}</a>
+                            <a class="nav-link" href="{{url('terms')}}">{{ __('landing.nav.terms') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="privacy.html">{{ __('landing.nav.privacy') }}</a>
+                            <a class="nav-link" href="{{url('privacy')}}">{{ __('landing.nav.privacy') }}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link smooth-anchor" href="#contact">{{ __('landing.nav.contact') }}</a>
                         </li>
                         <li class="nav-item d-flex align-items-center">
                             <div class="dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ app()->isLocale('ar') ? 'عربي' : 'English' }}
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" id="languageDropdown">
+                                    <i class="fas fa-globe {{ app()->isLocale('ar') ? 'ms-2' : 'me-2' }}"></i>
+                                    {{ app()->isLocale('ar') ? 'العربية' : 'English' }}
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item {{ app()->isLocale('en') ? 'active' : '' }}" href="{{ route('changeLang', ['lang' => 'en']) }}">English</a></li>
-                                    <li><a class="dropdown-item {{ app()->isLocale('ar') ? 'active' : '' }}" href="{{ route('changeLang', ['lang' => 'ar']) }}">العربية</a></li>
+                                <ul class="dropdown-menu dropdown-menu-{{ app()->isLocale('ar') ? 'start' : 'end' }}" aria-labelledby="languageDropdown">
+                                    <li class="dropdown-header">{{ __('landing.nav.language') ?? 'Choose Language' }}</li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-black {{ app()->isLocale('en') ? 'active' : '' }}" href="{{ route('changeLang', ['lang' => 'en']) }}">
+                                            <i class="fas fa-flag-usa me-2"></i> English
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-black {{ app()->isLocale('ar') ? 'active' : '' }}" href="{{ route('changeLang', ['lang' => 'ar']) }}">
+                                            <i class="fas fa-flag me-2"></i> العربية
+                                        </a>
+                                    </li>
+                                   
                                 </ul>
                             </div>
                         </li>
@@ -137,10 +210,10 @@
 
 							<!-- Download Button -->
 							<div class="button-group download-button d-flex align-items-center justify-content-center">
-								<a href="download.html">
+								<a href="{{url('download')}}">
 									<img src="assets/img/content/google-play.png" alt="">
 								</a>
-								<a href="download.html">
+								<a href="{{url('download')}}">
 									<img src="assets/img/content/app-store.png" alt="">
 								</a>
 							</div>
@@ -462,7 +535,7 @@
                             <!-- Footer Items -->
                             <div class="footer-items">
                                 <!-- Logo -->
-                                <a class="navbar-brand mb-6" href="index.html">
+                                <a class="navbar-brand mb-6" href="/">
                                     <img class="logo" src="assets/images/logo.svg" alt="{{ __('landing.site_name') }}" width="120" />
                                 </a>
                                 <p class="slug mt-3">{{ __('landing.footer.description') }}
@@ -497,19 +570,19 @@
                                 <!-- Navigation -->
                                 <ul class="nav flex-column">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="index.html">{{ __('landing.footer.links.home') }}</a>
+                                        <a class="nav-link" href="/">{{ __('landing.footer.links.home') }}</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="index.html#about">{{ __('landing.footer.links.about') }}</a>
+                                        <a class="nav-link" href="/#about">{{ __('landing.footer.links.about') }}</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="privacy.html">{{ __('landing.footer.links.privacy') }}</a>
+                                        <a class="nav-link" href="{{url('privacy')}}">{{ __('landing.footer.links.privacy') }}</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="terms.html">{{ __('landing.footer.links.terms') }}</a>
+                                        <a class="nav-link" href="{{url('terms')}}">{{ __('landing.footer.links.terms') }}</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="index.html#contact">{{ __('landing.footer.links.contact') }}</a>
+                                        <a class="nav-link" href="/#contact">{{ __('landing.footer.links.contact') }}</a>
                                     </li>
                                 </ul>
                             </div>
@@ -596,6 +669,22 @@
 
     <!-- Main js -->
     <script src="{{asset('assets/js/main.js')}}"></script>
+    
+    <!-- Initialize Bootstrap Dropdowns -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all dropdowns
+            const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
+            const dropdownList = [...dropdownElementList].map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl));
+            
+            // Debug: Log when dropdown is clicked
+            document.querySelectorAll('.dropdown-toggle').forEach(function(element) {
+                element.addEventListener('click', function(e) {
+                    console.log('Dropdown clicked');
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

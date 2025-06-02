@@ -70,6 +70,10 @@ class LandingController extends Controller
         });
     }
 
+    public function show($slug)
+    {
+        return view($slug);
+    }
     /**
      * Get featured services
      */
