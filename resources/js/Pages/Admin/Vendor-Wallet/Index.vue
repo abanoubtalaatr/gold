@@ -293,7 +293,7 @@
                                 </div>
                                 <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                                     <button type="button"
-                                        class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm"
+                                        class="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm confirm-rejection"
                                         @click="rejectSettlement" :disabled="!rejectReason">
                                         {{ $t('Confirm Rejection') }}
                                     </button>
@@ -593,5 +593,10 @@ const showRequestDetails = (request) => {
     color: rgb(0, 0, 0) !important;
     transform: translate(-1px, -1px) !important;
     transition: transform 0.2s ease-in-out !important;
+}
+
+.confirm-rejection {
+    height: 50px;
+    margin-top: 15px;
 }
 </style>
