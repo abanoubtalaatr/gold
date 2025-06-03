@@ -1448,5 +1448,16 @@
         "privacy_policy": "سياسة الخصوصية",
         "contact_us": "اتصل بنا",
         "language": "ع"
-    }
+    },
+    "Users Summary": "ملخص المستخدمين",
+    "Total Users": "مجموع المستخدمين",
+    "Active Users": "المستخدمين النشطين",
+    "Inactive Users": "المستخدمين غير نشطين",
+    "Users Details": "تفاصيل المستخدمين",
+    "Vendors Summary": "ملخص البائعين",
+    "Vendors Details": "تفاصيل البائعين",
+    "Complaints Summary": "ملخص الشكاوي",
+    "Complaints Details": "تفاصيل الشكاوي",
+    "Ratings Summary": "ملخص التقييمات",
+    "Ratings Details": "تفاصيل التقييمات"
 }

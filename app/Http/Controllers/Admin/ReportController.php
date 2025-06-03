@@ -24,7 +24,7 @@ class ReportController extends Controller
     public function generate(Request $request)
     {
         $validated = $request->validate([
-            'type' => 'required|in:users_summary,users_details,financial_summary,financial_details,Contacts_summary,Contacts_details,ratings_summary,ratings_details',
+            'type' => 'required|in:users_summary,users_details,vendors_summary,vendors_details,financial_summary,financial_details,Contacts_summary,Contacts_details,ratings_summary,ratings_details',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'format' => 'required|in:excel,pdf'
@@ -113,9 +113,10 @@ class ReportController extends Controller
 
         switch ($type) {
             case 'users_summary':
-                $activeUsers = User::where('is_active', true)->count();
-                $inactiveUsers = User::where('is_active', false)->count();
-                $newUsers = User::whereBetween('created_at', [$startDate, $endDate])->count();
+                $query = User::doesntHave('roles');
+                $activeUsers = $query->where('is_active', true)->count();
+                $inactiveUsers = $query->where('is_active', false)->count();
+                $newUsers = $query->whereBetween('created_at', [$startDate, $endDate])->count();
 
                 $headers = ['Metric', 'Count'];
                 $data = [
@@ -126,9 +127,12 @@ class ReportController extends Controller
                 break;
 
             case 'users_details':
-                $query = User::whereBetween('created_at', [$startDate, $endDate]);
-
-                $headers = ['ID', 'Name', 'Email', 'Phone', 'Status', 'User Type', 'Last Login', 'Created At'];
+                $query = User::doesntHave('roles')
+                    ->orWhereHas('roles', function ($query) {
+                        $query->where('name', 'user');
+                    })
+                    ->whereBetween('created_at', [$startDate, $endDate]);
+                $headers = ['ID', 'Name', 'Email', 'Phone', 'Status', 'Created At'];
                 $data = $query->get()
                     ->map(fn($user) => [
                         $user->id,
@@ -136,51 +140,38 @@ class ReportController extends Controller
                         $user->email,
                         $user->phone,
                         $user->is_active ? 'Active' : 'Inactive',
-                        $user->type,
-                        $user->last_login_at?->format('Y-m-d H:i') ?? 'Never',
                         $user->created_at->format('Y-m-d')
                     ])->toArray();
                 break;
 
-            // case 'financial_summary':
-            //     $rentalOrders = OrderRental::whereBetween('created_at', [$startDate, $endDate])->count();
-            //     $saleOrders = OrderSale::whereBetween('created_at', [$startDate, $endDate])->count();
-            //     $totalRevenue = Payment::whereBetween('created_at', [$startDate, $endDate])
-            //         ->where('status', 'completed')
-            //         ->sum('amount');
-            //     $adminProfit = $totalRevenue * 0.2; // Assuming 20% admin commission
-            //     $vendorProfit = $totalRevenue * 0.8; // Assuming 80% vendor profit
+            case 'vendors_summary':
+                $activeVendors = User::role('vendor')->where('is_active', true)->count();
+                $inactiveVendors = User::role('vendor')->where('is_active', false)->count();
+                $newVendors = User::role('vendor')->whereBetween('created_at', [$startDate, $endDate])->count();
 
-            //     $headers = ['Metric', 'Count/Amount'];
-            //     $data = [
-            //         ['Rental Orders', $rentalOrders],
-            //         ['Sale Orders', $saleOrders],
-            //         ['Total Revenue', $totalRevenue],
-            //         ['Admin Profit', $adminProfit],
-            //         ['Vendor Profit', $vendorProfit]
-            //     ];
-            //     break;
+                $headers = ['Metric', 'Count'];
+                $data = [
+                    ['Active Vendors', $activeVendors],
+                    ['Inactive Vendors', $inactiveVendors],
+                    ['New Vendors (Period)', $newVendors]
+                ];
+                break;
 
-            // case 'financial_details':
-            //     $query = Payment::whereBetween('created_at', [$startDate, $endDate])
-            //         ->where('status', 'completed')
-            //         ->with(['user', 'payable']);
+            case 'vendors_details':
+                $query = User::role('vendor')->whereBetween('created_at', [$startDate, $endDate]);
 
-            //     $headers = ['ID', 'User', 'Amount', 'Order Type', 'Gold Piece', 'Vendor', 'Order Date'];
-            //     $data = $query->get()
-            //         ->map(function ($payment) {
-            //             $order = $payment->payable;
-            //             return [
-            //                 $payment->id,
-            //                 $payment->user?->name ?? 'N/A',
-            //                 $payment->amount,
-            //                 class_basename($payment->payable_type),
-            //                 $order->goldPiece?->name ?? 'N/A',
-            //                 $order->branch?->vendor?->name ?? 'N/A',
-            //                 $payment->created_at->format('Y-m-d')
-            //             ];
-            //         })->toArray();
-            //     break;
+                $headers = ['ID', 'Name', 'Email', 'Phone', 'Status', 'Created At', 'Branch Count'];
+                $data = $query->withCount('branches')->get()
+                    ->map(fn($user) => [
+                        $user->id,
+                        $user->name,
+                        $user->email,
+                        $user->phone,
+                        $user->is_active ? 'Active' : 'Inactive',
+                        $user->created_at->format('Y-m-d'),
+                        $user->branches_count
+                    ])->toArray();
+                break;
 
             case 'Contacts_summary':
                 $openContacts = Contact::where('status', 'new')->count();
@@ -254,7 +245,7 @@ class ReportController extends Controller
                         'error' => $e->getMessage(),
                         'trace' => $e->getTraceAsString()
                     ]);
-                    throw $e; // Re-throw to be caught by the outer try-catch
+                    throw $e;
                 }
                 break;
 

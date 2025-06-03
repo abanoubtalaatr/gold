@@ -16,13 +16,12 @@
                             <form @submit.prevent>
                                 <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Report Type')
-                                        }}</label>
+                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Report Type') }}</label>
                                         <select v-model="form.type" class="w-full mt-1 rounded-md type">
                                             <option value="users_summary">{{ $t('Users Summary') }}</option>
                                             <option value="users_details">{{ $t('Users Details') }}</option>
-                                            <!-- <option value="financial_summary">{{ $t('Financial Summary') }}</option>
-                                            <option value="financial_details">{{ $t('Financial Details') }}</option> -->
+                                            <option value="vendors_summary">{{ $t('Vendors Summary') }}</option>
+                                            <option value="vendors_details">{{ $t('Vendors Details') }}</option>
                                             <option value="Contacts_summary">{{ $t('Complaints Summary') }}</option>
                                             <option value="Contacts_details">{{ $t('Complaints Details') }}</option>
                                             <option value="ratings_summary">{{ $t('Ratings Summary') }}</option>
@@ -31,17 +30,13 @@
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Start Date')
-                                        }}</label>
-                                        <input v-model="form.start_date" type="date"
-                                            class="w-full mt-1 rounded-md start-date">
+                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Start Date') }}</label>
+                                        <input v-model="form.start_date" type="date" class="w-full mt-1 rounded-md start-date">
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ $t('End Date')
-                                        }}</label>
-                                        <input v-model="form.end_date" type="date"
-                                            class="w-full mt-1 rounded-md end-date">
+                                        <label class="block text-sm font-medium text-gray-700">{{ $t('End Date') }}</label>
+                                        <input v-model="form.end_date" type="date" class="w-full mt-1 rounded-md end-date">
                                     </div>
 
                                     <div class="flex items-end space-x-2">
@@ -82,41 +77,6 @@ const form = useForm({
     end_date: new Date().toISOString().split('T')[0],
 });
 
-// const generateReport = async (format) => {
-//     try {
-//         const formData = new FormData();
-//         formData.append('type', form.type);
-//         formData.append('start_date', form.start_date);
-//         formData.append('end_date', form.end_date);
-//         formData.append('format', format);
-
-//         const response = await axios.post(route('admin.reports.generate'), formData, {
-//             responseType: 'blob',
-//             headers: {
-//                 'Accept': 'application/json',
-//                 'X-Requested-With': 'XMLHttpRequest',
-//             }
-//         });
-
-//         const fileExtension = format === 'excel' ? 'xlsx' : 'pdf';
-//         const fileName = `${form.type}_report_${form.start_date}_to_${form.end_date}.${fileExtension}`;
-
-//         const url = window.URL.createObjectURL(new Blob([response.data]));
-//         const link = document.createElement('a');
-//         link.href = url;
-//         link.setAttribute('download', fileName);
-//         document.body.appendChild(link);
-//         link.click();
-//         link.remove();
-//         window.URL.revokeObjectURL(url);
-//     } catch (error) {
-//         console.error('Error generating report:', error);
-//     } finally {
-//         form.processing = false;
-//     }
-// };
-
-
 const generateReport = async (format) => {
     form.processing = true;
     try {
@@ -149,7 +109,6 @@ const generateReport = async (format) => {
         console.error('Full error:', error);
 
         if (error.response) {
-            // The request was made and the server responded with a status code
             console.error('Response data:', error.response.data);
             console.error('Response status:', error.response.status);
             console.error('Response headers:', error.response.headers);
@@ -158,11 +117,9 @@ const generateReport = async (format) => {
                 alert('Server error occurred. Please check logs for details.');
             }
         } else if (error.request) {
-            // The request was made but no response was received
             console.error('No response received:', error.request);
             alert('No response from server. Please check your connection.');
         } else {
-            // Something happened in setting up the request
             console.error('Request setup error:', error.message);
             alert('Error setting up request: ' + error.message);
         }
