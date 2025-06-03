@@ -46,10 +46,7 @@ use App\Http\Controllers\LandingController;
 
 // Landing page route (accessible to everyone)
 Route::get('/', [LandingController::class, 'index'])->name('landing');
-Route::post('/contact', [LandingController::class, 'contact'])->name('landing.contact');
-Route::get('/{slug}', [LandingController::class, 'show'])->name('pages.show');
-Route::get('privacy', [LandingController::class, 'show'])->name('privacy')->defaults('slug', 'privacy');
-Route::get('terms', [LandingController::class, 'show'])->name('terms')->defaults('slug', 'terms');
+
 // Dashboard route for authenticated users
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -223,11 +220,11 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
 
 
-// Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
-//     // Orders
-//     Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders.index');
-//     Route::get('/orders/{id}/{type}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('admin.orders.show');
-// });
+Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+    // Orders
+    Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/orders/{id}/{type}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('admin.orders.show');
+});
 
 
 Route::middleware(['auth', 'verified'])->prefix('admin/orders')->group(function () {

@@ -30,92 +30,113 @@ class DashboardController extends Controller
         $this->goldPriceService = $goldPriceService;
     }
 
-    public function index(Request $request)
-    {
-        // Get filter parameters from request
-        $period = $request->input('period', 'monthly');
-        $start_date = $request->input('start_date');
-        $end_date = $request->input('end_date');
+ public function index(Request $request)
+{
+    // Get filter parameters from request
+    $period = $request->input('period', 'all'); // Default to 'all' if not specified
+    $start_date = $request->input('start_date');
+    $end_date = $request->input('end_date');
 
-        // Apply date filters
-        $dateFilter = function ($query) use ($period, $start_date, $end_date) {
-            if ($period !== 'all') {
-                $this->applyPeriodFilter($query, $period);
-            }
+    // Apply date filters
+    $dateFilter = function ($query) use ($period, $start_date, $end_date) {
+        if ($period !== 'all') {
+            $this->applyPeriodFilter($query, $period);
+        }
 
-            if ($start_date && $end_date) {
-                $query->whereBetween('created_at', [$start_date, $end_date]);
-            }
-        };
+        if ($start_date && $end_date) {
+            $query->whereBetween('created_at', [$start_date, $end_date]);
+        }
+    };
 
-        // Get counts with filters
-        $userCount = User::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-            ->whereIsActive(1)
-            ->count();
+    // Get counts with filters - Modified the when() conditions
+    $userCount = User::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
+        ->whereIsActive(1)
+        ->count();
 
-        $rolesCount = Role::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-            ->whereIsActive(1)
-            ->count();
+    $rolesCount = Role::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
+        ->whereIsActive(1)
+        ->count();
 
-        $reviewsData = $this->getReviewsData($period, $start_date, $end_date);
+    $reviewsData = $this->getReviewsData($period, $start_date, $end_date);
 
-        // Get new counts with filters
-        $salesOrdersCount = OrderSale::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-            ->count();
+    // Get new counts with filters
+    $salesOrdersCount = OrderSale::query()
+        ->when($period !== 'all', function($q) use ($period) {
+            $this->applyPeriodFilter($q, $period);
+        })
+        ->when($start_date && $end_date, function($q) use ($start_date, $end_date) {
+            $q->whereBetween('created_at', [$start_date, $end_date]);
+        })
+        ->count();
 
-        $rentalRequestsCount = OrderRental::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-            ->count();
 
-        $rentalOrdersCount = OrderSale::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-            ->count();
 
-        $branchesCount = Branch::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-            ->whereIsActive(1)
-            ->count();
+    $rentalOrdersCount = OrderRental::query()
+        ->when($period !== 'all', function($q) use ($period) {
+            $this->applyPeriodFilter($q, $period);
+        })
+        ->when($start_date && $end_date, function($q) use ($start_date, $end_date) {
+            $q->whereBetween('created_at', [$start_date, $end_date]);
+        })
+        ->count();
 
-        $vendorsCount = User::role('vendor')
-            ->when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-            ->whereIsActive(1)
-            ->count();
+    $branchesCount = Branch::query()
+        ->when($period !== 'all', function($q) use ($period) {
+            $this->applyPeriodFilter($q, $period);
+        })
+        ->when($start_date && $end_date, function($q) use ($start_date, $end_date) {
+            $q->whereBetween('created_at', [$start_date, $end_date]);
+        })
+        ->whereIsActive(1)
+        ->count();
 
-        // Gold Trading Specific Metrics
-        $goldMetrics = $this->getGoldTradingMetrics($period, $start_date, $end_date);
-        $revenueData = $this->getRevenueData($period, $start_date, $end_date);
-        $popularGoldPieces = $this->getPopularGoldPieces($period, $start_date, $end_date);
-        $recentTransactions = $this->getRecentTransactions();
-        $goldPricesSummary = $this->getCurrentGoldPrices();
+    $vendorsCount = User::role('vendor')
+        ->when($period !== 'all', function($q) use ($period) {
+            $this->applyPeriodFilter($q, $period);
+        })
+        ->when($start_date && $end_date, function($q) use ($start_date, $end_date) {
+            $q->whereBetween('created_at', [$start_date, $end_date]);
+        })
+        ->whereIsActive(1)
+        ->count();
 
-        // Get chart data with filters
-        $UserPerRolechartData = $this->getRolesChartData($period, $start_date, $end_date);
-        $statusChartData = $this->getUsersChartDataByStatus($period, $start_date, $end_date);
-        $orderStatusChart = $this->getOrderStatusChartData($period, $start_date, $end_date);
-        $monthlyRevenueChart = $this->getMonthlyRevenueChart($period, $start_date, $end_date);
+    // Rest of your code remains the same...
+    $goldMetrics = $this->getGoldTradingMetrics($period, $start_date, $end_date);
+    $revenueData = $this->getRevenueData($period, $start_date, $end_date);
+    $popularGoldPieces = $this->getPopularGoldPieces($period, $start_date, $end_date);
+    $recentTransactions = $this->getRecentTransactions();
+    $goldPricesSummary = $this->getCurrentGoldPrices();
 
-        return Inertia::render('Dashboard', [
-            'UserPerRolechartData' => $UserPerRolechartData,
-            'statusChartData' => $statusChartData,
-            'orderStatusChart' => $orderStatusChart,
-            'monthlyRevenueChart' => $monthlyRevenueChart,
-            'reviewsData' => $reviewsData,
-            'userCount' => $userCount,
-            'rolesCount' => $rolesCount,
-            'salesOrdersCount' => $salesOrdersCount,
-            'rentalRequestsCount' => $rentalRequestsCount,
-            'rentalOrdersCount' => $rentalOrdersCount,
-            'branchesCount' => $branchesCount,
-            'vendorsCount' => $vendorsCount,
-            'goldMetrics' => $goldMetrics,
-            'revenueData' => $revenueData,
-            'popularGoldPieces' => $popularGoldPieces,
-            'recentTransactions' => $recentTransactions,
-            'goldPricesSummary' => $goldPricesSummary,
-            'filters' => [
-                'period' => $period,
-                'start_date' => $start_date,
-                'end_date' => $end_date,
-            ],
-        ]);
-    }
+    // Get chart data with filters
+    $UserPerRolechartData = $this->getRolesChartData($period, $start_date, $end_date);
+    $statusChartData = $this->getUsersChartDataByStatus($period, $start_date, $end_date);
+    $orderStatusChart = $this->getOrderStatusChartData($period, $start_date, $end_date);
+    $monthlyRevenueChart = $this->getMonthlyRevenueChart($period, $start_date, $end_date);
+
+    return Inertia::render('Dashboard', [
+        'UserPerRolechartData' => $UserPerRolechartData,
+        'statusChartData' => $statusChartData,
+        'orderStatusChart' => $orderStatusChart,
+        'monthlyRevenueChart' => $monthlyRevenueChart,
+        'reviewsData' => $reviewsData,
+        'userCount' => $userCount,
+        'rolesCount' => $rolesCount,
+        'salesOrdersCount' => $salesOrdersCount,
+        'rentalOrdersCount' => $rentalOrdersCount,
+        'branchesCount' => $branchesCount,
+        'vendorsCount' => $vendorsCount,
+        'goldMetrics' => $goldMetrics,
+        'revenueData' => $revenueData,
+        'popularGoldPieces' => $popularGoldPieces,
+        'recentTransactions' => $recentTransactions,
+        'goldPricesSummary' => $goldPricesSummary,
+        'filters' => [
+            'period' => $period,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+        ],
+    ]);
+}
 
     /**
      * Get gold trading specific metrics
@@ -200,7 +221,7 @@ class DashboardController extends Controller
                 ]);
             }
 
-            $previousRevenue = $previousQuery->sum( 'total_price') ?: 0;
+            $previousRevenue = $previousQuery->sum('total_price') ?: 0;
             $growthRate = $previousRevenue > 0 ?
                 (($currentRevenue - $previousRevenue) / $previousRevenue) * 100 : 0;
 

@@ -154,24 +154,6 @@
                         </div>
                         <!-- End Sales Orders Card -->
 
-                        <!-- Rental Requests Card -->
-                        <div class="col-xxl-3 col-md-3">
-                            <div class="card info-card customers-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $t('rental_requests') }}</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-calendar-check"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ rentalRequestsCount }}</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End Rental Requests Card -->
 
                         <!-- Rental Orders Card -->
                         <div class="col-xxl-3 col-md-3">
