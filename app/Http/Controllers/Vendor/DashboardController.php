@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Rating;
 use Inertia\Inertia;
 use App\Models\Branch;
 use App\Models\OrderSale;
 use App\Models\OrderRental;
+use App\Models\GoldPiece;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -38,17 +40,109 @@ class DashboardController extends Controller
         $admins = User::where('vendor_id', Auth::id())->whereHas('roles')->count();
         $branches = Branch::where('vendor_id', Auth::id())->count();
 
-        $rentalRequests = OrderRental::when($period !== 'all' || ($fromDate && $toDate), $dateFilter)->count();
-        $salesOrders = OrderSale::when($period !== 'all' || ($fromDate && $toDate), $dateFilter)->count();
-        $rentalOrders = OrderRental::when($period !== 'all' || ($fromDate && $toDate), $dateFilter)->count();
+        // Sales orders count
+        $salesOrdersQuery = OrderSale::query();
+        $salesOrdersQuery->whereHas('branch.vendor', function ($query) {
+            $query->where('id', Auth::id());
+        });
+        if ($period !== 'all' || ($fromDate && $toDate)) {
+            $salesOrdersQuery->when($dateFilter, function ($query) use ($dateFilter) {
+                $query->where($dateFilter);
+            });
+        }
+        $salesOrders = $salesOrdersQuery->count();
+
+        // Rental orders count
+        $rentalOrdersQuery = OrderRental::query();
+        $rentalOrdersQuery->whereHas('branch.vendor', function ($query) {
+            $query->where('id', Auth::id());
+        });
+        if ($period !== 'all' || ($fromDate && $toDate)) {
+            $rentalOrdersQuery->when($dateFilter, function ($query) use ($dateFilter) {
+                $query->where($dateFilter);
+            });
+        }
+        $rentalOrders = $rentalOrdersQuery->count();
+
+        // Rental statistics
+        $rentalStats = [
+            'completed' => OrderRental::whereHas('branch.vendor', function ($query) {
+                    $query->where('id', Auth::id());
+                })
+                ->whereIn('status', ['available', 'sold', 'rejected'])
+                ->when($period !== 'all' || ($fromDate && $toDate), $dateFilter)
+                ->count(),
+            'current' => OrderRental::whereHas('branch.vendor', function ($query) {
+                    $query->where('id', Auth::id());
+                })
+                ->where('status', 'rented')
+                ->when($period !== 'all' || ($fromDate && $toDate), $dateFilter)
+                ->count(),
+            'upcoming' => OrderRental::whereHas('branch.vendor', function ($query) {
+                    $query->where('id', Auth::id());
+                })
+                ->whereIn('status', ['pending_approval', 'approved', 'piece_sent'])
+                ->when($period !== 'all' || ($fromDate && $toDate), $dateFilter)
+                ->count(),
+        ];
+
+        // Gold pieces statistics
+        $piecesStats = [
+            'available' => GoldPiece::whereHas('branch.vendor', function ($query) {
+                    $query->where('id', Auth::id());
+                })
+                ->where('status', 'available')
+                ->when($period !== 'all' || ($fromDate && $toDate), $dateFilter)
+                ->count(),
+            'purchased' => OrderSale::whereHas('branch.vendor', function ($query) {
+                    $query->where('id', Auth::id());
+                })
+                ->when($period !== 'all' || ($fromDate && $toDate), $dateFilter)
+                ->count(),
+        ];
+
+        // Ratings data
+        $ratings = [
+            'average' => GoldPiece::whereHas('branch.vendor', function($query) {
+                    $query->where('id', Auth::id());
+                })
+                ->withAvg('ratings as average_rating', 'rating')
+                ->get()
+                ->avg('average_rating') ?? 0,
+
+            'total' => Rating::whereHas('goldPiece.branch.vendor', function($query) {
+                    $query->where('id', Auth::id());
+                })
+                ->when($period !== 'all' || ($fromDate && $toDate), $dateFilter)
+                ->count(),
+
+            'breakdown' => Rating::whereHas('goldPiece.branch.vendor', function($query) {
+                    $query->where('id', Auth::id());
+                })
+                ->when($period !== 'all' || ($fromDate && $toDate), $dateFilter)
+                ->selectRaw('rating, count(*) as count')
+                ->groupBy('rating')
+                ->orderBy('rating', 'DESC')
+                ->pluck('count', 'rating')
+                ->toArray()
+        ];
+
+        // Convert breakdown to 5-element array [5-star, 4-star, ..., 1-star]
+        $breakdown = array_fill(1, 5, 0);
+        foreach ($ratings['breakdown'] as $rating => $count) {
+            $breakdown[$rating] = $count;
+        }
+        $ratings['breakdown'] = array_reverse(array_values($breakdown));
 
         return Inertia::render('Vendor/Dashboard', [
             'roles' => $roles,
             'admins' => $admins,
             'branches' => $branches,
-            'rentalRequests' => $rentalRequests,
             'salesOrders' => $salesOrders,
             'rentalOrders' => $rentalOrders,
+            'rentalStats' => $rentalStats,
+            'piecesStats' => $piecesStats,
+            'ratings' => $ratings,
             'filters' => [
                 'period' => $period,
                 'from_date' => $fromDate,

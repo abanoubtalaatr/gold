@@ -55,17 +55,6 @@ class OrderRentalController extends Controller
 
         $rentalOrders = $rentalOrdersQuery->paginate(10)->appends($filters);
 
-        // $rentalOrders->getCollection()->transform(function ($order) {
-        //     if ($order->goldPiece) {
-        //         $order->goldPiece->qr_code = base64_encode(
-        //             QrCode::format('png')->size(100)->generate(
-        //                 route('vendor.gold-pieces.show', $order->goldPiece->id)
-        //             )
-        //         );
-        //     }
-        //     return $order;
-        // });
-
         return Inertia::render('Vendor/Orders/RentalIndex', [
             'rentalOrders' => $rentalOrders,
             'branches' => $branches,
@@ -79,12 +68,12 @@ class OrderRentalController extends Controller
         $order = OrderRental::with(['goldPiece', 'goldPiece.user'])->findOrFail($orderId);
         $this->authorizeVendor($order);
 
-        $request->validate([
-            'branch_id' => 'required|exists:branches,id',
-        ]);
+        // $request->validate([
+        //     'branch_id' => 'required|exists:branches,id',
+        // ]);
 
         $order->update([
-            'branch_id' => $request->branch_id,
+            // 'branch_id' => $request->branch_id,
             'status' => OrderRental::STATUS_APPROVED,
         ]);
 
@@ -105,7 +94,7 @@ class OrderRentalController extends Controller
         $order = OrderRental::with(['goldPiece', 'goldPiece.user'])->findOrFail($orderId);
         $this->authorizeVendor($order);
 
-        $order->update(['status' => 'rejected']);
+        $order->update(['status' => 'rented']);
 
         // Notify gold piece owner
         $goldPieceUser = $order->goldPiece?->user;
@@ -116,7 +105,7 @@ class OrderRentalController extends Controller
         }
         Log::info('Order rejected', ['order_id' => $order->id, 'vendor_id' => Auth::id()]);
 
-        return back()->with('success', __('Order rejected successfully'));
+        return back();
     }
 
     public function updateStatus(Request $request, $orderId)
@@ -124,7 +113,7 @@ class OrderRentalController extends Controller
         try {
             $order = OrderRental::with(['user', 'branch', 'goldPiece'])->findOrFail($orderId);
             $this->authorizeVendor($order);
-            
+
             // Validate the incoming status
             $request->validate([
                 'status' => 'required|in:pending_approval,approved,piece_sent,rented,available,sold,rejected',
@@ -132,19 +121,19 @@ class OrderRentalController extends Controller
 
             $newStatus = $request->status;
             $oldStatus = $order->status;
-            
+
             // Use workflow service for proper status management and notifications
             $this->rentalWorkflowService->updateStatus($order, $newStatus, Auth::user());
 
             Log::info('Order status updated via workflow service', [
-                'order_id' => $order->id, 
+                'order_id' => $order->id,
                 'old_status' => $oldStatus,
                 'new_status' => $newStatus,
                 'vendor_id' => Auth::id()
             ]);
 
             return back()->with('success', __('Order status updated successfully'));
-            
+
         } catch (\Exception $e) {
             Log::error('Failed to update order status', [
                 'order_id' => $orderId,
