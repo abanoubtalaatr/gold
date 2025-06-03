@@ -1459,5 +1459,10 @@
     "Complaints Summary": "ملخص الشكاوي",
     "Complaints Details": "تفاصيل الشكاوي",
     "Ratings Summary": "ملخص التقييمات",
-    "Ratings Details": "تفاصيل التقييمات"
+    "Ratings Details": "تفاصيل التقييمات",
+    "completed_rentals": "الطلبات المنتهية",
+    "purchased_pieces": "القطع المشتراة",
+    "available_pieces": "القطع المتاحة",
+    "upcoming_rentals": "الطلبات المستقبلية",
+    "current_rentals": "طلبات الايجار الحالية"
 }

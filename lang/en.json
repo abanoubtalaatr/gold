@@ -841,5 +841,12 @@
         "privacy_policy": "Privacy Policy",
         "contact_us": "Contact Us",
         "language": "EN"
-    }
+    },
+    "completed_rentals": "Completed Rentals",
+    "pending_rentals": "Pending Rentals",
+    "rejected_rentals": "Rejected Rentals",
+    "upcoming_rentals": "Future Rentals",
+    "current_rentals": "Current Rentals",
+    "available_pieces": "Available Pieces",
+    "purchased_pieces": "Purchased Pieces"
 }

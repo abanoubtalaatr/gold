@@ -31,112 +31,209 @@ class DashboardController extends Controller
     }
 
  public function index(Request $request)
-{
-    // Get filter parameters from request
-    $period = $request->input('period', 'all'); // Default to 'all' if not specified
-    $start_date = $request->input('start_date');
-    $end_date = $request->input('end_date');
+    {
+        // Get filter parameters from request
+        $period = $request->input('period', 'monthly');
+        $start_date = $request->input('start_date');
+        $end_date = $request->input('end_date');
 
-    // Apply date filters
-    $dateFilter = function ($query) use ($period, $start_date, $end_date) {
-        if ($period !== 'all') {
-            $this->applyPeriodFilter($query, $period);
-        }
+        // Apply date filters
+        $dateFilter = function ($query) use ($period, $start_date, $end_date) {
+            if ($period !== 'monthly') {
+                $this->applyPeriodFilter($query, $period);
+            }
 
-        if ($start_date && $end_date) {
-            $query->whereBetween('created_at', [$start_date, $end_date]);
-        }
-    };
+            if ($start_date && $end_date) {
+                $query->whereBetween('created_at', [$start_date, $end_date]);
+            } elseif ($start_date) {
+                $query->where('created_at', '>=', $start_date);
+            } elseif ($end_date) {
+                $query->where('created_at', '<=', $end_date);
+            }
+        };
 
-    // Get counts with filters - Modified the when() conditions
-    $userCount = User::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-        ->whereIsActive(1)
-        ->count();
+        // Get counts with filters
+        $userCount = User::when($period !== 'monthly' || $start_date || $end_date, $dateFilter)
+            ->whereIsActive(1)
+            ->count();
 
-    $rolesCount = Role::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-        ->whereIsActive(1)
-        ->count();
+        $rolesCount = Role::when($period !== 'monthly' || $start_date || $end_date, $dateFilter)
+            ->whereIsActive(1)
+            ->count();
 
-    $reviewsData = $this->getReviewsData($period, $start_date, $end_date);
+        $reviewsData = $this->getReviewsData($period, $start_date, $end_date);
 
-    // Get new counts with filters
-    $salesOrdersCount = OrderSale::query()
-        ->when($period !== 'all', function($q) use ($period) {
-            $this->applyPeriodFilter($q, $period);
-        })
-        ->when($start_date && $end_date, function($q) use ($start_date, $end_date) {
-            $q->whereBetween('created_at', [$start_date, $end_date]);
-        })
-        ->count();
+        // Sales and rental orders
+        $salesOrdersCount = OrderSale::query()
+            ->when($period !== 'monthly', function($q) use ($period) {
+                $this->applyPeriodFilter($q, $period);
+            })
+            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $q->whereBetween('created_at', [$start_date, $end_date]);
+                } elseif ($start_date) {
+                    $q->where('created_at', '>=', $start_date);
+                } elseif ($end_date) {
+                    $q->where('created_at', '<=', $end_date);
+                }
+            })
+            ->count();
 
+        $rentalOrdersCount = OrderRental::query()
+            ->when($period !== 'monthly', function($q) use ($period) {
+                $this->applyPeriodFilter($q, $period);
+            })
+            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $q->whereBetween('created_at', [$start_date, $end_date]);
+                } elseif ($start_date) {
+                    $q->where('created_at', '>=', $start_date);
+                } elseif ($end_date) {
+                    $q->where('created_at', '<=', $end_date);
+                }
+            })
+            ->count();
 
+        // Branches and vendors
+        $branchesCount = Branch::query()
+            ->when($period !== 'monthly', function($q) use ($period) {
+                $this->applyPeriodFilter($q, $period);
+            })
+            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $q->whereBetween('created_at', [$start_date, $end_date]);
+                } elseif ($start_date) {
+                    $q->where('created_at', '>=', $start_date);
+                } elseif ($end_date) {
+                    $q->where('created_at', '<=', $end_date);
+                }
+            })
+            ->whereIsActive(1)
+            ->count();
 
-    $rentalOrdersCount = OrderRental::query()
-        ->when($period !== 'all', function($q) use ($period) {
-            $this->applyPeriodFilter($q, $period);
-        })
-        ->when($start_date && $end_date, function($q) use ($start_date, $end_date) {
-            $q->whereBetween('created_at', [$start_date, $end_date]);
-        })
-        ->count();
+        $vendorsCount = User::role('vendor')
+            ->when($period !== 'monthly', function($q) use ($period) {
+                $this->applyPeriodFilter($q, $period);
+            })
+            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $q->whereBetween('created_at', [$start_date, $end_date]);
+                } elseif ($start_date) {
+                    $q->where('created_at', '>=', $start_date);
+                } elseif ($end_date) {
+                    $q->where('created_at', '<=', $end_date);
+                }
+            })
+            ->whereIsActive(1)
+            ->count();
 
-    $branchesCount = Branch::query()
-        ->when($period !== 'all', function($q) use ($period) {
-            $this->applyPeriodFilter($q, $period);
-        })
-        ->when($start_date && $end_date, function($q) use ($start_date, $end_date) {
-            $q->whereBetween('created_at', [$start_date, $end_date]);
-        })
-        ->whereIsActive(1)
-        ->count();
+        // New rental statistics
+        $rentalStats = [
+            'completed' => OrderRental::whereIn('status', ['available', 'sold', 'rejected'])
+                ->when($period !== 'monthly', function($q) use ($period) {
+                    $this->applyPeriodFilter($q, $period);
+                })
+                ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                    if ($start_date && $end_date) {
+                        $q->whereBetween('created_at', [$start_date, $end_date]);
+                    } elseif ($start_date) {
+                        $q->where('created_at', '>=', $start_date);
+                    } elseif ($end_date) {
+                        $q->where('created_at', '<=', $end_date);
+                    }
+                })
+                ->count(),
 
-    $vendorsCount = User::role('vendor')
-        ->when($period !== 'all', function($q) use ($period) {
-            $this->applyPeriodFilter($q, $period);
-        })
-        ->when($start_date && $end_date, function($q) use ($start_date, $end_date) {
-            $q->whereBetween('created_at', [$start_date, $end_date]);
-        })
-        ->whereIsActive(1)
-        ->count();
+            'current' => OrderRental::where('status',  'rented')
+                ->when($period !== 'monthly', function($q) use ($period) {
+                    $this->applyPeriodFilter($q, $period);
+                })
+                ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                    if ($start_date && $end_date) {
+                        $q->whereBetween('created_at', [$start_date, $end_date]);
+                    } elseif ($start_date) {
+                        $q->where('created_at', '>=', $start_date);
+                    } elseif ($end_date) {
+                        $q->where('created_at', '<=', $end_date);
+                    }
+                })
+                ->count(),
 
-    // Rest of your code remains the same...
-    $goldMetrics = $this->getGoldTradingMetrics($period, $start_date, $end_date);
-    $revenueData = $this->getRevenueData($period, $start_date, $end_date);
-    $popularGoldPieces = $this->getPopularGoldPieces($period, $start_date, $end_date);
-    $recentTransactions = $this->getRecentTransactions();
-    $goldPricesSummary = $this->getCurrentGoldPrices();
+            'upcoming' => OrderRental::whereIn('status', ['pending_approval', 'approved', 'piece_sent'])
+                ->when($period !== 'monthly', function($q) use ($period) {
+                    $this->applyPeriodFilter($q, $period);
+                })
+                ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                    if ($start_date && $end_date) {
+                        $q->whereBetween('created_at', [$start_date, $end_date]);
+                    } elseif ($start_date) {
+                        $q->where('created_at', '>=', $start_date);
+                    } elseif ($end_date) {
+                        $q->where('created_at', '<=', $end_date);
+                    }
+                })
+                ->count(),
+        ];
 
-    // Get chart data with filters
-    $UserPerRolechartData = $this->getRolesChartData($period, $start_date, $end_date);
-    $statusChartData = $this->getUsersChartDataByStatus($period, $start_date, $end_date);
-    $orderStatusChart = $this->getOrderStatusChartData($period, $start_date, $end_date);
-    $monthlyRevenueChart = $this->getMonthlyRevenueChart($period, $start_date, $end_date);
+        // Available and purchased pieces
+        $availablePiecesCount = GoldPiece::where('status', 'available')
+            ->when($period !== 'monthly', function($q) use ($period) {
+                $this->applyPeriodFilter($q, $period);
+            })
+            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $q->whereBetween('created_at', [$start_date, $end_date]);
+                } elseif ($start_date) {
+                    $q->where('created_at', '>=', $start_date);
+                } elseif ($end_date) {
+                    $q->where('created_at', '<=', $end_date);
+                }
+            })
+            ->count();
 
-    return Inertia::render('Dashboard', [
-        'UserPerRolechartData' => $UserPerRolechartData,
-        'statusChartData' => $statusChartData,
-        'orderStatusChart' => $orderStatusChart,
-        'monthlyRevenueChart' => $monthlyRevenueChart,
-        'reviewsData' => $reviewsData,
-        'userCount' => $userCount,
-        'rolesCount' => $rolesCount,
-        'salesOrdersCount' => $salesOrdersCount,
-        'rentalOrdersCount' => $rentalOrdersCount,
-        'branchesCount' => $branchesCount,
-        'vendorsCount' => $vendorsCount,
-        'goldMetrics' => $goldMetrics,
-        'revenueData' => $revenueData,
-        'popularGoldPieces' => $popularGoldPieces,
-        'recentTransactions' => $recentTransactions,
-        'goldPricesSummary' => $goldPricesSummary,
-        'filters' => [
-            'period' => $period,
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-        ],
-    ]);
-}
+        $purchasedPiecesCount = OrderSale::query()
+            ->when($period !== 'monthly', function($q) use ($period) {
+                $this->applyPeriodFilter($q, $period);
+            })
+            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $q->whereBetween('created_at', [$start_date, $end_date]);
+                } elseif ($start_date) {
+                    $q->where('created_at', '>=', $start_date);
+                } elseif ($end_date) {
+                    $q->where('created_at', '<=', $end_date);
+                }
+            })
+            ->count();
+
+        // Get chart data
+        $UserPerRolechartData = $this->getRolesChartData($period, $start_date, $end_date);
+        $statusChartData = $this->getUsersChartDataByStatus($period, $start_date, $end_date);
+        $orderStatusChart = $this->getOrderStatusChartData($period, $start_date, $end_date);
+        $monthlyRevenueChart = $this->getMonthlyRevenueChart($period, $start_date, $end_date);
+
+        return Inertia::render('Dashboard', [
+            'UserPerRolechartData' => $UserPerRolechartData,
+            'statusChartData' => $statusChartData,
+            'orderStatusChart' => $orderStatusChart,
+            'monthlyRevenueChart' => $monthlyRevenueChart,
+            'reviewsData' => $reviewsData,
+            'userCount' => $userCount,
+            'rolesCount' => $rolesCount,
+            'salesOrdersCount' => $salesOrdersCount,
+            'rentalOrdersCount' => $rentalOrdersCount,
+            'branchesCount' => $branchesCount,
+            'vendorsCount' => $vendorsCount,
+            'rentalStats' => $rentalStats,
+            'availablePiecesCount' => $availablePiecesCount,
+            'purchasedPiecesCount' => $purchasedPiecesCount,
+            'filters' => [
+                'period' => $period,
+                'start_date' => $start_date,
+                'end_date' => $end_date,
+            ],
+        ]);
+    }
 
     /**
      * Get gold trading specific metrics
@@ -538,38 +635,67 @@ class DashboardController extends Controller
         });
     }
 
-    private function getReviewsData($period = 'all', $start_date = null, $end_date = null)
-    {
-        $query = Rating::query();
+private function getReviewsData($period = 'all', $start_date = null, $end_date = null)
+{
+    $query = Rating::query();
 
-        if ($period !== 'all') {
-            $this->applyPeriodFilter($query, $period);
-        }
-
-        if ($start_date && $end_date) {
-            $query->whereBetween('created_at', [$start_date, $end_date]);
-        }
-
-        $totalReviews = $query->count();
-        $averageRating = $query->avg('rating');
-
-        // Get rating distribution
-        $ratingDistribution = $query->select('rating', DB::raw('count(*) as count'))
-            ->groupBy('rating')
-            ->orderBy('rating')
-            ->get()
-            ->pluck('count', 'rating');
-
-        // Fill missing ratings
-        $fullDistribution = [];
-        for ($i = 1; $i <= 5; $i++) {
-            $fullDistribution[$i] = $ratingDistribution[$i] ?? 0;
-        }
-
-        return [
-            'total_reviews' => $totalReviews,
-            'average_rating' => round($averageRating, 1),
-            'rating_distribution' => $fullDistribution,
-        ];
+    // Apply period filter if specified and not 'all'
+    if ($period && $period !== 'all') {
+        $this->applyPeriodFilter($query, $period);
     }
+
+    // Apply date range filters if provided
+    if ($start_date || $end_date) {
+        if ($start_date && $end_date) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($start_date)->startOfDay(),
+                Carbon::parse($end_date)->endOfDay()
+            ]);
+        } elseif ($start_date) {
+            $query->where('created_at', '>=', Carbon::parse($start_date)->startOfDay());
+        } elseif ($end_date) {
+            $query->where('created_at', '<=', Carbon::parse($end_date)->endOfDay());
+        }
+    }
+
+    // Get total reviews and average rating
+    $totalReviews = $query->count();
+    $averageRating = $query->avg('rating');
+
+    // Get rating distribution (using the same query conditions)
+    $ratingDistribution = Rating::query()
+        ->when($period && $period !== 'all', function($q) use ($period) {
+            $this->applyPeriodFilter($q, $period);
+        })
+        ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+            if ($start_date && $end_date) {
+                $q->whereBetween('created_at', [
+                    Carbon::parse($start_date)->startOfDay(),
+                    Carbon::parse($end_date)->endOfDay()
+                ]);
+            } elseif ($start_date) {
+                $q->where('created_at', '>=', Carbon::parse($start_date)->startOfDay());
+            } elseif ($end_date) {
+                $q->where('created_at', '<=', Carbon::parse($end_date)->endOfDay());
+            }
+        })
+        ->select('rating', DB::raw('count(*) as count'))
+        ->groupBy('rating')
+        ->orderBy('rating')
+        ->get()
+        ->pluck('count', 'rating')
+        ->toArray();
+
+    // Fill missing ratings
+    $fullDistribution = [];
+    for ($i = 1; $i <= 5; $i++) {
+        $fullDistribution[$i] = $ratingDistribution[$i] ?? 0;
+    }
+
+    return [
+        'total_reviews' => $totalReviews,
+        'average_rating' => round($averageRating ?? 0, 1),
+        'rating_distribution' => $fullDistribution,
+    ];
+}
 }

@@ -154,7 +154,6 @@
                         </div>
                         <!-- End Sales Orders Card -->
 
-
                         <!-- Rental Orders Card -->
                         <div class="col-xxl-3 col-md-3">
                             <div class="card info-card revenue-card">
@@ -211,54 +210,106 @@
                             </div>
                         </div>
                         <!-- End Total Vendors Card -->
+
+                        <!-- New Rental Statistics Cards -->
+                        <!-- Completed Rentals Card -->
+                        <div class="col-xxl-3 col-md-3">
+                            <div class="card info-card completed-rentals-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $t('completed_rentals') }}</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-check-circle"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ rentalStats.completed }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Completed Rentals Card -->
+
+                        <!-- Current Rentals Card -->
+                        <div class="col-xxl-3 col-md-3">
+                            <div class="card info-card current-rentals-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $t('current_rentals') }}</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ rentalStats.current }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Current Rentals Card -->
+
+                        <!-- Upcoming Rentals Card -->
+                        <div class="col-xxl-3 col-md-3">
+                            <div class="card info-card upcoming-rentals-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $t('upcoming_rentals') }}</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-calendar-plus"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ rentalStats.upcoming }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Upcoming Rentals Card -->
+
+                        <!-- Available Pieces Card -->
+                        <div class="col-xxl-3 col-md-3">
+                            <div class="card info-card available-pieces-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $t('available_pieces') }}</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-box-seam"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ availablePiecesCount }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Available Pieces Card -->
+
+                        <!-- Purchased Pieces Card -->
+                        <div class="col-xxl-3 col-md-3">
+                            <div class="card info-card purchased-pieces-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $t('purchased_pieces') }}</h5>
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-cart-check-fill"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h6>{{ purchasedPiecesCount }}</h6>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Purchased Pieces Card -->
                     </div>
                 </div>
                 <!-- End Left side columns -->
             </div>
-
-            <!-- Charts Row -->
-            <!-- <div class="row"> -->
-                <!-- Users by Role Chart -->
-                <!-- <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $t('users_by_role') }}</h5>
-                            <BarChart v-if="UserPerRolechartData" :chart-data="UserPerRolechartData" />
-                            <div v-else class="text-muted">No data available</div>
-                        </div>
-                    </div>
-                </div> -->
-
-                <!-- Users by Status Chart -->
-                <!-- <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $t('users_by_status') }}</h5>
-                            <PieChart v-if="statusChartData" :chart-data="statusChartData" />
-                            <div v-else class="text-muted">No data available</div>
-                        </div>
-                    </div>
-                </div> -->
-            <!-- </div> -->
-
-            <!-- Rating Distribution Chart -->
-            <!-- <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $t('rating_distribution') }}</h5>
-                            <BarChart :chart-data="{
-                                labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
-                                datasets: [{
-                                    label: 'Number of Reviews',
-                                    backgroundColor: '#36A2EB',
-                                    data: Object.values(reviewsData.rating_distribution)
-                                }]
-                            }" />
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </section>
     </AuthenticatedLayout>
 </template>
@@ -266,9 +317,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Link, router } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
-import BarChart from '@/Components/Charts/BarChart.vue';
-import PieChart from '@/Components/Charts/PieChart.vue';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -284,6 +333,9 @@ const props = defineProps({
     rentalOrdersCount: Number,
     branchesCount: Number,
     vendorsCount: Number,
+    rentalStats: Object,
+    availablePiecesCount: Number,
+    purchasedPiecesCount: Number,
     filters: Object,
 });
 
@@ -294,13 +346,16 @@ const filters = ref({
 });
 
 const applyFilters = () => {
-    router.get(route('dashboard'), {
+    const params = {
         period: filters.value.period,
-        start_date: filters.value.start_date,
-        end_date: filters.value.end_date,
-    }, {
+        start_date: filters.value.start_date || null,
+        end_date: filters.value.end_date || null,
+    };
+
+    router.get(route('dashboard'), params, {
         preserveState: true,
         preserveScroll: true,
+        replace: true,
     });
 };
 
@@ -310,6 +365,42 @@ const resetFilters = () => {
         start_date: null,
         end_date: null,
     };
-    applyFilters();
+
+    router.get(route('dashboard'), {
+        period: 'monthly',
+        start_date: null,
+        end_date: null,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
 };
 </script>
+
+<style scoped>
+.completed-rentals-card .card-icon {
+    background-color: #28a74520;
+    color: #28a745;
+}
+
+.current-rentals-card .card-icon {
+    background-color: #17a2b820;
+    color: #17a2b8;
+}
+
+.upcoming-rentals-card .card-icon {
+    background-color: #ffc10720;
+    color: #ffc107;
+}
+
+.available-pieces-card .card-icon {
+    background-color: #6f42c120;
+    color: #6f42c1;
+}
+
+.purchased-pieces-card .card-icon {
+    background-color: #fd7e1420;
+    color: #fd7e14;
+}
+</style>
