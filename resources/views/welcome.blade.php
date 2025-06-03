@@ -68,10 +68,10 @@
                             <a class="nav-link smooth-anchor" href="#about">About Us</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="terms.html">Terms & Conditions</a>
+                            <a class="nav-link" href="{{url('terms')}}">Terms & Conditions</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="privacy.html">Privacy Policy</a>
+                            <a class="nav-link" href="{{url('privacy')}}">Privacy Policy</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link smooth-anchor" href="#contact">Contact us</a>

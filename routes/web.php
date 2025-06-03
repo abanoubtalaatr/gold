@@ -46,7 +46,10 @@ use App\Http\Controllers\LandingController;
 
 // Landing page route (accessible to everyone)
 Route::get('/', [LandingController::class, 'index'])->name('landing');
-
+Route::post('/contact', [LandingController::class, 'contact'])->name('landing.contact');
+Route::get('/{slug}', [LandingController::class, 'show'])->name('pages.show');
+Route::get('privacy', [LandingController::class, 'show'])->name('privacy')->defaults('slug', 'privacy');
+Route::get('terms', [LandingController::class, 'show'])->name('terms')->defaults('slug', 'terms');
 // Dashboard route for authenticated users
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 

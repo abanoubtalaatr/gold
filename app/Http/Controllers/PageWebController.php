@@ -19,6 +19,12 @@ class PageWebController extends Controller
         return inertia('Pages/Edit', ['page' => $page]);
     }
 
+    public function show($slug)
+    {
+        $page = $this->repository->getPageWithSections($slug);
+        return view('pages.show', ['page' => $page]);
+    }
+
     public function update(UpdatePageRequest $request, $id)
     {
 

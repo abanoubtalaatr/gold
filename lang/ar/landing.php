@@ -12,7 +12,7 @@ return [
         'terms' => 'الشروط والأحكام',
         'privacy' => 'سياسة الخصوصية',
         'contact' => 'اتصل بنا',
-        'language' => 'عربي',
+        'language' => 'اللغة',
     ],
     
     // Hero Section
@@ -116,6 +116,8 @@ return [
             'message' => 'الرسالة',
             'submit' => 'إرسال الرسالة',
         ],
+        'success_message' => 'شكراً لك على رسالتك! سنتواصل معك قريباً.',
+        'error_message' => 'عذراً، حدث خطأ في إرسال رسالتك. يرجى المحاولة مرة أخرى.',
     ],
     
     // Footer Section

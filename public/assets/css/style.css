@@ -2486,8 +2486,17 @@ a.badge:not(.btn):hover,
     .breadcrumb
     .breadcrumb-item
     + .breadcrumb-item::before {
-    content: ">";
+    content: "❯"; /* Better arrow for LTR */
     color: var(--white-color);
+}
+
+/* RTL Support for Arabic breadcrumb separator */
+[dir="rtl"] .breadcrumb-area
+    .breadcrumb-content
+    .breadcrumb
+    .breadcrumb-item
+    + .breadcrumb-item::before {
+    content: "❮"; /* Better arrow for RTL */
 }
 
 .breadcrumb-area .breadcrumb-content .breadcrumb .breadcrumb-item,

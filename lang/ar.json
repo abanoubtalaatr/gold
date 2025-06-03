@@ -1438,5 +1438,15 @@
     "This Week": "هذا الاسبوع",
     "Custom Range": "نطاق مخصص",
     "Completed": "منتهي",
-    "Future": "مستقبلي"
+    "Future": "مستقبلي",
+    "Success!": "نجاح!",
+    "Your message has been sent successfully.": "تم ارسال رسالتك بنجاح.",
+    "nav": {
+        "home": "الرئيسية",
+        "about_us": "من نحن",
+        "terms_conditions": "الشروط والأحكام",
+        "privacy_policy": "سياسة الخصوصية",
+        "contact_us": "اتصل بنا",
+        "language": "ع"
+    }
 }

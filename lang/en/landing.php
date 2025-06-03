@@ -12,7 +12,7 @@ return [
         'terms' => 'Terms & Conditions',
         'privacy' => 'Privacy Policy',
         'contact' => 'Contact us',
-        'language' => 'EN',
+        'language' => 'Language',
     ],
     
     // Hero Section
@@ -116,6 +116,8 @@ return [
             'message' => 'Message',
             'submit' => 'Submit Message',
         ],
+        'success_message' => 'Thank you for your message! We\'ll get back to you soon.',
+        'error_message' => 'Sorry, there was an error sending your message. Please try again.',
     ],
     
     // Footer Section

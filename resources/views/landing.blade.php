@@ -20,27 +20,13 @@
     <!-- Style css -->
     <link rel="stylesheet" href="{{asset('assets/css/style.css')}}" />
     
-    @if(app()->isLocale('ar'))
-    <!-- RTL CSS for Arabic -->
-    <link rel="stylesheet" href="{{asset('css/rtl.css')}}" />
-    @endif
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     
-    @if(app()->isLocale('ar'))
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .navbar-nav {
-            flex-direction: row-reverse;
-        }
-        .text-end-ar {
-            text-align: right !important;
-        }
-        .text-start-ar {
-            text-align: left !important;
-        }
-    </style>
-    @endif
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+
 </head>
 
 <body>
@@ -70,58 +56,7 @@
         <!-- ***** Preloader End ***** -->
 
         <!-- ***** Header Start ***** -->
-        <header id="header">
-            <!-- Navbar -->
-            <nav data-aos="zoom-out" data-aos-delay="800" class="navbar gameon-navbar navbar-expand">
-                <div class="container header">
-                    <!-- Logo -->
-                    <a class="navbar-brand" href="index.html">
-                        <img src="assets/images/logo.svg" alt="{{ __('landing.site_name') }}" width="100" />
-                    </a>
-
-                    <div class="ms-auto"></div>
-
-                    <!-- Navbar Nav -->
-                    <ul class="navbar-nav items ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link smooth-anchor" href="#home">{{ __('landing.nav.home') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link smooth-anchor" href="#about">{{ __('landing.nav.about') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="terms.html">{{ __('landing.nav.terms') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="privacy.html">{{ __('landing.nav.privacy') }}</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link smooth-anchor" href="#contact">{{ __('landing.nav.contact') }}</a>
-                        </li>
-                        <li class="nav-item d-flex align-items-center">
-                            <div class="dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    {{ app()->isLocale('ar') ? 'عربي' : 'English' }}
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item {{ app()->isLocale('en') ? 'active' : '' }}" href="{{ route('changeLang', ['lang' => 'en']) }}">English</a></li>
-                                    <li><a class="dropdown-item {{ app()->isLocale('ar') ? 'active' : '' }}" href="{{ route('changeLang', ['lang' => 'ar']) }}">العربية</a></li>
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
-
-                    <!-- Navbar Toggler -->
-                    <ul class="navbar-nav toggle">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#menu">
-                                <i class="icon-menu m-0"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </header>
+        @include('header')
         <!-- ***** Header End ***** -->
 
         <!-- ***** Hero Section Start ***** -->
@@ -137,10 +72,10 @@
 
 							<!-- Download Button -->
 							<div class="button-group download-button d-flex align-items-center justify-content-center">
-								<a href="download.html">
+								<a href="{{url('download')}}">
 									<img src="assets/img/content/google-play.png" alt="">
 								</a>
-								<a href="download.html">
+								<a href="{{url('download')}}">
 									<img src="assets/img/content/app-store.png" alt="">
 								</a>
 							</div>
@@ -216,8 +151,6 @@
             </div>
         </section>
         <!-- ***** Content Section End ***** -->
-
-       
 
          <!-- ***** Counter Area Start ***** -->
         <section class="counter-area">
@@ -425,7 +358,7 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-6 mt-4 mt-md-0">
-                        <form id="contact-form" class="contact-form outlined" method="POST">
+                        <form id="contact-form" class="contact-form outlined" method="POST" action="{{ route('landing.contact') }}">
                             @csrf
                             <div class="form-floating mb-3">
                                 <input type="text" class="form-control" name="name" id="name" placeholder="{{ __('landing.contact.form.name') }}" required />
@@ -462,7 +395,7 @@
                             <!-- Footer Items -->
                             <div class="footer-items">
                                 <!-- Logo -->
-                                <a class="navbar-brand mb-6" href="index.html">
+                                <a class="navbar-brand mb-6" href="/">
                                     <img class="logo" src="assets/images/logo.svg" alt="{{ __('landing.site_name') }}" width="120" />
                                 </a>
                                 <p class="slug mt-3">{{ __('landing.footer.description') }}
@@ -497,19 +430,19 @@
                                 <!-- Navigation -->
                                 <ul class="nav flex-column">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="index.html">{{ __('landing.footer.links.home') }}</a>
+                                        <a class="nav-link" href="/">{{ __('landing.footer.links.home') }}</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="index.html#about">{{ __('landing.footer.links.about') }}</a>
+                                        <a class="nav-link" href="/#about">{{ __('landing.footer.links.about') }}</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="privacy.html">{{ __('landing.footer.links.privacy') }}</a>
+                                        <a class="nav-link" href="{{url('privacy')}}">{{ __('landing.footer.links.privacy') }}</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="terms.html">{{ __('landing.footer.links.terms') }}</a>
+                                        <a class="nav-link" href="{{url('terms')}}">{{ __('landing.footer.links.terms') }}</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="index.html#contact">{{ __('landing.footer.links.contact') }}</a>
+                                        <a class="nav-link" href="/#contact">{{ __('landing.footer.links.contact') }}</a>
                                     </li>
                                 </ul>
                             </div>
@@ -550,20 +483,7 @@
         <!--====== Footer Area End ======-->
 
         <!--====== Modal Responsive Menu Area Start ======-->
-        <div id="menu" class="modal fade p-0">
-            <div class="modal-dialog modal-dialog-slideout">
-                <div class="modal-content full">
-                    <div class="modal-header" data-bs-dismiss="modal">{{ __('landing.menu.title') }} <i class="icon-close"></i></div>
-                    <div class="menu modal-body">
-                        <div class="row w-100">
-                            <div class="items p-0 col-12 text-center">
-                                <!-- Append [navbar] -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @include('footer')
         <!--====== Modal Responsive Menu Area End ======-->
 
         <!--====== Scroll To Top Area Start ======-->
@@ -596,6 +516,98 @@
 
     <!-- Main js -->
     <script src="{{asset('assets/js/main.js')}}"></script>
+    
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    
+    <!-- Contact Form Handler -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const contactForm = document.getElementById('contact-form');
+            
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Get form data
+                    const formData = new FormData(this);
+                    const submitButton = this.querySelector('button[type="submit"]');
+                    const originalButtonText = submitButton.textContent;
+                    
+                    // Disable submit button and show loading
+                    submitButton.disabled = true;
+                    submitButton.textContent = '{{ __("Sending...") }}';
+                    
+                    // Send AJAX request
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success alert
+                            Swal.fire({
+                                icon: 'success',
+                                title: '{{ __("Success!") }}',
+                                text: data.message,
+                                confirmButtonColor: '#006ce7',
+                                confirmButtonText: '{{ __("OK") }}'
+                            });
+                            
+                            // Reset form
+                            contactForm.reset();
+                        } else {
+                            // Show error alert
+                            Swal.fire({
+                                icon: 'error',
+                                title: '{{ __("Error!") }}',
+                                text: data.message || '{{ __("landing.contact.error_message") }}',
+                                confirmButtonColor: '#006ce7',
+                                confirmButtonText: '{{ __("OK") }}'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Show error alert
+                        Swal.fire({
+                            icon: 'error',
+                            title: '{{ __("Error!") }}',
+                            text: '{{ __("landing.contact.error_message") }}',
+                            confirmButtonColor: '#006ce7',
+                            confirmButtonText: '{{ __("OK") }}'
+                        });
+                    })
+                    .finally(() => {
+                        // Re-enable submit button
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalButtonText;
+                    });
+                });
+            }
+        });
+    </script>
+    
+    <!-- Initialize Bootstrap Dropdowns -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all dropdowns
+            const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
+            const dropdownList = [...dropdownElementList].map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl));
+            
+            // Debug: Log when dropdown is clicked
+            document.querySelectorAll('.dropdown-toggle').forEach(function(element) {
+                element.addEventListener('click', function(e) {
+                    console.log('Dropdown clicked');
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

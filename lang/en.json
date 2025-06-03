@@ -833,5 +833,13 @@
     "Rejected": "Rejected",
     "Reject Order": "Reject Order",
     "Are you sure you want to reject this order? This action cannot be undone.": "Are you sure you want to reject this order? This action cannot be undone.",
-    "sale_orders": "Sale Orders"
+    "sale_orders": "Sale Orders",
+    "nav": {
+        "home": "Home",
+        "about_us": "About Us",
+        "terms_conditions": "Terms & Conditions",
+        "privacy_policy": "Privacy Policy",
+        "contact_us": "Contact Us",
+        "language": "EN"
+    }
 }
