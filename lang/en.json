@@ -832,5 +832,6 @@
     "Sold": "Sold",
     "Rejected": "Rejected",
     "Reject Order": "Reject Order",
-    "Are you sure you want to reject this order? This action cannot be undone.": "Are you sure you want to reject this order? This action cannot be undone."
+    "Are you sure you want to reject this order? This action cannot be undone.": "Are you sure you want to reject this order? This action cannot be undone.",
+    "sale_orders": "Sale Orders"
 }

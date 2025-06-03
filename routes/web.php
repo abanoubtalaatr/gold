@@ -220,12 +220,20 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
 
 
 
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
-    // Orders
-    Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders.index');
-    Route::get('/orders/{id}/{type}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('admin.orders.show');
-});
+// Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+//     // Orders
+//     Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders.index');
+//     Route::get('/orders/{id}/{type}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('admin.orders.show');
+// });
 
+
+Route::middleware(['auth', 'verified'])->prefix('admin/orders')->group(function () {
+    Route::get('/rental', [\App\Http\Controllers\Admin\OrderController::class, 'rentalIndex'])->name('admin.orders.rental.index');
+    Route::get('/rental/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'showRental'])->name('admin.orders.rental.show');
+
+    Route::get('/sale', [\App\Http\Controllers\Admin\OrderController::class, 'saleIndex'])->name('admin.orders.sale.index');
+    Route::get('/sale/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'showSale'])->name('admin.orders.sale.show');
+});
 /************************************************************************ */
 
 
@@ -380,4 +388,3 @@ require __DIR__ . '/auth.php';
 
 //     return response()->json(['message' => 'Notification sent successfully']);
 // });
-

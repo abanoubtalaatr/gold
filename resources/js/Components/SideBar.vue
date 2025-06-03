@@ -203,11 +203,24 @@
                 </Link>
             </li>
 
+            <!-- Admin rental orders -->
+
             <li class="nav-item">
-                <Link class="nav-link" :href="route('admin.orders.index')"
-                    :class="{ collapsed: !$page.url.startsWith('/admin/orders') }">
+                <Link class="nav-link" :href="route('admin.orders.rental.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/admin/orders/rental') }">
+                <i class="bi bi-cart-check"></i>
+                <span>{{ $t("rental_orders") }}</span>
+                </Link>
+            </li>
+
+
+            <!-- Admin sale orders -->
+
+              <li class="nav-item">
+                <Link class="nav-link" :href="route('admin.orders.sale.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/admin/orders/sale') }">
                 <i class="bi bi-cart"></i>
-                <span>{{ $t("orders") }}</span>
+                <span>{{ $t("sale_orders") }}</span>
                 </Link>
             </li>
 

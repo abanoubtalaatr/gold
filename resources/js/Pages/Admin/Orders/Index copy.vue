@@ -1,4 +1,5 @@
 <template>
+
     <Head title="Orders Management" />
 
     <AuthenticatedLayout>
@@ -21,13 +22,20 @@
                                         :placeholder="$t('Search by user or piece name...')" />
                                 </div>
 
+                                <!-- <select v-model="form.type"
+                                    class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">{{ $t('All Types') }}</option>
+                                    <option value="rent">{{ $t('Rental') }}</option>
+                                    <option value="sale">{{ $t('Sale') }}</option>
+                                </select> -->
+
                                 <select v-model="form.status"
                                     class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     v-if="form.type === 'rent' || !form.type">
                                     <option value="">{{ $t('All Statuses') }}</option>
-                                    <option value="current">{{ $t('Current') }}</option>
+                                    <option value="active">{{ $t('Active') }}</option>
                                     <option value="future">{{ $t('Future') }}</option>
-                                    <option value="finished">{{ $t('Finished') }}</option>
+                                    <option value="completed">{{ $t('Completed') }}</option>
                                 </select>
 
                                 <select v-model="form.time_range"
@@ -168,7 +176,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span
                                                 :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(order.status).class]">
-                                                {{ getStatusDisplayText(order.status) }}
+                                                {{ getStatusClass(order.status).text }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -242,7 +250,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                              <span
                                                 :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(order.status).class]">
-                                                {{ getStatusDisplayText(order.status) }}
+                                                {{ getStatusClass(order.status).text }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -314,20 +322,7 @@ const form = useForm({
 });
 
 const applyFilters = () => {
-    // Convert display status to actual status values before sending to backend
-    const statusMap = {
-        'current': 'rented',
-        'future': 'pending_approval,approved,piece_sent',
-        'finished': 'available,sold,rejected'
-    };
-
-    const filters = {
-        ...form.data(),
-        status: statusMap[form.status] || form.status
-    };
-
     form.get(route('admin.orders.index'), {
-        data: filters,
         preserveState: true,
         preserveScroll: true,
     });
@@ -341,53 +336,47 @@ const resetFilters = () => {
     });
 };
 
-const getStatusDisplayText = (status) => {
-    const statusMap = {
-        'pending_approval': t('Future'),
-        'approved': t('Future'),
-        'piece_sent': t('Future'),
-        'rented': t('Current'),
-        'available': t('Finished'),
-        'sold': t('Finished'),
-        'rejected': t('Finished')
-    };
-
-    return statusMap[status] || t(status);
-};
-
 const getStatusClass = (status) => {
     switch (status) {
         case 'pending_approval':
             return {
-                class: 'bg-yellow-100 text-yellow-800'
+                class: 'bg-yellow-100 text-yellow-800',
+                text: t('pending_approval')
             };
         case 'approved':
             return {
-                class: 'bg-green-100 text-green-800'
+                class: 'bg-green-100 text-green-800',
+                text: t('approved')
             };
         case 'piece_sent':
             return {
-                class: 'bg-blue-100 text-blue-800'
+                class: 'bg-blue-100 text-blue-800',
+                text: t('piece_sent')
             };
         case 'available':
             return {
-                class: 'bg-indigo-100 text-indigo-800'
+                class: 'bg-indigo-100 text-indigo-800',
+                text: t('available')
             };
         case 'rented':
             return {
-                class: 'bg-purple-100 text-purple-800'
+                class: 'bg-purple-100 text-purple-800',
+                text: t('rented')
             };
         case 'sold':
             return {
-                class: 'bg-gray-100 text-gray-800'
+                class: 'bg-gray-100 text-gray-800',
+                text: t('sold')
             };
         case 'rejected':
             return {
-                class: 'bg-red-100 text-red-800'
+                class: 'bg-red-100 text-red-800',
+                text: t('rejected')
             };
         default:
             return {
-                class: 'bg-gray-100 text-gray-800'
+                class: 'bg-gray-100 text-gray-800',
+                text: t(status) // fallback to translation if exists
             };
     }
 };
@@ -410,6 +399,7 @@ watch(() => form.time_range, (newValue) => {
 </script>
 
 <style scoped>
+/* Add your custom styles here */
 .order-name {
     border: none;
     background-color: transparent;

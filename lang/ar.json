@@ -1428,5 +1428,15 @@
     "State": "الولاية",
     "Country": "البلد",
     "Save": "حفظ",
-    "Cities": "المدن"
+    "Cities": "المدن",
+    "sale_orders": "طلبات البيع",
+    "finished": "منتهي",
+    "future": "مستقبلي",
+    "current": "حالي",
+    "confirmed": "مؤكد",
+    "Today": "اليوم",
+    "This Week": "هذا الاسبوع",
+    "Custom Range": "نطاق مخصص",
+    "Completed": "منتهي",
+    "Future": "مستقبلي"
 }

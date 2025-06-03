@@ -134,23 +134,23 @@ class DashboardController extends Controller
                 }
             };
 
-            $totalGoldPieces = GoldPiece::whereIsActive(1)->count();
-            
+            $totalGoldPieces = GoldPiece::count();
+
             $averageOrderValue = OrderSale::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
                 ->where('status', 'completed')
-                ->avg('total_amount') ?: 0;
+                ->avg('total_price') ?: 0;
 
             $totalRevenue = OrderSale::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
                 ->where('status', 'completed')
-                ->sum('total_amount') ?: 0;
+                ->sum('total_price') ?: 0;
 
-            $pendingOrders = OrderSale::where('status', 'pending')->count() + 
-                           OrderRental::where('status', 'pending')->count();
+            $pendingOrders = OrderSale::where('status', 'pending')->count() +
+                OrderRental::where('status', 'pending')->count();
 
             $completedOrders = OrderSale::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-                ->where('status', 'completed')->count() + 
+                ->where('status', 'completed')->count() +
                 OrderRental::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-                ->where('status', 'completed')->count();
+                    ->where('status', 'completed')->count();
 
             return [
                 'total_gold_pieces' => $totalGoldPieces,
@@ -171,7 +171,7 @@ class DashboardController extends Controller
 
         return Cache::remember($cacheKey, 30, function () use ($period, $start_date, $end_date) {
             $query = OrderSale::where('status', 'completed');
-            
+
             if ($period !== 'all') {
                 $this->applyPeriodFilter($query, $period);
             }
@@ -179,8 +179,8 @@ class DashboardController extends Controller
                 $query->whereBetween('created_at', [$start_date, $end_date]);
             }
 
-            $currentRevenue = $query->sum('total_amount') ?: 0;
-            
+            $currentRevenue = $query->sum('total_price') ?: 0;
+
             // Calculate previous period for comparison
             $previousQuery = OrderSale::where('status', 'completed');
             if ($period === 'monthly') {
@@ -200,8 +200,8 @@ class DashboardController extends Controller
                 ]);
             }
 
-            $previousRevenue = $previousQuery->sum('total_amount') ?: 0;
-            $growthRate = $previousRevenue > 0 ? 
+            $previousRevenue = $previousQuery->sum( 'total_price') ?: 0;
+            $growthRate = $previousRevenue > 0 ?
                 (($currentRevenue - $previousRevenue) / $previousRevenue) * 100 : 0;
 
             return [
@@ -273,7 +273,7 @@ class DashboardController extends Controller
                         'type' => 'sale',
                         'user_name' => $order->user->name ?? 'N/A',
                         'gold_piece' => $order->goldPiece->name ?? 'N/A',
-                        'amount' => $order->total_amount,
+                        'amount' => $order->total_price,
                         'status' => $order->status,
                         'created_at' => $order->created_at->format('M d, Y H:i'),
                     ];
@@ -289,7 +289,7 @@ class DashboardController extends Controller
                         'type' => 'rental',
                         'user_name' => $order->user->name ?? 'N/A',
                         'gold_piece' => 'Rental Item',
-                        'amount' => $order->total_amount ?? 0,
+                        'amount' => $order->total_price ?? 0,
                         'status' => $order->status,
                         'created_at' => $order->created_at->format('M d, Y H:i'),
                     ];
@@ -384,14 +384,14 @@ class DashboardController extends Controller
             for ($i = 5; $i >= 0; $i--) {
                 $month = Carbon::now()->subMonths($i);
                 $last6Months[] = $month->format('M Y');
-                
+
                 $revenue = OrderSale::where('status', 'completed')
                     ->whereBetween('created_at', [
                         $month->startOfMonth()->copy(),
                         $month->endOfMonth()->copy()
                     ])
-                    ->sum('total_amount') ?: 0;
-                    
+                    ->sum('total_price') ?: 0;
+
                 $revenueData[] = round($revenue, 2);
             }
 
