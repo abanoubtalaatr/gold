@@ -172,22 +172,7 @@
         <!--====== Footer Area End ======-->
 
         <!--====== Modal Responsive Menu Area Start ======-->
-        <div id="menu" class="modal fade p-0">
-            <div class="modal-dialog modal-dialog-slideout">
-                <div class="modal-content full">
-                    <div class="modal-header" data-bs-dismiss="modal">
-                        {{ __('terms.menu.title') }} <i class="icon-close"></i>
-                    </div>
-                    <div class="menu modal-body">
-                        <div class="row w-100">
-                            <div class="items p-0 col-12 text-center">
-                                <!-- Append [navbar] -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
         <!--====== Modal Responsive Menu Area End ======-->
 
         <!--====== Scroll To Top Area Start ======-->

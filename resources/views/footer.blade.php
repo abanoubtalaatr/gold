@@ -373,13 +373,27 @@ $(document).ready(function() {
             return;
         }
         
-        // Handle anchor links (same page navigation)
+        // Handle anchor links
         if (originalHref && originalHref.includes('#')) {
-            const hash = originalHref.substring(originalHref.indexOf('#'));
+            const hashPart = originalHref.substring(originalHref.indexOf('#'));
+            const urlWithoutHash = originalHref.substring(0, originalHref.indexOf('#'));
+            const currentPathname = window.location.pathname;
+            const currentOrigin = window.location.origin;
             
-            // Check if it's navigation to the same page
-            if (originalHref.includes(window.location.pathname) || originalHref.startsWith('/') || originalHref.startsWith('#')) {
-                console.log('Handling anchor navigation to:', hash);
+            console.log('Hash part:', hashPart);
+            console.log('URL without hash:', urlWithoutHash);
+            console.log('Current pathname:', currentPathname);
+            
+            // Check if we're navigating to the same page or to the landing page
+            const isLandingPage = urlWithoutHash === currentOrigin || urlWithoutHash === currentOrigin + '/' || urlWithoutHash === '';
+            const isCurrentPage = currentPathname === '/' || currentPathname === '';
+            
+            console.log('Is landing page URL:', isLandingPage);
+            console.log('Is current page landing:', isCurrentPage);
+            
+            // If we're already on the landing page and clicking an anchor link
+            if (isLandingPage && isCurrentPage) {
+                console.log('Same page anchor navigation');
                 e.preventDefault();
                 e.stopPropagation();
                 
@@ -388,10 +402,10 @@ $(document).ready(function() {
                 
                 // Navigate after modal is hidden
                 $('#menu').on('hidden.bs.modal.modalNav', function() {
-                    $(this).off('hidden.bs.modal.modalNav'); // Remove this specific handler
+                    $(this).off('hidden.bs.modal.modalNav');
                     
-                    console.log('Modal hidden, navigating to:', hash);
-                    const targetElement = $(hash);
+                    console.log('Modal hidden, scrolling to:', hashPart);
+                    const targetElement = $(hashPart);
                     if (targetElement.length) {
                         $('html, body').animate({
                             scrollTop: targetElement.offset().top
@@ -399,21 +413,33 @@ $(document).ready(function() {
                         
                         // Update URL
                         if (window.history.pushState) {
-                            window.history.pushState(null, null, hash);
+                            window.history.pushState(null, null, hashPart);
                         }
-                    } else {
-                        console.log('Target element not found, doing full navigation');
-                        // Target not found, do full navigation
-                        window.location.href = originalHref;
                     }
+                });
+                return false;
+            } 
+            // If we need to navigate to landing page with anchor
+            else if (isLandingPage && !isCurrentPage) {
+                console.log('Navigate to landing page with anchor');
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Close the modal and navigate to the landing page
+                $('#menu').modal('hide');
+                
+                $('#menu').on('hidden.bs.modal.modalNav', function() {
+                    $(this).off('hidden.bs.modal.modalNav');
+                    console.log('Modal hidden, navigating to landing page with hash:', originalHref);
+                    window.location.href = originalHref;
                 });
                 return false;
             }
         }
         
-        // Handle full page navigation (terms, privacy, etc.)
-        if (originalHref && !originalHref.startsWith('#') && originalHref !== '') {
-            console.log('Handling page navigation to:', originalHref);
+        // Handle full page navigation (terms, privacy, etc.) - no anchors
+        if (originalHref && !originalHref.includes('#') && originalHref !== '') {
+            console.log('Handling full page navigation to:', originalHref);
             
             // Let Bootstrap handle the modal dismissal for these
             if ($link.attr('data-bs-dismiss') === 'modal') {
