@@ -48,11 +48,21 @@
         #content h1 {
             font-size: inherit;
         }
+
+        /* Disable automatic breadcrumb separators */
+        .breadcrumb-area .breadcrumb-content .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+            content: none !important;
+        }
     </style>
     @else
     <style>
         #content h1 {
             font-size: inherit;
+        }
+
+        /* Disable automatic breadcrumb separators */
+        .breadcrumb-area .breadcrumb-content .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+            content: none !important;
         }
     </style>
     @endif
@@ -96,14 +106,21 @@
                         <!-- Breamcrumb Content -->
                         <div class="breadcrumb-content text-center">
                             <h2 class="text-white">{{ __('terms.breadcrumb.title') }}</h2>
-                            <ol class="breadcrumb d-flex justify-content-center">
-                                <li class="breadcrumb-item">
-                                    <a class="text-white" href="{{ route('landing') }}">{{ __('terms.breadcrumb.home') }}</a>
-                                </li>
-                                <li class="breadcrumb-item text-white active">
-                                    {{ __('terms.breadcrumb.title') }}
-                                </li>
-                            </ol>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb d-flex justify-content-center align-items-center gap-2">
+                                    <li class="breadcrumb-item">
+                                        <a href="{{ route('landing') }}" class="text-white text-decoration-none hover:text-primary transition-colors">
+                                            {{ __('terms.breadcrumb.home') }}
+                                        </a>
+                                    </li>
+                                    <li class="breadcrumb-item text-white-50">
+                                        <i class="fa-solid {{ app()->isLocale('ar') ? 'fa-chevron-left' : 'fa-chevron-right' }} fa-xs"></i>
+                                    </li>
+                                    <li class="breadcrumb-item active text-white" aria-current="page">
+                                        {{ __('terms.breadcrumb.title') }}
+                                    </li>
+                                </ol>
+                            </nav>
                         </div>
                     </div>
                 </div>

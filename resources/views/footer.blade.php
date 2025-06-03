@@ -11,37 +11,33 @@
                     <div class="mobile-nav-section">
                         <ul class="mobile-nav-list">
                             <li>
-                                <a href="{{ route('landing') }}" data-bs-dismiss="modal">
+                                <a href="{{ route('landing') }}" >
                                     <i class="fas fa-home"></i>
                                     <span>{{ __('landing.nav.home') }}</span>
                                 </a>
                             </li>
-                            <li>
-                                <a href="{{ route('landing') }}#about" data-bs-dismiss="modal">
-                                    <i class="fas fa-info-circle"></i>
-                                    <span>{{ __('landing.nav.about') }}</span>
-                                </a>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('landing') }}#about" data-bs-dismiss="modal">@lang('landing.nav.about')</a>
                             </li>
-                            <li>
-                                <a href="{{ route('landing') }}#features" data-bs-dismiss="modal">
-                                    <i class="fas fa-star"></i>
-                                    <span>{{ __('landing.features.title') }}</span>
-                                </a>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('landing') }}#features" data-bs-dismiss="modal">@lang('landing.features.title')</a>
                             </li>
+                            
                             <li>
-                                <a href="{{ route('terms') }}" data-bs-dismiss="modal">
+                                <a href="{{ route('terms') }}" >
                                     <i class="fas fa-file-contract"></i>
                                     <span>{{ __('landing.nav.terms') }}</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('privacy') }}" data-bs-dismiss="modal">
+                                <a href="{{ route('privacy') }}" >
                                     <i class="fas fa-shield-alt"></i>
                                     <span>{{ __('landing.nav.privacy') }}</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('landing') }}#contact" data-bs-dismiss="modal">
+                                <a href="{{ route('landing') }}#contact" >
                                     <i class="fas fa-envelope"></i>
                                     <span>{{ __('landing.nav.contact') }}</span>
                                 </a>
@@ -73,16 +69,16 @@
                     <div class="mobile-social-section">
                         <h6>{{ __('landing.footer.description') }}</h6>
                         <div class="social-buttons">
-                            <a href="#" class="social-btn">
+                            <a href="#" class="social-btn" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
-                            <a href="#" class="social-btn">
+                            <a href="#" class="social-btn" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-twitter"></i>
                             </a>
-                            <a href="#" class="social-btn">
+                            <a href="#" class="social-btn" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-linkedin-in"></i>
                             </a>
-                            <a href="#" class="social-btn">
+                            <a href="#" class="social-btn" target="_blank" rel="noopener noreferrer">
                                 <i class="fab fa-instagram"></i>
                             </a>
                         </div>
@@ -339,3 +335,101 @@
     background: rgba(255, 255, 255, 0.5);
 }
 </style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    console.log('Modal navigation script loaded');
+    
+    // Simple solution: Handle modal navigation directly and prevent jQuery errors
+    $('#menu .modal-body a[href*="#"]').each(function() {
+        const $link = $(this);
+        const originalHref = $link.attr('href');
+        
+        console.log('Processing link:', originalHref);
+        
+        // Store the original href in a data attribute
+        $link.attr('data-original-href', originalHref);
+        
+        // Replace problematic URLs with just the hash part for jQuery compatibility
+        if (originalHref.includes('#')) {
+            const hashPart = originalHref.substring(originalHref.indexOf('#'));
+            $link.attr('href', hashPart);
+            console.log('Updated href to:', hashPart);
+        }
+    });
+    
+    // Handle clicks on modal navigation links
+    $('#menu .modal-body a').on('click', function(e) {
+        const $link = $(this);
+        const originalHref = $link.attr('data-original-href') || $link.attr('href');
+        const isExternal = $link.attr('target') === '_blank';
+        
+        console.log('Link clicked:', originalHref, 'External:', isExternal);
+        
+        // Don't interfere with external links
+        if (isExternal) {
+            console.log('External link, allowing default behavior');
+            return;
+        }
+        
+        // Handle anchor links (same page navigation)
+        if (originalHref && originalHref.includes('#')) {
+            const hash = originalHref.substring(originalHref.indexOf('#'));
+            
+            // Check if it's navigation to the same page
+            if (originalHref.includes(window.location.pathname) || originalHref.startsWith('/') || originalHref.startsWith('#')) {
+                console.log('Handling anchor navigation to:', hash);
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Close the modal
+                $('#menu').modal('hide');
+                
+                // Navigate after modal is hidden
+                $('#menu').on('hidden.bs.modal.modalNav', function() {
+                    $(this).off('hidden.bs.modal.modalNav'); // Remove this specific handler
+                    
+                    console.log('Modal hidden, navigating to:', hash);
+                    const targetElement = $(hash);
+                    if (targetElement.length) {
+                        $('html, body').animate({
+                            scrollTop: targetElement.offset().top
+                        }, 500);
+                        
+                        // Update URL
+                        if (window.history.pushState) {
+                            window.history.pushState(null, null, hash);
+                        }
+                    } else {
+                        console.log('Target element not found, doing full navigation');
+                        // Target not found, do full navigation
+                        window.location.href = originalHref;
+                    }
+                });
+                return false;
+            }
+        }
+        
+        // Handle full page navigation (terms, privacy, etc.)
+        if (originalHref && !originalHref.startsWith('#') && originalHref !== '') {
+            console.log('Handling page navigation to:', originalHref);
+            
+            // Let Bootstrap handle the modal dismissal for these
+            if ($link.attr('data-bs-dismiss') === 'modal') {
+                console.log('Has data-bs-dismiss, allowing default behavior');
+                return; // Let the browser handle navigation normally
+            }
+            
+            // For links without data-bs-dismiss, close modal manually
+            console.log('No data-bs-dismiss, closing modal manually');
+            e.preventDefault();
+            $('#menu').modal('hide');
+            
+            setTimeout(function() {
+                window.location.href = originalHref;
+            }, 300);
+        }
+    });
+});
+</script>
