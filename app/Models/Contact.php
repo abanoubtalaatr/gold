@@ -25,6 +25,7 @@ class Contact extends Model
         'sale_order_id',
         'rental_order_id',
         'status',
+        'is_to_admin',
     ];
 
 

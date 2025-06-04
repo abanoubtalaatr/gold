@@ -61,10 +61,10 @@
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Status') }}
                                         </th>
-                                        <th
+                                        <!-- <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Related Order') }}
-                                        </th>
+                                        </th> -->
                                         <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Actions') }}
@@ -84,7 +84,7 @@
                                                 {{ complaint.vendor.name }} ({{ $t('Vendor') }})
                                             </div>
                                             <div v-else>
-                                                {{ complaint.name || 'N/A' }}
+                                                {{ complaint.user.name || 'N/A' }}
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -101,10 +101,10 @@
                                                 {{ formatStatus(complaint) }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             <div v-if="complaint.rental_order">
                                                 <p><strong>{{ $t('Rental Order') }} #{{ complaint.rental_order.id
-                                                }}</strong>
+                                                        }}</strong>
                                                 </p>
                                                 <p v-if="complaint.rental_order.branch">{{ $t('Branch') }}: {{
                                                     complaint.rental_order.branch.name }}</p>
@@ -113,7 +113,7 @@
                                             </div>
                                             <div v-else-if="complaint.sale_order">
                                                 <p><strong>{{ $t('Sale Order') }} #{{ complaint.sale_order.id
-                                                }}</strong></p>
+                                                        }}</strong></p>
                                                 <p v-if="complaint.sale_order.branch">{{ $t('Branch') }}: {{
                                                     complaint.sale_order.branch.name }}</p>
                                                 <p v-if="complaint.sale_order.branch?.vendor">{{ $t('Vendor') }}: {{
@@ -122,7 +122,7 @@
                                             <div v-else>
                                                 N/A
                                             </div>
-                                        </td>
+                                        </td> -->
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="relative inline-block text-left dropdown selesct">
                                                 <button type="button"
@@ -181,7 +181,7 @@
                                 <div>
                                     <p><strong>{{ $t('Complainant') }}:</strong>
                                         <span v-if="selectedComplaint.user">
-                                            {{ selectedComplaint.user.name }} ({{ $t('User') }})
+                                            {{ selectedComplaint.user.name }}
                                         </span>
                                         <span v-else-if="selectedComplaint.vendor">
                                             {{ selectedComplaint.vendor.name }} ({{ $t('Vendor') }})
@@ -190,8 +190,10 @@
                                             {{ selectedComplaint.name || 'N/A' }}
                                         </span>
                                     </p>
-                                    <p><strong>{{ $t('Email') }}:</strong> {{ selectedComplaint.email || 'N/A' }}</p>
-                                    <p><strong>{{ $t('Phone') }}:</strong> {{ selectedComplaint.phone || 'N/A' }}</p>
+                                    <p><strong>{{ $t('Email') }}:</strong> {{ selectedComplaint.user.email || 'N/A' }}
+                                    </p>
+                                    <p><strong>{{ $t('Phone') }}:</strong> {{ selectedComplaint.user.mobile || 'N/A' }}
+                                    </p>
                                 </div>
                                 <div>
                                     <p><strong>{{ $t('Date') }}:</strong> {{ formatDate(selectedComplaint.created_at) }}

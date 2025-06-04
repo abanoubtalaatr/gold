@@ -314,7 +314,7 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::put('gold-pieces/{goldPiece}/approve', [GoldPieceController::class, 'approve'])
         ->name('gold-pieces.approve');
 
-     Route::put('gold-pieces/{goldPiece}/reject', [GoldPieceController::class, 'reject'])
+    Route::put('gold-pieces/{goldPiece}/reject', [GoldPieceController::class, 'reject'])
         ->name('gold-pieces.reject');
 
 
@@ -336,6 +336,8 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::post('contacts/{contact}/replay', [VendorContactController::class, 'reply'])->name('contacts.reply');
     Route::PATCH('contacts/{contact}/markAsRead', [VendorContactController::class, 'markAsRead'])->name('contacts.markAsRead');
 
+    Route::get('/contacts/vendor-messages', [VendorContactController::class, 'vendorMessages'])
+        ->name('contacts.vendor-messages');
 
     route::controller(OrderSalesController::class)->group(function () {
         Route::get('/sale-orders', 'index')->name('orders.sale.index');

@@ -19,6 +19,11 @@ class ComplaintController extends Controller
             'rentalOrder' => fn($query) => $query->with(['branch.vendor']),
             'saleOrder' => fn($query) => $query->with(['branch.vendor'])
         ])
+            ->where('is_to_admin', '1')
+            ->orWhere(function ($query) {
+                $query->whereNull('sale_order_id')
+                    ->whereNull('rental_order_id');
+            })
             ->latest()
             ->filter($request->only('search', 'status'))
             ->paginate(10)

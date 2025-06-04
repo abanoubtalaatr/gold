@@ -27,15 +27,22 @@ class ContactController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+
+        $vendorMessages = Contact::where('is_to_admin', '1')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->paginate(10, ['*'], 'vendor_messages_page');
+
         return inertia('Vendor/Compalins/index', [
             'contacts' => $contacts,
+            'vendorMessages' => $vendorMessages,
             'filters' => $request->all('search', 'type', 'status'),
         ]);
     }
 
 
 
-     public function create()
+    public function create()
     {
         return inertia('Vendor/Compalins/Create');
     }
@@ -51,12 +58,13 @@ class ContactController extends Controller
             'subject' => $request->subject,
             'message' => $request->message,
             'user_id' => auth()->user()->id,
+            'is_to_admin' => '1'
         ]);
 
         return redirect()->route('vendor.contacts.index')->with('success', 'Your message has been sent to admin.');
     }
 
-    
+
     public function markAsRead(Contact $contact)
     {
         $contact->update([
@@ -88,5 +96,18 @@ class ContactController extends Controller
         ]);
 
         return back()->with('success', 'Reply sent successfully.');
+    }
+
+    public function vendorMessages()
+    {
+        $messages = Contact::
+            where('is_to_admin', '1')
+            ->where('user_id', auth()->user()->id)
+            ->latest()
+            ->paginate(10);
+        return inertia('Vendor/Compalins/index', [
+            'vendorMessages' => $messages,
+            'filters' => request()->all(['search', 'type', 'status']),
+        ]);
     }
 }
