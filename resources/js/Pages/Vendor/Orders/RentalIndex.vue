@@ -215,6 +215,65 @@
                 </div>
             </div>
         </div>
+
+        <!-- Order Details Modal -->
+        <Modal :show="showDetailsModal" @close="closeDetailsModal">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
+                <div
+                    class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="p-6">
+                        <h2 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Gold Piece Details') }}</h2>
+                        <div v-if="selectedOrder" class="mt-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <p><strong>{{ $t('Name') }}:</strong>
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.name ?
+                                            selectedOrder.gold_piece.name :
+                                        'N/A' }}
+                                    </p>
+                                    <p><strong>{{ $t('Description') }}:</strong>
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.description ?
+                                            selectedOrder.gold_piece.description :
+                                        'N/A' }}
+                                    </p>
+                                    <p><strong>{{ $t('Type') }}:</strong> {{ selectedOrder.goldPiece?.type === 'rent' ?
+                                        $t('Rental') : $t('Sale') }}</p>
+                                    <p><strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR')
+                                        }}</p>
+                                    <p><strong>{{ $t('Weight') }}:</strong>
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.weight ?
+                                            selectedOrder.gold_piece.weight :
+                                        'N/A' }}
+                                        {{
+                                            $t('grams') }}</p>
+                                    <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || 'N/A' }}</p>
+                                    <p><strong>{{ $t('Status') }}:</strong> {{ getDisplayStatus(selectedOrder.status) }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p><strong>{{ $t('Images') }}:</strong></p>
+                                    <div v-if="selectedOrder.gold_piece?.images?.length" class="flex flex-wrap gap-2">
+                                        <img v-for="image in selectedOrder.gold_piece.images" :key="image.id"
+                                            :src="image.url" class="h-20 w-20 object-cover rounded"
+                                            alt="Gold piece image" />
+                                    </div>
+                                    <p v-else>{{ $t('No images available') }}</p>
+                                    <p class="mt-4"><strong>{{ $t('QR Code') }}:</strong></p>
+                                    <img v-if="selectedOrder.gold_piece?.qr_code"
+                                        :src="selectedOrder.gold_piece.qr_code" class="h-24 w-24" alt="QR Code" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end">
+                            <button @click="closeDetailsModal"
+                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                                {{ $t('Close') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Modal>
     </AuthenticatedLayout>
 </template>
 
@@ -425,8 +484,6 @@ const acceptOrderDirect = (order) => {
         }
     });
 };
-
-
 
 // Update the rejectOrderDirect function
 const rejectOrderDirect = async (order) => {
