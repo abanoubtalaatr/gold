@@ -12,9 +12,18 @@ class ContactController extends Controller
 {
     public function index(Request $request)
     {
+        $vendorId = auth()->user()->id;
+
         $contacts = Contact::with(['user', 'rentalOrder', 'saleOrder'])
             ->latest()
             ->filter($request->only('search', 'type', 'status'))
+            ->where(function ($query) use ($vendorId) {
+                $query->whereHas('saleOrder.branch', function ($q) use ($vendorId) {
+                    $q->where('vendor_id', $vendorId);
+                })->orWhereHas('rentalOrder.branch', function ($q) use ($vendorId) {
+                    $q->where('vendor_id', $vendorId);
+                });
+            })
             ->paginate(10)
             ->withQueryString();
 
@@ -24,6 +33,30 @@ class ContactController extends Controller
         ]);
     }
 
+
+
+     public function create()
+    {
+        return inertia('Vendor/Compalins/Create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|min:10',
+        ]);
+
+        Contact::create([
+            'subject' => $request->subject,
+            'message' => $request->message,
+            'user_id' => auth()->user()->id,
+        ]);
+
+        return redirect()->route('vendor.contacts.index')->with('success', 'Your message has been sent to admin.');
+    }
+
+    
     public function markAsRead(Contact $contact)
     {
         $contact->update([

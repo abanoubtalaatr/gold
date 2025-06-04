@@ -19,7 +19,9 @@
                                 <input v-model="form.search" type="text"
                                     class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     :placeholder="$t('Search by name, email...')" @input="debouncedSearch" />
+
                             </div>
+
                             <div class="flex items-center gap-4">
                                 <select v-model="form.type"
                                     class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -41,11 +43,16 @@
                                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
                                     {{ $t('Reset') }}
                                 </button>
+                                <Link :href="route('vendor.contacts.create')"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                {{ $t('Contact Admin') }}
+                                </Link>
                             </div>
                         </div>
 
                         <!-- Contacts Table -->
                         <div v-if="contacts?.data?.length > 0" class="overflow-x-auto">
+
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
@@ -228,14 +235,14 @@
 
                             <div v-if="selectedContact.rentalOrder">
                                 <p><strong>{{ $t('Related Rental Order') }} (ID: {{ selectedContact.rentalOrder.id
-                                }})</strong>
+                                        }})</strong>
                                 </p>
                                 <p>{{ $t('Status') }}: {{ formatStatus(selectedContact.rentalOrder) }}</p>
                             </div>
 
                             <div v-if="selectedContact.saleOrder">
                                 <p><strong>{{ $t('Related Sale Order') }} (ID: {{ selectedContact.saleOrder.id
-                                }})</strong></p>
+                                        }})</strong></p>
                                 <p>{{ $t('Status') }}: {{ formatStatus(selectedContact.saleOrder) }}</p>
                             </div>
 
@@ -266,14 +273,14 @@
                     <div class="p-6">
                         <h2 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Reply to Contact') }}</h2>
                         <p class="mb-2"><strong>{{ $t('From') }}:</strong> {{ replyForm.name }} &lt;{{ replyForm.email
-                        }}&gt;
+                            }}&gt;
                         </p>
                         <p class="mb-4"><strong>{{ $t('Subject') }}:</strong> {{ replyForm.subject }}</p>
 
                         <form @submit.prevent="sendReply">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Your Reply')
-                                }}</label>
+                                    }}</label>
                                 <textarea v-model="replyForm.message" rows="5"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                     required></textarea>
@@ -302,7 +309,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { Head, useForm, router } from '@inertiajs/vue3';
+import { Head, useForm, Link, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
 import Modal from '@/Components/Modal.vue';
