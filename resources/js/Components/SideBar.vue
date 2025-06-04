@@ -133,41 +133,41 @@
 
 
             <!-- Complaints -->
-            <!-- <li class="nav-item" v-if="hasPermission('vendor read users')">
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
                 <Link class="nav-link" :href="route('vendor.contacts.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/contacts') }">
                 <i class="bi bi-person-lines-fill"></i>
                 <span>{{ $t("Complaints") }}</span>
                 </Link>
-            </li> -->
+            </li>
 
 
             <!-- Wallet -->
-            <!-- <li class="nav-item" v-if="hasPermission('vendor read users')">
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
                 <Link class="nav-link" :href="route('vendor.wallet.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/wallet') }">
                 <i class="bi bi-wallet"></i>
                 <span>{{ $t("Wallet") }}</span>
                 </Link>
-            </li> -->
+            </li>
 
             <!-- Reports -->
-            <!-- <li class="nav-item" v-if="hasPermission('vendor read users')">
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
                 <Link class="nav-link" :href="route('vendor.reports.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/reports') }">
                 <i class="bi bi-file-earmark-bar-graph"></i>
                 <span>{{ $t("Reports") }}</span>
                 </Link>
-            </li> -->
+            </li>
 
             <!-- Store Information -->
-            <!-- <li class="nav-item" v-if="hasPermission('vendor read users')">
+            <li class="nav-item" v-if="hasPermission('vendor read users')">
                 <Link class="nav-link" :href="route('vendor.store.show')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/store/show') }">
                 <i class="bi bi-shop"></i>
                 <span>{{ $t("Store Information") }}</span>
                 </Link>
-            </li> -->
+            </li>
 
 
 

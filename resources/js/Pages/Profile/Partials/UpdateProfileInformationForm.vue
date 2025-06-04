@@ -114,7 +114,7 @@ const handleAvatarChange = (file) => {
             <div class="flex items-center gap-4">
                 <PrimaryButton :disabled="form.processing">{{
                     $t("save")
-                    }}</PrimaryButton>
+                }}</PrimaryButton>
 
                 <Transition enter-active-class="transition ease-in-out" enter-from-class="opacity-0"
                     leave-active-class="transition ease-in-out" leave-to-class="opacity-0">

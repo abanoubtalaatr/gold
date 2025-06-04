@@ -1,5 +1,4 @@
 <template>
-
     <Head title="Edit Store Information" />
 
     <AuthenticatedLayout>
@@ -246,11 +245,14 @@ const logoPreview = ref(null);
 const initializeWorkingHours = () => {
     if (props.store.working_hours && props.store.working_hours.length) {
         return props.store.working_hours.map(day => ({
-            ...day,
-            closed: day.closed || false // Ensure closed is boolean
+            day: day.day,
+            open: day.open || '09:00',
+            close: day.close || '18:00',
+            closed: day.closed === true || day.closed === 1 || false
         }));
     }
 
+    // Default working hours
     return [
         { day: 'Sunday', open: '09:00', close: '18:00', closed: false },
         { day: 'Monday', open: '09:00', close: '18:00', closed: false },
@@ -280,6 +282,7 @@ const form = useForm({
     },
     working_hours: initializeWorkingHours()
 });
+
 const handleFileChange = (event, field) => {
     const file = event.target.files[0];
     form[field] = file;
