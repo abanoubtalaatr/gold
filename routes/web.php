@@ -311,6 +311,12 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::patch('gold-pieces/{goldPiece}/toggle-status', [GoldPieceController::class, 'toggleStatus'])
         ->name('gold-pieces.toggle-status');
 
+    Route::put('gold-pieces/{goldPiece}/approve', [GoldPieceController::class, 'approve'])
+        ->name('gold-pieces.approve');
+
+     Route::put('gold-pieces/{goldPiece}/reject', [GoldPieceController::class, 'reject'])
+        ->name('gold-pieces.reject');
+
 
     Route::get('/orders', action: [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders/{orderId}/accept', action: [OrderController::class, 'accept'])->name('orders.accept');

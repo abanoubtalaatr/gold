@@ -1,43 +1,49 @@
 <template>
 
-    <Head title="Gold Piece Details" />
+    <Head :title="goldPiece.name" />
 
     <AuthenticatedLayout>
         <template #header>
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                    Gold Piece Details
+                    {{ goldPiece.name }}
                 </h2>
-                <Link :href="route('vendor.gold-pieces.index')"
-                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                <ArrowLeftIcon class="w-5 h-5 mr-2" />
-                Back to List
-                </Link>
+                <div class="flex space-x-2">
+                    <Link :href="route('admin.gold-pieces.edit', goldPiece.id)"
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <PencilIcon class="w-5 h-5 mr-2" />
+                    {{ $t('Edit') }}
+                    </Link>
+                    <button @click="confirmDelete"
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        <TrashIcon class="w-5 h-5 mr-2" />
+                        {{ $t('Delete') }}
+                    </button>
+                </div>
             </div>
         </template>
 
         <div class="py-12">
             <div class="mx-auto max-w-5xl">
-                <div class=" overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
-
-                        <!-- ✅ IMAGE SECTION IN FULL ROW -->
+                        <!-- Image Section -->
                         <div class="mb-8">
                             <div class="w-full">
-                                <div v-if="hasImages">
+                                <div v-if="goldPiece.images.length > 0">
                                     <!-- Main Image -->
                                     <div class="relative overflow-hidden rounded-lg aspect-square mb-4">
                                         <img :src="currentImageSrc" class="object-cover w-full h-full"
-                                            alt="Gold piece image" />
+                                            :alt="goldPiece.name" />
                                     </div>
 
                                     <!-- Thumbnails -->
                                     <div v-if="goldPiece.images.length > 1" class="flex space-x-2 overflow-x-auto">
                                         <div v-for="(image, index) in goldPiece.images" :key="index"
-                                            class="overflow-hidden rounded-lg">
-                                            <img :src="fullImagePath(image.path)"
-                                                class="object-cover w-16 h-16 cursor-pointer"
-                                                @click="currentImageIndex = index" alt="Thumbnail" />
+                                            class="overflow-hidden rounded-lg cursor-pointer"
+                                            @click="currentImageIndex = index">
+                                            <img :src="image.url" class="object-cover w-16 h-16"
+                                                :alt="'Thumbnail ' + (index + 1)" />
                                         </div>
                                     </div>
                                 </div>
@@ -48,7 +54,7 @@
                             </div>
                         </div>
 
-                        <!-- ✅ DETAILS SECTION BELOW IMAGE -->
+                        <!-- Details Section -->
                         <div class="space-y-6">
                             <div>
                                 <h1 class="text-2xl font-bold text-gray-900">{{ goldPiece.name }}</h1>
@@ -59,18 +65,19 @@
                             <div class="grid gap-6 sm:grid-cols-2">
                                 <!-- Basic Info -->
                                 <div class="p-4 bg-gray-50 rounded-lg">
-                                    <h3 class="mb-3 text-lg font-medium text-gray-900">Basic Information</h3>
+                                    <h3 class="mb-3 text-lg font-medium text-gray-900">{{ $t('Basic Information') }}
+                                    </h3>
                                     <dl class="space-y-3">
                                         <div>
-                                            <dt class="text-sm font-medium text-gray-500">Weight</dt>
+                                            <dt class="text-sm font-medium text-gray-500">{{ $t('Weight') }}</dt>
                                             <dd class="mt-1 text-sm text-gray-900">{{ goldPiece.weight }}g</dd>
                                         </div>
                                         <div>
-                                            <dt class="text-sm font-medium text-gray-500">Carat</dt>
+                                            <dt class="text-sm font-medium text-gray-500">{{ $t('Carat') }}</dt>
                                             <dd class="mt-1 text-sm text-gray-900">{{ goldPiece.carat }}K</dd>
                                         </div>
                                         <div>
-                                            <dt class="text-sm font-medium text-gray-500">Type</dt>
+                                            <dt class="text-sm font-medium text-gray-500">{{ $t('Type') }}</dt>
                                             <dd class="mt-1 text-sm text-gray-900">
                                                 <span :class="[
                                                     'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
@@ -78,18 +85,19 @@
                                                         ? 'bg-blue-100 text-blue-800'
                                                         : 'bg-green-100 text-green-800'
                                                 ]">
-                                                    {{ goldPiece.type === 'for_rent' ? 'For Rent' : 'For Sale' }}
+                                                    {{ goldPiece.type === 'for_rent' ? $t('For Rent') : $t('For Sale')
+                                                    }}
                                                 </span>
                                             </dd>
                                         </div>
                                         <div>
-                                            <dt class="text-sm font-medium text-gray-500">Status</dt>
+                                            <dt class="text-sm font-medium text-gray-500">{{ $t('Status') }}</dt>
                                             <dd class="mt-1 text-sm text-gray-900">
                                                 <span :class="[
                                                     'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
                                                     statusClass(goldPiece.status)
                                                 ]">
-                                                    {{ statusText(goldPiece.status) }}
+                                                    {{ $t(statusText(goldPiece.status)) }}
                                                 </span>
                                             </dd>
                                         </div>
@@ -98,21 +106,23 @@
 
                                 <!-- Pricing Info -->
                                 <div class="p-4 bg-gray-50 rounded-lg">
-                                    <h3 class="mb-3 text-lg font-medium text-gray-900">Pricing</h3>
+                                    <h3 class="mb-3 text-lg font-medium text-gray-900">{{ $t('Pricing') }}</h3>
                                     <dl class="space-y-3">
                                         <div v-if="goldPiece.type === 'for_rent'">
-                                            <dt class="text-sm font-medium text-gray-500">Rental Price Per Day</dt>
+                                            <dt class="text-sm font-medium text-gray-500">{{ $t('Rental Price Per Day')
+                                            }}</dt>
                                             <dd class="mt-1 text-sm text-gray-900">{{
                                                 formatCurrency(goldPiece.rental_price_per_day) }}</dd>
                                         </div>
                                         <div v-if="goldPiece.type === 'for_sale'">
-                                            <dt class="text-sm font-medium text-gray-500">Sale Price</dt>
+                                            <dt class="text-sm font-medium text-gray-500">{{ $t('Sale Price') }}</dt>
                                             <dd class="mt-1 text-sm text-gray-900">{{
                                                 formatCurrency(goldPiece.sale_price) }}
                                             </dd>
                                         </div>
                                         <div v-if="goldPiece.deposit_amount">
-                                            <dt class="text-sm font-medium text-gray-500">Deposit Amount</dt>
+                                            <dt class="text-sm font-medium text-gray-500">{{ $t('Deposit Amount') }}
+                                            </dt>
                                             <dd class="mt-1 text-sm text-gray-900">{{
                                                 formatCurrency(goldPiece.deposit_amount)
                                             }}</dd>
@@ -122,37 +132,37 @@
 
                                 <!-- Additional Info -->
                                 <div class="p-4 bg-gray-50 rounded-lg">
-                                    <h3 class="mb-3 text-lg font-medium text-gray-900">Additional Information</h3>
+                                    <h3 class="mb-3 text-lg font-medium text-gray-900">{{ $t('Additional Information')
+                                    }}</h3>
                                     <dl class="space-y-3">
                                         <div>
-                                            <dt class="text-sm font-medium text-gray-500">Branch</dt>
-                                            <dd class="mt-1 text-sm text-gray-900">{{ goldPiece.branch?.name || 'N/A' }}
+                                            <dt class="text-sm font-medium text-gray-500">{{ $t('Branch') }}</dt>
+                                            <dd class="mt-1 text-sm text-gray-900">{{ goldPiece.branch?.name ||
+                                                $t('N/A') }}
                                             </dd>
                                         </div>
                                         <div>
-                                            <dt class="text-sm font-medium text-gray-500">Created At</dt>
-                                            <dd class="mt-1 text-sm text-gray-900">{{ goldPiece.created_at }}</dd>
+                                            <dt class="text-sm font-medium text-gray-500">{{ $t('Owner') }}</dt>
+                                            <dd class="mt-1 text-sm text-gray-900">{{ goldPiece.user?.name || $t('N/A')
+                                            }}</dd>
                                         </div>
                                         <div>
-                                            <dt class="text-sm font-medium text-gray-500">Updated At</dt>
-                                            <dd class="mt-1 text-sm text-gray-900">{{ goldPiece.updated_at }}</dd>
+                                            <dt class="text-sm font-medium text-gray-500">{{ $t('Created At') }}</dt>
+                                            <dd class="mt-1 text-sm text-gray-900">{{ goldPiece.created_at }}</dd>
                                         </div>
+
                                     </dl>
                                 </div>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="flex mt-6 space-x-3">
-                                <Link :href="route('vendor.gold-pieces.edit', goldPiece.id)"
-                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                <PencilIcon class="w-5 h-5 mr-2" />
-                                Edit
-                                </Link>
-                                <button @click="confirmDelete"
-                                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                    <TrashIcon class="w-5 h-5 mr-2" />
-                                    Delete
-                                </button>
+                            <!-- QR Code Section -->
+                            <div v-if="goldPiece.qr_code" class="p-4 bg-gray-50 rounded-lg">
+                                <h3 class="mb-3 text-lg font-medium text-gray-900">{{ $t('QR Code') }}</h3>
+                                <div class="flex flex-col items-center">
+                                    <img :src="goldPiece.qr_code" alt="QR Code" class="w-32 h-32" />
+                                    <p class="mt-2 text-sm text-gray-500">{{ $t('Scan this QR code to view this gold piece') }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -160,9 +170,24 @@
             </div>
         </div>
 
-        <!-- ✅ DELETE MODAL - STYLED ALERT -->
+        <!-- Delete Confirmation Modal -->
         <Modal :show="confirmingDeletion" @close="closeModal">
-
+            <div class="p-6">
+                <h2 class="text-lg font-medium text-gray-900">
+                    {{ $t('Are you sure you want to delete this gold piece?') }}
+                </h2>
+                <p class="mt-1 text-sm text-gray-600">
+                    {{ $t('This action cannot be undone.') }}
+                </p>
+                <div class="mt-6 flex justify-end">
+                    <SecondaryButton @click="closeModal">
+                        {{ $t('Cancel') }}
+                    </SecondaryButton>
+                    <DangerButton class="ml-3" @click="deletePiece" :disabled="form.processing">
+                        {{ $t('Delete') }}
+                    </DangerButton>
+                </div>
+            </div>
         </Modal>
     </AuthenticatedLayout>
 </template>
@@ -172,14 +197,9 @@ import { ref, computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Modal from '@/Components/Modal.vue';
-import Swal from 'sweetalert2';
-
-import {
-    ArrowLeftIcon,
-    CubeIcon,
-    PencilIcon,
-    TrashIcon,
-} from '@heroicons/vue/24/outline';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+import DangerButton from '@/Components/DangerButton.vue';
+import { PencilIcon, TrashIcon, CubeIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     goldPiece: {
@@ -189,18 +209,15 @@ const props = defineProps({
 });
 
 const confirmingDeletion = ref(false);
+const currentImageIndex = ref(0);
 const form = useForm({});
 
-const hasImages = computed(() => props.goldPiece.images && props.goldPiece.images.length > 0);
-const currentImageIndex = ref(0);
 const currentImageSrc = computed(() => {
-    if (hasImages.value) {
-        return fullImagePath(props.goldPiece.images[currentImageIndex.value].path);
+    if (props.goldPiece.images.length > 0) {
+        return props.goldPiece.images[currentImageIndex.value].url;
     }
     return '';
 });
-
-const fullImagePath = (path) => `/storage/${path}`;
 
 const statusClass = (status) => {
     switch (status) {
@@ -208,7 +225,7 @@ const statusClass = (status) => {
         case 'available': return 'bg-green-100 text-green-800';
         case 'rented': return 'bg-blue-100 text-blue-800';
         case 'sold': return 'bg-purple-100 text-purple-800';
-        case 'accepted': return 'bg-gray-100 text-gray-800';
+        case 'unavailable': return 'bg-gray-100 text-gray-800';
         default: return '';
     }
 };
@@ -219,37 +236,26 @@ const statusText = (status) => {
         available: 'Available',
         rented: 'Rented',
         sold: 'Sold',
-        accepted: 'Accepted',
+        unavailable: 'Unavailable',
     };
     return mapping[status] || status;
 };
 
 const confirmDelete = () => {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "This action cannot be undone.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#6b7280', // Tailwind gray-500
-        confirmButtonText: 'Yes, delete it!',
-        reverseButtons: true,
-    }).then((result) => {
-        if (result.isConfirmed) {
-            deletePiece();
-        }
+    confirmingDeletion.value = true;
+};
+
+const deletePiece = () => {
+    form.delete(route('admin.gold-pieces.destroy', props.goldPiece.id), {
+        preserveScroll: true,
+        onSuccess: () => closeModal(),
     });
 };
 
 const closeModal = () => {
     confirmingDeletion.value = false;
 };
-const deletePiece = () => {
-    form.delete(route('vendor.gold-pieces.destroy', props.goldPiece.id), {
-        preserveScroll: true,
-        onSuccess: () => closeModal(),
-    });
-};
+
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
