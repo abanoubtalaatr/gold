@@ -42,6 +42,10 @@ class Branch extends Model
         return $this->belongsTo(City::class);
     }
 
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function scopeActive($query)
     {

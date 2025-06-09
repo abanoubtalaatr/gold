@@ -19,6 +19,7 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        
         // Get filter parameters from request
         $period = $request->input('period', 'all');
         $fromDate = $request->input('from_date');
@@ -56,13 +57,27 @@ class DashboardController extends Controller
         $rentalOrdersQuery = OrderRental::query();
         $rentalOrdersQuery->whereHas('branch.vendor', function ($query) {
             $query->where('id', Auth::id());
-        });
+        })->where('type',OrderRental::RENT_TYPE);
+
         if ($period !== 'all' || ($fromDate && $toDate)) {
             $rentalOrdersQuery->when($dateFilter, function ($query) use ($dateFilter) {
                 $query->where($dateFilter);
             });
         }
+
+        $rentalRequestQuery = OrderRental::query();
+        $rentalRequestQuery->whereHas('branch.vendor', function ($query) {
+            $query->where('id', Auth::id());
+        })->where('type',OrderRental::LEASE_TYPE);
+        
+        if ($period !== 'all' || ($fromDate && $toDate)) {
+            $rentalRequestQuery->when($dateFilter, function ($query) use ($dateFilter) {
+                $query->where($dateFilter);
+            });
+        }
+
         $rentalOrders = $rentalOrdersQuery->count();
+        $rentalRequests = $rentalRequestQuery->count();
 
         // Rental statistics
         $rentalStats = [
@@ -140,6 +155,7 @@ class DashboardController extends Controller
             'branches' => $branches,
             'salesOrders' => $salesOrders,
             'rentalOrders' => $rentalOrders,
+            'rentalRequests' => $rentalRequests,// استئجار
             'rentalStats' => $rentalStats,
             'piecesStats' => $piecesStats,
             'ratings' => $ratings,

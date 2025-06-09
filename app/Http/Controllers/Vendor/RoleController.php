@@ -16,10 +16,7 @@ class RoleController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:vendor read roles', ['only' => ['index']]);
-        $this->middleware('permission:vendor create roles', ['only' => ['create', 'store']]);
-        $this->middleware('permission:vendor update roles', ['only' => ['update', 'edit']]);
-        $this->middleware('permission:vendor delete roles', ['only' => ['destroy']]);
+        
     }
 
     public function index(Request $request)
@@ -27,7 +24,7 @@ class RoleController extends Controller
         // Get the current authenticated user (assuming it's a vendor)
         $user = Auth::user();
 
-        $roles = Role::where('name', '!=', 'superadmin')
+        $roles = Role::where('name', '!=', 'superadmin')->where('vendor_id', $user->vendor_id??$user->id)
             ->latest()
             ->with('translations');
 
@@ -169,18 +166,20 @@ class RoleController extends Controller
 
     public function addPermissionToRole($roleId)
     {
-        // i want to pluck the ids of permissions that are already assigned to the role
-        $role = Role::where('name', 'vendor')->first();
-
-        $permissions = Permission::whereIn('id', $role->permissions->pluck('id'))->get();
+        // Get the role we want to add permissions to
         $role = Role::findOrFail($roleId);
+        
+        // Get all vendor-prefixed permissions
+        $permissions = Permission::where('name', 'like', 'vendor %')->get();
+        ;
+        // Get permissions already assigned to this role
         $rolePermissions = DB::table('role_has_permissions')
             ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
             ->where('role_has_permissions.role_id', $role->id)
             ->pluck('permissions.name')
             ->all();
 
-
+        
         return Inertia('Vendor/roles-permissions/Roles/Add-permissions', [
             'role' => $role,
             'permissions' => $permissions,
@@ -190,7 +189,6 @@ class RoleController extends Controller
 
     public function givePermissionToRole(Request $request, $roleId)
     {
-        dd($roleId);
         $request->validate([
             'selectedPermissions' => 'required'
         ]);

@@ -360,7 +360,7 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
             ->name('password.resend-otp');
     });
 
-    Route::middleware(['auth', 'role:vendor'])->group(function () {
+    Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Vendor\DashboardController::class, 'index'])->name('dashboard');
     });
 });

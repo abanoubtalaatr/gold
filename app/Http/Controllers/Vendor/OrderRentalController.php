@@ -31,7 +31,7 @@ class OrderRentalController extends Controller
 
     public function index(Request $request)
     {
-        $vendorId = Auth::id();
+        $vendorId = $request->user()->vendor_id??$request->user()->id;
         $branchIds = Branch::where('vendor_id', $vendorId)->pluck('id');
         $branches = Branch::where('vendor_id', $vendorId)->select('id', 'name')->get();
 

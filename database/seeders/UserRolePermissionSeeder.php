@@ -143,5 +143,15 @@ class UserRolePermissionSeeder extends Seeder
 
             $user->syncRoles([$userData['role']]);
         }
+
+        // Sync existing vendor users with the vendor role
+        $vendorUsers = User::whereHas('roles', function ($query) {
+            $query->where('name', 'vendor');
+        })->get();
+        $vendorRole = Role::findByName('vendor', 'web');
+        
+        foreach ($vendorUsers as $vendorUser) {
+            $vendorUser->syncRoles([$vendorRole]);
+        }
     }
 }

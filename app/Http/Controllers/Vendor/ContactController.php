@@ -12,8 +12,8 @@ class ContactController extends Controller
 {
     public function index(Request $request)
     {
-        $vendorId = auth()->user()->id;
-
+        $vendorId = auth()->user()->vendor_id??auth()->user()->id;
+        
         $contacts = Contact::with(['user', 'rentalOrder', 'saleOrder'])
             ->latest()
             ->filter($request->only('search', 'type', 'status'))

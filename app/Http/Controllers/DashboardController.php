@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\User;
+use Inertia\Inertia;
+// use App\Models\SalesOrder;
+use App\Models\Branch;
 use App\Models\Rating;
 use App\Models\Review;
-use App\Models\User;
-// use App\Models\SalesOrder;
-use App\Models\RentalRequest;
-use App\Models\RentalOrder;
-use App\Models\Branch;
-use App\Models\OrderRental;
-use App\Models\OrderSale;
 use App\Models\Vendor;
 use App\Models\GoldPiece;
-use App\Services\GoldPriceService;
-use Carbon\Carbon;
+use App\Models\OrderSale;
+use App\Models\OrderRental;
+use App\Models\RentalOrder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
+use App\Models\RentalRequest;
+use App\Services\GoldPriceService;
 use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -30,8 +31,12 @@ class DashboardController extends Controller
         $this->goldPriceService = $goldPriceService;
     }
 
- public function index(Request $request)
+    public function index(Request $request)
     {
+        $parent = User::where('id', auth()->user()->vendor_id)->first();
+        if ($parent || auth()->user()->hasRole('vendor')) {
+            return redirect()->route('vendor.dashboard');
+        }
         // Get filter parameters from request
         $period = $request->input('period', 'monthly');
         $start_date = $request->input('start_date');
@@ -65,10 +70,10 @@ class DashboardController extends Controller
 
         // Sales and rental orders
         $salesOrdersCount = OrderSale::query()
-            ->when($period !== 'monthly', function($q) use ($period) {
+            ->when($period !== 'monthly', function ($q) use ($period) {
                 $this->applyPeriodFilter($q, $period);
             })
-            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+            ->when($start_date || $end_date, function ($q) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
                     $q->whereBetween('created_at', [$start_date, $end_date]);
                 } elseif ($start_date) {
@@ -80,10 +85,10 @@ class DashboardController extends Controller
             ->count();
 
         $rentalOrdersCount = OrderRental::query()
-            ->when($period !== 'monthly', function($q) use ($period) {
+            ->when($period !== 'monthly', function ($q) use ($period) {
                 $this->applyPeriodFilter($q, $period);
             })
-            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+            ->when($start_date || $end_date, function ($q) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
                     $q->whereBetween('created_at', [$start_date, $end_date]);
                 } elseif ($start_date) {
@@ -96,10 +101,10 @@ class DashboardController extends Controller
 
         // Branches and vendors
         $branchesCount = Branch::query()
-            ->when($period !== 'monthly', function($q) use ($period) {
+            ->when($period !== 'monthly', function ($q) use ($period) {
                 $this->applyPeriodFilter($q, $period);
             })
-            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+            ->when($start_date || $end_date, function ($q) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
                     $q->whereBetween('created_at', [$start_date, $end_date]);
                 } elseif ($start_date) {
@@ -112,10 +117,10 @@ class DashboardController extends Controller
             ->count();
 
         $vendorsCount = User::role('vendor')
-            ->when($period !== 'monthly', function($q) use ($period) {
+            ->when($period !== 'monthly', function ($q) use ($period) {
                 $this->applyPeriodFilter($q, $period);
             })
-            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+            ->when($start_date || $end_date, function ($q) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
                     $q->whereBetween('created_at', [$start_date, $end_date]);
                 } elseif ($start_date) {
@@ -130,10 +135,10 @@ class DashboardController extends Controller
         // New rental statistics
         $rentalStats = [
             'completed' => OrderRental::whereIn('status', ['available', 'sold', 'rejected'])
-                ->when($period !== 'monthly', function($q) use ($period) {
+                ->when($period !== 'monthly', function ($q) use ($period) {
                     $this->applyPeriodFilter($q, $period);
                 })
-                ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                ->when($start_date || $end_date, function ($q) use ($start_date, $end_date) {
                     if ($start_date && $end_date) {
                         $q->whereBetween('created_at', [$start_date, $end_date]);
                     } elseif ($start_date) {
@@ -145,10 +150,10 @@ class DashboardController extends Controller
                 ->count(),
 
             'current' => OrderRental::where('status',  'rented')
-                ->when($period !== 'monthly', function($q) use ($period) {
+                ->when($period !== 'monthly', function ($q) use ($period) {
                     $this->applyPeriodFilter($q, $period);
                 })
-                ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                ->when($start_date || $end_date, function ($q) use ($start_date, $end_date) {
                     if ($start_date && $end_date) {
                         $q->whereBetween('created_at', [$start_date, $end_date]);
                     } elseif ($start_date) {
@@ -160,10 +165,10 @@ class DashboardController extends Controller
                 ->count(),
 
             'upcoming' => OrderRental::whereIn('status', ['pending_approval', 'approved', 'piece_sent'])
-                ->when($period !== 'monthly', function($q) use ($period) {
+                ->when($period !== 'monthly', function ($q) use ($period) {
                     $this->applyPeriodFilter($q, $period);
                 })
-                ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+                ->when($start_date || $end_date, function ($q) use ($start_date, $end_date) {
                     if ($start_date && $end_date) {
                         $q->whereBetween('created_at', [$start_date, $end_date]);
                     } elseif ($start_date) {
@@ -177,10 +182,10 @@ class DashboardController extends Controller
 
         // Available and purchased pieces
         $availablePiecesCount = GoldPiece::where('status', 'available')
-            ->when($period !== 'monthly', function($q) use ($period) {
+            ->when($period !== 'monthly', function ($q) use ($period) {
                 $this->applyPeriodFilter($q, $period);
             })
-            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+            ->when($start_date || $end_date, function ($q) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
                     $q->whereBetween('created_at', [$start_date, $end_date]);
                 } elseif ($start_date) {
@@ -192,10 +197,10 @@ class DashboardController extends Controller
             ->count();
 
         $purchasedPiecesCount = OrderSale::query()
-            ->when($period !== 'monthly', function($q) use ($period) {
+            ->when($period !== 'monthly', function ($q) use ($period) {
                 $this->applyPeriodFilter($q, $period);
             })
-            ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+            ->when($start_date || $end_date, function ($q) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
                     $q->whereBetween('created_at', [$start_date, $end_date]);
                 } elseif ($start_date) {
@@ -268,7 +273,7 @@ class DashboardController extends Controller
             $completedOrders = OrderSale::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
                 ->where('status', 'completed')->count() +
                 OrderRental::when($period !== 'all' || ($start_date && $end_date), $dateFilter)
-                    ->where('status', 'completed')->count();
+                ->where('status', 'completed')->count();
 
             return [
                 'total_gold_pieces' => $totalGoldPieces,
@@ -635,67 +640,67 @@ class DashboardController extends Controller
         });
     }
 
-private function getReviewsData($period = 'all', $start_date = null, $end_date = null)
-{
-    $query = Rating::query();
+    private function getReviewsData($period = 'all', $start_date = null, $end_date = null)
+    {
+        $query = Rating::query();
 
-    // Apply period filter if specified and not 'all'
-    if ($period && $period !== 'all') {
-        $this->applyPeriodFilter($query, $period);
-    }
-
-    // Apply date range filters if provided
-    if ($start_date || $end_date) {
-        if ($start_date && $end_date) {
-            $query->whereBetween('created_at', [
-                Carbon::parse($start_date)->startOfDay(),
-                Carbon::parse($end_date)->endOfDay()
-            ]);
-        } elseif ($start_date) {
-            $query->where('created_at', '>=', Carbon::parse($start_date)->startOfDay());
-        } elseif ($end_date) {
-            $query->where('created_at', '<=', Carbon::parse($end_date)->endOfDay());
+        // Apply period filter if specified and not 'all'
+        if ($period && $period !== 'all') {
+            $this->applyPeriodFilter($query, $period);
         }
-    }
 
-    // Get total reviews and average rating
-    $totalReviews = $query->count();
-    $averageRating = $query->avg('rating');
-
-    // Get rating distribution (using the same query conditions)
-    $ratingDistribution = Rating::query()
-        ->when($period && $period !== 'all', function($q) use ($period) {
-            $this->applyPeriodFilter($q, $period);
-        })
-        ->when($start_date || $end_date, function($q) use ($start_date, $end_date) {
+        // Apply date range filters if provided
+        if ($start_date || $end_date) {
             if ($start_date && $end_date) {
-                $q->whereBetween('created_at', [
+                $query->whereBetween('created_at', [
                     Carbon::parse($start_date)->startOfDay(),
                     Carbon::parse($end_date)->endOfDay()
                 ]);
             } elseif ($start_date) {
-                $q->where('created_at', '>=', Carbon::parse($start_date)->startOfDay());
+                $query->where('created_at', '>=', Carbon::parse($start_date)->startOfDay());
             } elseif ($end_date) {
-                $q->where('created_at', '<=', Carbon::parse($end_date)->endOfDay());
+                $query->where('created_at', '<=', Carbon::parse($end_date)->endOfDay());
             }
-        })
-        ->select('rating', DB::raw('count(*) as count'))
-        ->groupBy('rating')
-        ->orderBy('rating')
-        ->get()
-        ->pluck('count', 'rating')
-        ->toArray();
+        }
 
-    // Fill missing ratings
-    $fullDistribution = [];
-    for ($i = 1; $i <= 5; $i++) {
-        $fullDistribution[$i] = $ratingDistribution[$i] ?? 0;
+        // Get total reviews and average rating
+        $totalReviews = $query->count();
+        $averageRating = $query->avg('rating');
+
+        // Get rating distribution (using the same query conditions)
+        $ratingDistribution = Rating::query()
+            ->when($period && $period !== 'all', function ($q) use ($period) {
+                $this->applyPeriodFilter($q, $period);
+            })
+            ->when($start_date || $end_date, function ($q) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $q->whereBetween('created_at', [
+                        Carbon::parse($start_date)->startOfDay(),
+                        Carbon::parse($end_date)->endOfDay()
+                    ]);
+                } elseif ($start_date) {
+                    $q->where('created_at', '>=', Carbon::parse($start_date)->startOfDay());
+                } elseif ($end_date) {
+                    $q->where('created_at', '<=', Carbon::parse($end_date)->endOfDay());
+                }
+            })
+            ->select('rating', DB::raw('count(*) as count'))
+            ->groupBy('rating')
+            ->orderBy('rating')
+            ->get()
+            ->pluck('count', 'rating')
+            ->toArray();
+
+        // Fill missing ratings
+        $fullDistribution = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $fullDistribution[$i] = $ratingDistribution[$i] ?? 0;
+        }
+
+        return [
+            'total_reviews' => $totalReviews,
+            'average_rating' => round($averageRating ?? 0, 1),
+            'rating_distribution' => $fullDistribution,
+        ];
     }
-
-    return [
-        'total_reviews' => $totalReviews,
-        'average_rating' => round($averageRating ?? 0, 1),
-        'rating_distribution' => $fullDistribution,
-    ];
-}
 }

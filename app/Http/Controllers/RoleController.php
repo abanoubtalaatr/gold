@@ -8,17 +8,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
+use App\Models\User;
 use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('permission:read roles', ['only' => ['index']]);
-        $this->middleware('permission:create roles', ['only' => ['create', 'store']]);
-        $this->middleware('permission:update roles', ['only' => ['update', 'edit']]);
-        $this->middleware('permission:delete roles', ['only' => ['destroy']]);
-    }
+    public function __construct() {}
 
     public function index(Request $request)
     {
@@ -43,10 +38,10 @@ class RoleController extends Controller
         $roles = $roles->paginate(10);
         $roles->getCollection()->transform(function ($role) {
             return [
-            'id' => $role->id,
-            'is_active' => $role->is_active,
-            'name' => $role->translate(app()->getLocale())?->name ?? $role->name,
-            'guard_name' => $role->guard_name,
+                'id' => $role->id,
+                'is_active' => $role->is_active,
+                'name' => $role->translate(app()->getLocale())?->name ?? $role->name,
+                'guard_name' => $role->guard_name,
             ];
         });
 
@@ -70,7 +65,7 @@ class RoleController extends Controller
             'guard_name' => 'web',
             'vendor_id' => auth()->user()->id
         ]);
-    
+
         $translations = [];
         foreach ($request->input('translations') as $locale => $translation) {
             $translations[] = [
@@ -79,13 +74,13 @@ class RoleController extends Controller
                 'name' => $translation['name']
             ];
         }
-    
+
         DB::table('role_translations')->upsert(
             $translations,
             ['role_id', 'locale'], // Unique key for checking duplicates
             ['name'] // Fields to update if duplicate is found
         );
-    
+
         return redirect()->route('roles.index')
             ->with('success', __('messages.data_created_successfully'));
     }
@@ -100,19 +95,19 @@ class RoleController extends Controller
     // }
 
     public function edit(Role $role)
-{
-   $role->load('translations');
+    {
+        $role->load('translations');
 
 
-    return Inertia('roles-permissions/Roles/Edit', [
-        'role' => [
-            'id' => $role->id,
-            'name' =>  $role->name, 
-            'guard_name' => $role->guard_name,
-             'translations' => $role->translations,
-        ],
-    ]);
-}
+        return Inertia('roles-permissions/Roles/Edit', [
+            'role' => [
+                'id' => $role->id,
+                'name' =>  $role->name,
+                'guard_name' => $role->guard_name,
+                'translations' => $role->translations,
+            ],
+        ]);
+    }
 
 
     public function update(UpdateRoleRequest $request, Role $role)
@@ -139,10 +134,9 @@ class RoleController extends Controller
 
             DB::commit();
 
-
+            
             return redirect()->route('roles.index')
                 ->with('success', __('messages.data_updated_successfully'));
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Update failed:', [
@@ -155,7 +149,7 @@ class RoleController extends Controller
 
     public function destroy($roleId)
     {
-        
+
         $role = Role::find($roleId->id);
         $role->delete();
         return redirect()->route('roles.index')
@@ -182,22 +176,25 @@ class RoleController extends Controller
 
     public function givePermissionToRole(Request $request, $roleId)
     {
+        
         $request->validate([
             'selectedPermissions' => 'required'
         ]);
 
         $role = Role::findOrFail($roleId);
         $role->syncPermissions($request->selectedPermissions);
-        if(auth()->user()->hasRole('vendor')){
+        $parentRole = User::find(auth()->user()->vendor_id??auth()->user()->id);
+
+        if (auth()->user()->hasRole('vendor') || $parentRole->hasRole('vendor')) {
             return redirect()->route('vendor.roles.index')
-            ->with('success',  __('messages.role_permissions_updated_successfully'));
+                ->with('success',  __('messages.role_permissions_updated_successfully'));
         }
         return redirect()->route('roles.index')
             ->with('success',  __('messages.role_permissions_updated_successfully'));
     }
 
 
-     public function activate(Role $role)
+    public function activate(Role $role)
     {
         $role->update(
             [

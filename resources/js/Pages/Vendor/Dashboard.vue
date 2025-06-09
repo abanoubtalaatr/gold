@@ -201,81 +201,13 @@
                         <div class="col-xxl-3 col-md-3">
                             <div class="card info-card completed-rentals-card">
                                 <div class="card-body">
-                                    <h5 class="card-title">{{ $t('Completed Rentals') }}</h5>
+                                    <h5 class="card-title">{{ $t('rental_requests') }}</h5>
                                     <div class="d-flex align-items-center">
                                         <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                                             <i class="bi bi-check-circle"></i>
                                         </div>
                                         <div class="ps-3">
-                                            <h6>{{ rentalStats.completed }}</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Current Rentals Card -->
-                        <div class="col-xxl-3 col-md-3">
-                            <div class="card info-card current-rentals-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $t('Current Rentals') }}</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-arrow-repeat"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ rentalStats.current }}</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Upcoming Rentals Card -->
-                        <div class="col-xxl-3 col-md-3">
-                            <div class="card info-card upcoming-rentals-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $t('Upcoming Rentals') }}</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-calendar-plus"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ rentalStats.upcoming }}</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Available Pieces Card -->
-                        <div class="col-xxl-3 col-md-3">
-                            <div class="card info-card available-pieces-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $t('Available Pieces') }}</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-box-seam"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ piecesStats.available }}</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Purchased Pieces Card -->
-                        <div class="col-xxl-3 col-md-3">
-                            <div class="card info-card purchased-pieces-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $t('Purchased Pieces') }}</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-cart-check-fill"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ piecesStats.purchased }}</h6>
+                                            <h6>{{ rentalRequests }}</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -308,6 +240,7 @@ const props = defineProps({
     branches: Number,
     salesOrders: Number,
     rentalOrders: Number,
+    rentalRequests: Number,
     rentalStats: {
         completed: Number,
         current: Number,

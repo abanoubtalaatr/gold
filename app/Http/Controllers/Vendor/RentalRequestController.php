@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\RentalWorkflowService;
+use App\Events\OrderRentalStatusChangeEvent;
 
 class RentalRequestController extends Controller
 {
@@ -27,7 +28,7 @@ class RentalRequestController extends Controller
 
     public function index(Request $request)
     {
-        $vendorId = $request->user()->id;
+        $vendorId = $request->user()->vendor_id??$request->user()->id;
         $branchIds = Branch::where('vendor_id', $vendorId)->pluck('id');
         $branches = Branch::where('vendor_id', $vendorId)->select('id', 'name')->get();
         $statuses = [
@@ -93,7 +94,7 @@ class RentalRequestController extends Controller
             })
             ->when($filters['date_filter'] ?? null, function ($query, $dateFilter) use ($filters) {
                 if ($dateFilter === 'today') {
-                    $query->whereDate('start_date', Carbon::today());
+                    $query->whereDate('created_at', Carbon::today());
                 } elseif ($dateFilter === 'week') {
                     $query->whereBetween('start_date', [
                         Carbon::now()->startOfWeek(),
@@ -154,7 +155,7 @@ class RentalRequestController extends Controller
             ]);
 
         // Paginate results
-        $orders = $ordersQuery->orderBy('created_at', 'desc')->paginate(10)->appends($filters);
+        $orders = $ordersQuery->orderBy('start_date', 'desc')->paginate(10)->appends($filters);
 
         // Transform orders to include rental_days, invoice, and allowed_actions
         $orders->getCollection()->transform(function ($order) {
@@ -238,10 +239,12 @@ class RentalRequestController extends Controller
     public function accept(Request $request, $order)
     {
         $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
+        
         $this->authorizeVendor($order);
 
-        // Use the workflow service for proper status management
-        $this->rentalWorkflowService->approve($order, $request->user());
+        $order->status = OrderRental::STATUS_APPROVED;
+        $order->save();
+        event(new OrderRentalStatusChangeEvent($order, $request->user()));
 
         return back()->with('success', __('Order accepted successfully'));
     }
@@ -270,8 +273,9 @@ class RentalRequestController extends Controller
         }
 
         // Use the workflow service for proper status management
-        $this->rentalWorkflowService->markAsSent($order, $request->user());
-
+        $order->status = OrderRental::STATUS_PIECE_SENT;
+        $order->save();
+        event(new OrderRentalStatusChangeEvent($order, $request->user()));
         return back()->with('success', __('Order marked as sent successfully'));
     }
 
@@ -309,8 +313,10 @@ class RentalRequestController extends Controller
         $platformWallet->credit($platformAmount, 'Platform commission for order #' . $order->id);
         $platformWallet->update(['balance' => $platformWallet->balance + $platformAmount, 'total_earned' => $platformWallet->total_earned + $platformAmount]);
         // Use the workflow service for proper status management
-        $this->rentalWorkflowService->confirmRental($order, $request->user());
-
+        $order->status = OrderRental::STATUS_RENTED;
+        $order->save();
+        event(new OrderRentalStatusChangeEvent($order, $request->user()));
+        
         return back()->with('success', __('Rental confirmed successfully'));
     }
 

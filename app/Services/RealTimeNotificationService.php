@@ -23,12 +23,7 @@ class RealTimeNotificationService
             
             // Save to database immediately
             $this->saveNotificationToDatabase($order, $oldStatus, $newStatus, $actor);
-            
-            Log::info('Critical notification sent immediately', [
-                'order_id' => $order->id,
-                'status_change' => "{$oldStatus} → {$newStatus}",
-                'delivery_type' => 'immediate_critical',
-            ]);
+        
             
         } catch (\Exception $e) {
             Log::error('Failed to send critical notification', [

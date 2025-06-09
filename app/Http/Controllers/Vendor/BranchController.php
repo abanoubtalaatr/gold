@@ -24,7 +24,7 @@ class BranchController extends Controller
     {
         $filters = $request->only(['search']);
         
-        $branches = $this->branchService->list($request->user()->id, $filters);
+        $branches = $this->branchService->list($request->user()->vendor_id??$request->user()->id, $filters);
 
         return Inertia::render('Vendor/Branches/Index', [
             'branches' => $branches,

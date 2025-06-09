@@ -23,6 +23,8 @@ class ContactController extends Controller
      */
     public function index(Request $request)
     {
+        $vendorId = $request->user()->vendor_id??$request->user()->id;
+        
         $filters = [
             'name' => $request->name,
             'email' => $request->email,

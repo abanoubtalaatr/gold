@@ -2,15 +2,7 @@
     <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
 
-            <li class="nav-item" v-if="hasPermission('vendor view dashboard')">
-                <Link class="nav-link" :href="route('vendor.dashboard')"
-                    :class="{ collapsed: $page.url !== '/vendor/dashboard' }">
-                <i class="bi bi-grid"></i>
-                <span> {{ $t("dashboard") }} </span>
-                </Link>
-            </li>
-
-            <li class="nav-item" v-else>
+            <li class="nav-item">
                 <Link class="nav-link" :href="route('dashboard')" :class="{ collapsed: $page.url !== '/dashboard' }">
                 <i class="bi bi-grid"></i>
                 <span> {{ $t("dashboard") }} </span>
@@ -180,7 +172,7 @@
             </li> -->
 
             <!-- Reports -->
-            <li class="nav-item" v-if="hasPermission('vendor read users')">
+            <li class="nav-item" v-if="hasPermission('vendor read reports')">
                 <Link class="nav-link" :href="route('vendor.reports.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/reports') }">
                 <i class="bi bi-file-earmark-bar-graph"></i>

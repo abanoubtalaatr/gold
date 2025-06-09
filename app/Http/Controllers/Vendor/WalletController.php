@@ -16,8 +16,10 @@ class WalletController extends Controller
 {
     public function index()
     {
-        $wallet = Auth::user()->wallet()->firstOrCreate([
-            'user_id' => Auth::id()
+        $vendorId = Auth::user()->vendor_id??Auth::user()->id;
+        
+        $wallet = User::find($vendorId)->wallet()->firstOrCreate([
+            'user_id' => $vendorId
         ], [
             'balance' => 0,
             'pending_balance' => 0,

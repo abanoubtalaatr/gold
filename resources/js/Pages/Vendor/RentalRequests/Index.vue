@@ -101,6 +101,12 @@
                                             {{ $t('Branch') }}</th>
                                         <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $t('Start Date') }}</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $t('End Date') }}</th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Price') }}</th>
                                         <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -134,6 +140,12 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{
                                             order.branch?.name ||
                                             'N/A' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ order.start_date ? formatDate(order.start_date, true) : 'N/A' }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ order.end_date ? formatDate(order.end_date, true) : 'N/A' }}
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{
                                             order.total_price }} {{
                                             $t('SAR') }}</td>
@@ -247,9 +259,9 @@
                                 $t('grams') }}</p>
                             <p><strong>{{ $t('Carat') }}:</strong> {{ selectedOrder.goldPiece?.carat || 'N/A' }}</p>
                             <p v-if="selectedOrder.start_date"><strong>{{ $t('Start Date') }}:</strong> {{
-                                formatDate(selectedOrder.start_date) }}</p>
+                                formatDate(selectedOrder.start_date, true) }}</p>
                             <p v-if="selectedOrder.end_date"><strong>{{ $t('End Date') }}:</strong> {{
-                                formatDate(selectedOrder.end_date) }}</p>
+                                formatDate(selectedOrder.end_date, true) }}</p>
                             <p><strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR') }}</p>
                             <p><strong>{{ $t('Status') }}:</strong> {{ formatStatus(selectedOrder.status) }}</p>
                             <p><strong>{{ $t('Branch') }}:</strong> {{ selectedOrder.branch?.name || 'N/A' }}</p>
@@ -451,9 +463,9 @@
                     <p v-if="selectedOrder.invoice.rental_days"><strong>{{ $t('Rental Days') }}:</strong> {{
                         selectedOrder.invoice.rental_days }}</p>
                     <p v-if="selectedOrder.invoice.start_date"><strong>{{ $t('Start Date') }}:</strong> {{
-                        formatDate(selectedOrder.invoice.start_date) }}</p>
+                        formatDate(selectedOrder.invoice.start_date, true) }}</p>
                     <p v-if="selectedOrder.invoice.end_date"><strong>{{ $t('End Date') }}:</strong> {{
-                        formatDate(selectedOrder.invoice.end_date) }}</p>
+                        formatDate(selectedOrder.invoice.end_date, true) }}</p>
                     <p><strong>{{ $t('Total Price') }}:</strong> {{ selectedOrder.invoice.total_price }} {{ $t('SAR') }}
                     </p>
                     <p><strong>{{ $t('Branch') }}:</strong> {{ selectedOrder.invoice.branch_name }}</p>
@@ -611,8 +623,16 @@ const formatStatus = (status) => {
         .join(' ');
 };
 
-const formatDate = (date) => {
-    return date ? new Date(date).toLocaleString() : 'N/A';
+const formatDate = (date, dateOnly = false) => {
+    if (!date) return 'N/A';
+    
+    const dateObj = new Date(date);
+    
+    if (dateOnly) {
+        return dateObj.toLocaleDateString();
+    }
+    
+    return dateObj.toLocaleString();
 };
 
 const showDetails = (order) => {

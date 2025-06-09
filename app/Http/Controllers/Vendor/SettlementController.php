@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Http\Controllers\Controller;
-use App\Models\SettlementRequest;
+use App\Models\User;
+use Inertia\Inertia;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use App\Models\SettlementRequest;
+use App\Http\Controllers\Controller;
 
 class SettlementController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
-        $wallet = $user->wallet;
+        $user = auth()->user()->vendor_id??auth()->user()->id;
+        $wallet = User::find($user)->wallet;
 
         if (!$wallet) {
             return Inertia::render('Vendor/SettlementRequests/Index', [
