@@ -16,10 +16,10 @@
                                 <h3 class="text-lg font-medium text-gray-500">{{ $t('Current Balance') }}</h3>
                                 <div class="flex items-center justify-between">
                                     <p class="text-2xl font-bold">{{ wallet?.balance ?? 0 }} {{ $t('SAR') }}</p>
-                                    <button @click="showBalanceAdjustment = true"
+                                    <!-- <button @click="showBalanceAdjustment = true"
                                         class="p-1 text-gray-400 hover:text-gray-600">
                                         <PencilSquareIcon class="w-5 h-5" />
-                                    </button>
+                                    </button> -->
                                 </div>
                             </div>
 

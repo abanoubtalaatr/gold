@@ -44,6 +44,14 @@ createInertiaApp({
       import.meta.glob('./Pages/**/*.vue')
     ),
   setup({ el, App, props, plugin }) {
+    // Set up CSRF token from page props or meta tag
+    const csrfToken = props.initialPage.props.csrf_token || 
+                      document.head.querySelector('meta[name="csrf-token"]')?.content
+    
+    if (csrfToken) {
+      window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken
+    }
+
     return createApp({ render: () => h(App, props) })
       .use(plugin)
       .use(ZiggyVue)
@@ -62,6 +70,14 @@ createInertiaApp({
 // Axios and Echo setup
 window.axios = axios
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+
+// Set up CSRF token for axios (fallback)
+const token = document.head.querySelector('meta[name="csrf-token"]')
+if (token) {
+  window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content
+} else {
+  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token')
+}
 
 // window.Pusher = Pusher
 

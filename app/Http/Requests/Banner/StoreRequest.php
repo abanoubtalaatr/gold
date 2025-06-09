@@ -18,68 +18,50 @@ class StoreRequest extends FormRequest
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
-    {        //dd($this->image);
-
+    {
         $rules = [
-        'image' => 'nullable|image|mimes:webp,jpeg,png,jpg,gif|max:2048',
-        'sort_order' => 'required|numeric|unique:banners,sort_order',
+            'image' => 'nullable|image|mimes:webp,jpeg,png,jpg,gif|max:2048',
+            'sort_order' => 'required|numeric|unique:banners,sort_order',
+            'is_active' => 'boolean'
         ];
 
-
-
         foreach (config('app.supported_languages') as $language) {
-            $nameRules = [
+            $rules["translations.{$language}.title"] = [
                 'required',
                 'string',
-                'min:20',
+                'min:2',
                 'max:255',
             ];
-
-            $descriptionRules = [
-                'required',
+            
+            $rules["translations.{$language}.description"] = [
+                'nullable',
                 'string',
-                'min:20',
+                'min:10',
                 'max:500',
             ];
-
-
-            if ($language === 'ar') {
-                $nameRules[] = function($attribute, $value, $fail) {
-                    if (!preg_match('/^[\p{Arabic}\p{N}\p{P}\p{Z}\s]+$/u', $value)) {
-                        $fail(__('messages.arabic_text_only'));
-                    }
-                };
-                $descriptionRules[] = function($attribute, $value, $fail) {
-                    $plainText = strip_tags($value);
-                    if (!preg_match('/[\p{Arabic}]/u', $plainText)) {
-                        $fail(__('messages.arabic_text_only'));
-                    }
-                };
-            } elseif ($language === 'en') {
-                $nameRules[] = function($attribute, $value, $fail) {
-                    if (!preg_match('/^[a-zA-Z0-9\s\-\_]+$/', $value)) {
-                        $fail(__('messages.english_text_only'));
-                    }
-                };
-                $descriptionRules[] = function($attribute, $value, $fail) {
-                    if (!preg_match('/^[a-zA-Z0-9\s\-\_]+$/', $value)) {
-                        $fail(__('messages.english_text_only'));
-                    }
-                };
-            }
-
-            $rules["translations.{$language}.title"] = $nameRules;
-            $rules["translations.{$language}.description"] = $descriptionRules;
         }
 
-
         return $rules;
-
     }
 
     /**
      * Get custom messages for validator errors.
      */
+    public function messages(): array
+    {
+        return [
+            'translations.*.title.required' => __('messages.title_required_all_languages'),
+            'translations.ar.title.required' => __('messages.title_ar_required'),
+            'translations.en.title.required' => __('messages.title_en_required'),
+            'translations.*.title.min' => __('messages.title_min_length'),
+            'translations.*.description.min' => __('messages.description_min_length'),
+            'translations.*.description.max' => __('messages.description_max_length'),
+            'image.image' => __('messages.file_must_be_image'),
+            'image.mimes' => __('messages.image_format_invalid'),
+            'image.max' => __('messages.image_size_too_large'),
+            'sort_order.unique' => __('messages.sort_order_unique'),
+        ];
+    }
 
     /**
      * Get custom attributes for validator errors.

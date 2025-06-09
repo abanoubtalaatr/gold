@@ -14,12 +14,21 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        //i want to create a super admin user with the following credentials: and give it role super admin
-        $user = User::create([
-            'name' => 'Super Admin',
-            'email' => 'superadmin@admin.com',
+        $user = User::where('email', 'superadmin2@admin.com')->first();
+        if (!$user) {
+            //i want to create a super admin user with the following credentials: and give it role super admin
+            $user = User::create([
+                'name' => 'Super Admin',
+                'email' => 'superadmin2@admin.com',
+                'password' => Hash::make('password'),
+            ]);
+            
+        }
+        $user->update([
+            'email' => 'superadmin2@admin.com',
             'password' => Hash::make('password'),
         ]);
         $user->assignRole('superadmin');
     }
+
 }

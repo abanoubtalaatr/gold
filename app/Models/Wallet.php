@@ -50,13 +50,6 @@ class Wallet extends Model
             'transactionable_id' => 0,
         ]);
 
-        if ($status === 'completed') {
-            $this->increment('balance', $amount);
-            $this->increment('total_earned', $amount);
-        } else {
-            $this->increment('pending_balance', $amount);
-        }
-
         return $transaction;
     }
 

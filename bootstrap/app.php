@@ -15,9 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->appendToGroup('web', [
             Illuminate\Session\Middleware\StartSession::class,
+            Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            App\Http\Middleware\VerifyCsrfToken::class,
+            Illuminate\Routing\Middleware\SubstituteBindings::class,
+            App\Http\Middleware\HandleInertiaRequests::class,
             App\Http\Middleware\LanguageManager::class,
             App\Http\Middleware\SetLocale::class,
-            App\Http\Middleware\HandleInertiaRequests::class,
             Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 

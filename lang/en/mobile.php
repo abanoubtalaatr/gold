@@ -236,4 +236,12 @@ return [
     'print_the_invoice_pdf' => 'Print the invoice PDF',
     'gram' => 'Gram',
     'sar' => 'SAR',
+    'mark_all_as_read' => 'Mark All as Read',
+    'read' => 'Read',
+    'unread' => 'Unread',
+    'order_created_success' => 'Order created successfully',
+    'order_updated_success' => 'Order updated successfully',
+    'order_deleted_success' => 'Order deleted successfully',
+    'order_fetched_success' => 'Order fetched successfully',
+    'order_count_fetched_success' => 'Order count fetched successfully',
 ];

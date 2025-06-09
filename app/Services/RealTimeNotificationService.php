@@ -319,31 +319,41 @@ class RealTimeNotificationService
     {
         $notifiables = [];
 
-        // Always notify the user (rental requester)
-        if ($order->user) {
-            $notifiables[] = $order->user;
+        // Determine who should be notified based on the status change
+        switch ($newStatus) {
+            case OrderRental::STATUS_PENDING_APPROVAL:
+                // New rental request - notify vendor only
+                if ($order->branch && $order->branch->vendor) {
+                    $notifiables[] = $order->branch->vendor;
+                }
+                break;
+                
+            case OrderRental::STATUS_APPROVED:
+            case OrderRental::STATUS_REJECTED:
+            case OrderRental::STATUS_PIECE_SENT:
+            case OrderRental::STATUS_RENTED:
+            case OrderRental::STATUS_AVAILABLE:
+                // Vendor actions - notify user only
+                if ($order->user) {
+                    $notifiables[] = $order->user;
+                }
+                break;
+                
+            default:
+                // Fallback: notify the user
+                if ($order->user) {
+                    $notifiables[] = $order->user;
+                }
+                break;
         }
 
-        // Notify vendor based on the status change
-        if ($order->branch && $order->branch->vendor) {
-            $vendor = $order->branch->vendor;
-            
-            if (in_array($newStatus, [
-                OrderRental::STATUS_PENDING_APPROVAL,
-                OrderRental::STATUS_PIECE_SENT,
-                OrderRental::STATUS_RENTED,
-                OrderRental::STATUS_AVAILABLE
-            ])) {
-                $notifiables[] = $vendor;
-            }
-        }
-
-        // Notify gold piece owner if different from requester
-        if ($order->type === OrderRental::RENT_TYPE && $order->goldPiece && $order->goldPiece->user) {
-            $goldPieceOwner = $order->goldPiece->user;
-            if ($goldPieceOwner->id !== $order->user_id) {
-                $notifiables[] = $goldPieceOwner;
-            }
+        // Always notify gold piece owner if different from requester (for rental completion)
+        if ($newStatus === OrderRental::STATUS_AVAILABLE && 
+            $order->type === OrderRental::RENT_TYPE && 
+            $order->goldPiece && 
+            $order->goldPiece->user && 
+            $order->goldPiece->user->id !== $order->user_id) {
+            $notifiables[] = $order->goldPiece->user;
         }
 
         return array_unique($notifiables, SORT_REGULAR);

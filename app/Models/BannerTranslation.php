@@ -8,5 +8,5 @@ class BannerTranslation extends Model
 {
     public $timestamps = false;
     
-    protected $fillable = ['title'];
+    protected $fillable = ['title', 'description'];
 }

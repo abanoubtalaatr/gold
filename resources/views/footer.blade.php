@@ -20,6 +20,9 @@
                                 <a class="nav-link" href="{{ route('landing') }}#about" data-bs-dismiss="modal">@lang('landing.nav.about')</a>
                             </li>
 
+
+
+                            
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('landing') }}#features" data-bs-dismiss="modal">@lang('landing.features.title')</a>
                             </li>

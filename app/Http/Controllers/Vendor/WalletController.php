@@ -2,28 +2,29 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Http\Controllers\Controller;
-use App\Models\SettlementRequest;
 use App\Models\User;
-use App\Models\Wallet;
-use App\Models\WalletTransaction;
-use App\Notifications\Admin\NewSettlementRequest;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
+use App\Models\SystemSetting;
+use App\Models\SettlementRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
+use App\Notifications\Admin\NewSettlementRequest;
 
 class WalletController extends Controller
 {
     public function index()
     {
-        $wallet = auth()->user()->wallet()->firstOrCreate([
-            'user_id' => auth()->id()
+        $wallet = Auth::user()->wallet()->firstOrCreate([
+            'user_id' => Auth::id()
         ], [
             'balance' => 0,
             'pending_balance' => 0,
             'total_earned' => 0
         ]);
 
+        
         return Inertia::render('Vendor/Wallet/Index', [
             'wallet' => $wallet,
             'transactions' => $wallet->transactions()
@@ -42,7 +43,7 @@ class WalletController extends Controller
 
     public function transactions()
     {
-        $transactions = auth()->user()->wallet->transactions()
+        $transactions = Auth::user()->wallet->transactions()
             ->latest()
             ->paginate(15);
 
@@ -61,15 +62,20 @@ class WalletController extends Controller
 
     public function requestSettlement(Request $request)
     {
+        $minPayoutAmount = SystemSetting::first()->minimum_payout_amount ?? 100;
+        $wallet = Auth::user()->wallet;
+        
         $request->validate([
-            'amount' => 'required|numeric|min:100',
+            'amount' => [
+                'required',
+                'numeric',
+                "min:{$minPayoutAmount}",
+                "max:{$wallet->balance}"
+            ],
+        ], [
+            'amount.max' => __('Insufficient balance. Your current balance is :balance SAR', ['balance' => $wallet->balance]),
+            'amount.min' => __('Minimum payout amount is :amount SAR', ['amount' => $minPayoutAmount]),
         ]);
-
-        $wallet = auth()->user()->wallet;
-
-        if ($request->amount > $wallet->balance) {
-            return back()->with('error', 'Insufficient balance');
-        }
 
         $settlementRequest = SettlementRequest::create([
             'wallet_id' => $wallet->id,
@@ -80,13 +86,18 @@ class WalletController extends Controller
         // Notify all admins
         $admins = User::whereHas('roles', function ($query) {
             $query->where('name', 'admin')
-                ->orWhere('name',  'superadmin')
+                ->orWhere('name', 'superadmin')
                 ->whereNull('vendor_id');
         })->get();
+
         foreach ($admins as $admin) {
-            Log::info('Admin notified', ['admin_id' => $admin->id, 'settlement_request_id' => $settlementRequest->id]);
+            Log::info('Admin notified', [
+                'admin_id' => $admin->id, 
+                'settlement_request_id' => $settlementRequest->id
+            ]);
             $admin->notify(new NewSettlementRequest($settlementRequest));
         }
-        return back()->with('success', 'Settlement request submitted successfully');
+
+        return back()->with('success', __('Settlement request submitted successfully'));
     }
 }

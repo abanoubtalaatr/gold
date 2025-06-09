@@ -24,10 +24,18 @@ use App\Notifications\NewGoldPieceNotification;
 use App\Http\Requests\Api\V1\StoreGoldPieceRequest;
 use App\Http\Requests\Api\V1\UpdateGoldPieceRequest;
 use App\Notifications\Vendor\NewGoldPieceAvailableNotification;
+use App\Services\VendorNotificationService;
 
 class GoldPieceController extends Controller
 {
     use ApiResponseTrait;
+
+    protected $vendorNotificationService;
+
+    public function __construct(VendorNotificationService $vendorNotificationService)
+    {
+        $this->vendorNotificationService = $vendorNotificationService;
+    }
 
     public function index(Request $request)
     {
@@ -87,6 +95,7 @@ class GoldPieceController extends Controller
                 ->whereHas('vendor', function ($query) {
                     $query->where('is_active', true);
                 })
+                ->with('vendor') // Eager load vendor for notifications
                 ->get();
 
             if ($branches->isEmpty()) {
@@ -124,19 +133,11 @@ class GoldPieceController extends Controller
                 }
             }
 
-            // Generate QR code
-            // $qrCode = QrCode::format('png')
-            //     ->size(200)
-            //     ->generate(route('api.v1.gold_pieces.show', $goldPiece->id));
-
-            // $goldPiece->update([
-            //     'qr_code' => $qrCode
-            // ]);
-
             // Create orders for each branch
+            $createdOrders = [];
             foreach ($branches as $branch) {
                 if ($request->type === 'for_rent') {
-                    OrderRental::create([
+                    $order = OrderRental::create([
                         'user_id' => $user->id,
                         'gold_piece_id' => $goldPiece->id,
                         'branch_id' => $branch->id,
@@ -144,35 +145,38 @@ class GoldPieceController extends Controller
                         'total_price' => $goldPiece->rental_price_per_day,
                         'type' => OrderRental::RENT_TYPE,
                     ]);
+                    $createdOrders[] = ['order' => $order, 'type' => 'rental'];
                 } else {
-                    OrderSale::create([
+                    $order = OrderSale::create([
                         'user_id' => $user->id,
                         'gold_piece_id' => $goldPiece->id,
                         'branch_id' => $branch->id,
                         'status' => OrderSale::STATUS_PENDING_APPROVAL,
                         'total_price' => $goldPiece->sale_price,
                     ]);
+                    $createdOrders[] = ['order' => $order, 'type' => 'sale'];
                 }
-
-                // Send database notification
-                $branch->notify(new NewGoldPieceNotification($goldPiece));
-
-                // Broadcast event
-                broadcast(new NewGoldPieceEvent($goldPiece, $branch->id))->toOthers();
             }
 
             DB::commit();
 
-            // Get unique vendors from the branches we created orders for
-            $vendors = collect($branches)
-                ->pluck('vendor') // Get all vendors from branches
-                ->unique('id')    // Remove duplicates
-                ->filter();       // Remove null values
-
-            // Notify each vendor
-            foreach ($vendors as $vendor) {
-                $vendor->notify(new NewGoldPieceAvailableNotification($goldPiece));
+            // Send vendor notifications for the created orders
+            foreach ($createdOrders as $orderData) {
+                try {
+                    $this->vendorNotificationService->notifyVendorOfNewOrder(
+                        $orderData['order'], 
+                        $orderData['type']
+                    );
+                } catch (\Exception $e) {
+                    // Log notification failure but don't fail the entire request
+                    Log::error('Failed to send vendor notification for new order', [
+                        'order_id' => $orderData['order']->id,
+                        'order_type' => $orderData['type'],
+                        'error' => $e->getMessage(),
+                    ]);
+                }
             }
+
             // Load the media relationship before returning the resource
             $goldPiece->load('user');
             return $this->successResponse(

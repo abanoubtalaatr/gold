@@ -46,7 +46,7 @@
                                             :min="filters.from_date" :max="new Date().toISOString().split('T')[0]">
                                     </div>
                                     <div class="col-md-3 d-flex align-items-end">
-                                        <button type="submit" class="btn btn-primary me-2">{{ $t('apply') }}</button>
+                                        <button type="submit" class="btn btn-primary me-2">{{ $t('Apply') }}</button>
                                         <button type="button" class="btn btn-secondary" @click="resetFilters">{{
                                             $t('reset') }}</button>
                                     </div>

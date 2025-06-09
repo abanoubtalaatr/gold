@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Http\Controllers\Controller;
-use App\Models\Branch;
-use App\Models\OrderRental;
-use App\Services\RentalWorkflowService;
-use Illuminate\Http\Request;
+use Carbon\Carbon;
+use App\Models\User;
 use Inertia\Inertia;
+use App\Models\Branch;
+use App\Models\Wallet;
+use App\Models\OrderRental;
+use Illuminate\Http\Request;
+use App\Models\SystemSetting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Services\RentalWorkflowService;
 
 class RentalRequestController extends Controller
 {
@@ -27,7 +30,13 @@ class RentalRequestController extends Controller
         $vendorId = $request->user()->id;
         $branchIds = Branch::where('vendor_id', $vendorId)->pluck('id');
         $branches = Branch::where('vendor_id', $vendorId)->select('id', 'name')->get();
-        $statuses = OrderRental::statuses(); // Get dynamic statuses from OrderRental model
+        $statuses = [
+            OrderRental::STATUS_PENDING_APPROVAL,
+            OrderRental::STATUS_APPROVED,
+            OrderRental::STATUS_PIECE_SENT,
+            OrderRental::STATUS_RENTED,
+            OrderRental::STATUS_REJECTED
+        ];
 
         // Filters
         $filters = $request->only([
@@ -42,9 +51,10 @@ class RentalRequestController extends Controller
             'date_from',
             'date_to',
             'status',
+            'rental_status',
         ]);
 
-        
+
         // Query for rental orders with lease type only
         $ordersQuery = OrderRental::query()
             ->where('type', OrderRental::LEASE_TYPE)
@@ -52,7 +62,7 @@ class RentalRequestController extends Controller
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->whereHas('user', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%");
                 })->orWhereHas('goldPiece', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%");
                 });
@@ -101,14 +111,35 @@ class RentalRequestController extends Controller
                 // Date-based conditions for specific statuses
                 if ($filters['status'] === OrderRental::STATUS_RENTED) {
                     $query->where('start_date', '<=', Carbon::now())
-                          ->where('end_date', '>=', Carbon::now());
+                        ->where('end_date', '>=', Carbon::now());
                 } elseif ($filters['status'] === OrderRental::STATUS_APPROVED) {
                     $query->where('start_date', '>', Carbon::now());
                 } elseif ($filters['status'] === OrderRental::STATUS_AVAILABLE) {
                     $query->where('end_date', '<', Carbon::now());
                 }
             })
-            ->with(['user', 'goldPiece', 'branch'])
+            ->when($filters['rental_status'] ?? null, function ($query, $rentalStatus) {
+                switch ($rentalStatus) {
+                    case 'current':
+                        // Current rentals: start_date <= now and end_date >= now
+                        $query->where('start_date', '<=', Carbon::now())
+                            ->where('end_date', '>=', Carbon::now());
+                        break;
+                    case 'finished':
+                        // Finished rentals: end_date < now
+                        $query->where('end_date', '<', Carbon::now());
+                        break;
+                    case 'future':
+                        // Future rentals: start_date > now
+                        $query->where('start_date', '>', Carbon::now());
+                        break;
+                }
+            })
+            ->with([
+                'user',
+                'goldPiece',
+                'branch'
+            ])
             ->select([
                 'id',
                 'user_id',
@@ -123,7 +154,7 @@ class RentalRequestController extends Controller
             ]);
 
         // Paginate results
-        $orders = $ordersQuery->paginate(10)->appends($filters);
+        $orders = $ordersQuery->orderBy('created_at', 'desc')->paginate(10)->appends($filters);
 
         // Transform orders to include rental_days, invoice, and allowed_actions
         $orders->getCollection()->transform(function ($order) {
@@ -132,6 +163,7 @@ class RentalRequestController extends Controller
                 : null;
             $order->invoice = $order->status === 'payment_confirmed' ? $this->generateInvoice($order) : null;
             $order->allowed_actions = $this->getAllowedActions($order);
+
             return $order;
         });
 
@@ -170,19 +202,32 @@ class RentalRequestController extends Controller
         foreach ($allowedTransitions as $transition) {
             switch ($transition) {
                 case OrderRental::STATUS_APPROVED:
-                    $actions[] = 'approve';
+                    // Only show approve action if the current status is pending_approval
+                    if ($order->status === OrderRental::STATUS_PENDING_APPROVAL) {
+                        $actions[] = 'approve';
+                    }
                     break;
                 case OrderRental::STATUS_REJECTED:
-                    $actions[] = 'reject';
+                    // Only show reject action if the current status is pending_approval
+                    if ($order->status === OrderRental::STATUS_PENDING_APPROVAL) {
+                        $actions[] = 'reject';
+                    }
                     break;
                 case OrderRental::STATUS_PIECE_SENT:
-                    $actions[] = 'mark_as_sent';
+                    // Only show mark_as_sent action if the current status is approved
+                    if ($order->status === OrderRental::STATUS_APPROVED) {
+                        $actions[] = 'mark_as_sent';
+                    }
                     break;
                 case OrderRental::STATUS_RENTED:
-                    $actions[] = 'confirm_rental';
+                    // Only show confirm_rental action if the current status is piece_sent
+                    if ($order->status === OrderRental::STATUS_PIECE_SENT) {
+                        $actions[] = 'confirm_rental';
+                    }
                     break;
                 case OrderRental::STATUS_AVAILABLE:
-                    $actions[] = 'complete_rental';
+                    // Remove complete_rental action entirely - this button should not exist
+                    // Rental completion should happen automatically or through other means
                     break;
             }
         }
@@ -190,125 +235,83 @@ class RentalRequestController extends Controller
         return $actions;
     }
 
-    public function accept(Request $request, $orderId)
+    public function accept(Request $request, $order)
     {
-        try {
-            $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
-            $this->authorizeVendor($order);
+        $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
+        $this->authorizeVendor($order);
 
-            $request->validate([
-                'branch_id' => 'required|exists:branches,id',
-            ]);
+        // Use the workflow service for proper status management
+        $this->rentalWorkflowService->approve($order, $request->user());
 
-            // Use the workflow service for proper status management
-            $this->rentalWorkflowService->approve($order, $request->branch_id, $request->user());
-
-            return back()->with('success', __('Order accepted successfully'));
-
-        } catch (\Exception $e) {
-            Log::error('Failed to accept rental order', [
-                'order_id' => $orderId,
-                'error' => $e->getMessage(),
-            ]);
-
-            return back()->with('error', __('Failed to accept order. Please try again.'));
-        }
+        return back()->with('success', __('Order accepted successfully'));
     }
 
-    public function reject(Request $request, $orderId)
+    public function reject(Request $request, $order)
     {
-        try {
-            $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
-            $this->authorizeVendor($order);
+        $orderId = $order; // Store the original ID
+        $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
+        $this->authorizeVendor($order);
 
-            // Use the workflow service for proper status management
-            $this->rentalWorkflowService->reject($order, $order->user);
+        // Use the workflow service for proper status management
+        $this->rentalWorkflowService->reject($order, $request->user());
 
-            return back()->with('success', __('Order rejected successfully'));
-
-        } catch (\Exception $e) {
-            Log::error('Failed to reject rental order', [
-                'order_id' => $orderId,
-                'error' => $e->getMessage(),
-            ]);
-
-            return back()->with('error', __('Failed to reject order. Please try again.'));
-        }
+        return back()->with('success', __('Order rejected successfully'));
     }
 
-    public function markAsSent(Request $request, $orderId)
+    public function markAsSent(Request $request, $order)
     {
-        try {
-            $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
-            $this->authorizeVendor($order);
 
-            if ($order->status !== OrderRental::STATUS_APPROVED) {
-                return back()->with('error', __('Order must be approved before marking as sent.'));
-            }
+        $orderId = $order; // Store the original ID
+        $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
+        $this->authorizeVendor($order);
 
-            // Use the workflow service for proper status management
-            $this->rentalWorkflowService->markAsSent($order, $request->user());
-
-            return back()->with('success', __('Order marked as sent successfully'));
-
-        } catch (\Exception $e) {
-            Log::error('Failed to mark rental order as sent', [
-                'order_id' => $orderId,
-                'error' => $e->getMessage(),
-            ]);
-
-            return back()->with('error', __('Failed to mark order as sent. Please try again.'));
+        if ($order->status !== OrderRental::STATUS_APPROVED) {
+            return back()->with('error', __('Order must be approved before marking as sent.'));
         }
+
+        // Use the workflow service for proper status management
+        $this->rentalWorkflowService->markAsSent($order, $request->user());
+
+        return back()->with('success', __('Order marked as sent successfully'));
     }
 
-    public function confirmRental(Request $request, $orderId)
+    public function confirmRental(Request $request, $order)
     {
-        try {
-            $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
-            $this->authorizeVendor($order);
+        $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
+        $this->authorizeVendor($order);
 
-            if ($order->status !== OrderRental::STATUS_PIECE_SENT) {
-                return back()->with('error', __('Order must be marked as sent before confirming rental.'));
-            }
-
-            // Use the workflow service for proper status management
-            $this->rentalWorkflowService->confirmRental($order, $request->user());
-
-            return back()->with('success', __('Rental confirmed successfully'));
-
-        } catch (\Exception $e) {
-            Log::error('Failed to confirm rental', [
-                'order_id' => $orderId,
-                'error' => $e->getMessage(),
-            ]);
-
-            return back()->with('error', __('Failed to confirm rental. Please try again.'));
+        if ($order->status !== OrderRental::STATUS_PIECE_SENT) {
+            return back()->with('error', __('Order must be marked as sent before confirming rental.'));
         }
-    }
+        $totalPrice = $order->total_price;
+        $settings = SystemSetting::first();
+        $merchantCommission = $settings->merchant_commission_percentage ?? 0;
+        $platformCommission = $settings->platform_commission_percentage ?? 0;
 
-    public function completeRental(Request $request, $orderId)
-    {
-        try {
-            $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
-            $this->authorizeVendor($order);
+        $vendorAmount = ($totalPrice * $merchantCommission) / 100;
+        $platformAmount = ($totalPrice * $platformCommission) / 100;
 
-            if ($order->status !== OrderRental::STATUS_RENTED) {
-                return back()->with('error', __('Order must be in rented status to complete.'));
-            }
+        // i want for vendor first check if the wallet is exist or not if not create new one
+        $vendorWallet = Wallet::where('user_id', auth()->id())->first();
 
-            // Use the workflow service for proper status management
-            $this->rentalWorkflowService->completeRental($order, $request->user());
-
-            return back()->with('success', __('Rental completed successfully'));
-
-        } catch (\Exception $e) {
-            Log::error('Failed to complete rental', [
-                'order_id' => $orderId,
-                'error' => $e->getMessage(),
+        if (!$vendorWallet) {
+            $vendorWallet = Wallet::create([
+                'user_id' => $order->user_id,
             ]);
-
-            return back()->with('error', __('Failed to complete rental. Please try again.'));
         }
+        // create wallet transaction for the vendor
+        $vendorWallet->credit($vendorAmount, 'Vendor commission for order #' . $order->id);
+        $vendorWallet->update(['balance' => $vendorWallet->balance + $vendorAmount, 'pending_balance' => $vendorWallet->pending_balance + $vendorAmount]);
+
+        // create wallet transaction for the platform
+        $platformWallet = Wallet::where('user_id', User::where('email', 'admin@admin.com')->first()->id)->first();
+
+        $platformWallet->credit($platformAmount, 'Platform commission for order #' . $order->id);
+        $platformWallet->update(['balance' => $platformWallet->balance + $platformAmount, 'total_earned' => $platformWallet->total_earned + $platformAmount]);
+        // Use the workflow service for proper status management
+        $this->rentalWorkflowService->confirmRental($order, $request->user());
+
+        return back()->with('success', __('Rental confirmed successfully'));
     }
 
     protected function authorizeVendor($order)

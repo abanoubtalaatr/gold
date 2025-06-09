@@ -15,11 +15,7 @@
                     <div class="p-6 bg-white border-b border-gray-200">
                         <!-- Filters -->
                         <div class="flex flex-wrap items-center justify-between mb-6 gap-4">
-                            <div class="flex-1 min-w-0">
-                                <input v-model="form.search" type="text"
-                                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    :placeholder="$t('Search by user or piece name...')" @input="debouncedSearch" />
-                            </div>
+                            
                             <div class="flex items-center gap-4">
                                 <select v-model="form.branch_id"
                                     class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -33,9 +29,8 @@
                                     class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     @change="applyFilters">
                                     <option value="">{{ $t('All Statuses') }}</option>
-                                    <option value="pending_approval">{{ $t('Future') }}</option>
-                                    <option value="rented">{{ $t('Current') }}</option>
-                                    <option value="available">{{ $t('Finished') }}</option>
+                                    <option value="pending_approval">{{ $t('Pending Approval') }}</option>
+                                    <option value="rejected">{{ $t('Rejected') }}</option>
                                 </select>
                                 <button @click="resetFilters"
                                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
@@ -82,8 +77,8 @@
                                                 <img v-if="order.user?.avatar" :src="order.user.avatar"
                                                     class="h-8 w-8 rounded-full object-cover mr-2" alt="User avatar" />
                                                 <div>
-                                                    {{ order.user?.name || 'N/A' }}<br />
-                                                    {{ order.user?.email || 'N/A' }}
+                                                    {{ order.user?.name || '--' }}<br />
+                                                    {{ order.user?.mobile || '--' }}
                                                 </div>
                                             </div>
                                         </td>
@@ -91,11 +86,11 @@
                                             <strong @click="showDetails(order)"
                                                 class="text-yellow-600 hover:text-yellow-200 hover:underline cursor-pointer transition-colors duration-200">
                                                 {{ order.gold_piece && order.gold_piece.name ? order.gold_piece.name :
-                                                    'N/A' }}
+                                                    '--' }}
                                             </strong>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ order.branch?.name || 'N/A' }}
+                                            {{ order.branch?.name || '--' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ order.total_price }} {{ $t('SAR') }}
@@ -108,99 +103,23 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex items-center space-x-2">
-                                                <!-- Accept button - only show for Future orders -->
+                                                <!-- Accept button - only show for pending_approval orders -->
                                                 <button
-                                                    v-if="order.status === 'pending_approval' || order.status === 'rejected'"
-                                                    @click="acceptOrderDirect(order)" :disabled="accepting"
+                                                    v-if="order.status === 'pending_approval'"
+                                                    @click="openAcceptModal(order)" :disabled="accepting"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 transition-colors duration-200">
                                                     {{ accepting && selectedOrderId === order.id ? $t('Processing...') :
                                                         $t('Accept') }}
                                                 </button>
 
-                                                <!-- Reject button - only show for Future orders -->
+                                                <!-- Reject button - only show for pending_approval orders -->
                                                 <button
-                                                    v-if="order.status === 'pending_approval' || order.status === 'rejected'"
+                                                    v-if="order.status === 'pending_approval'"
                                                     @click="rejectOrderDirect(order)" :disabled="rejecting"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors duration-200">
                                                     {{ rejecting && selectedOrderId === order.id ? $t('Processing...') :
                                                         $t('Reject') }}
                                                 </button>
-                                                <!-- Updated Dropdown Menu with simplified status options -->
-                                                <div class="relative inline-block text-left"
-                                                    v-if="['rented', 'available', 'approved'].includes(order.status)">
-                                                    <button type="button" @click.stop="toggleOrderDropdown(order.id)"
-                                                        class="inline-flex items-center justify-center w-full px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-150"
-                                                        :aria-expanded="activeDropdown === order.id"
-                                                        aria-haspopup="true">
-                                                        {{ $t('Change Status') }}
-                                                        <svg class="w-4 h-4 ml-2 -mr-1"
-                                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                                            fill="currentColor">
-                                                            <path fill-rule="evenodd"
-                                                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                                                                clip-rule="evenodd" />
-                                                        </svg>
-                                                    </button>
-                                                    <div enter-active-class="transition ease-out duration-100"
-                                                        enter-from-class="transform opacity-0 scale-95"
-                                                        enter-to-class="transform opacity-100 scale-100"
-                                                        leave-active-class="transition ease-in duration-75"
-                                                        leave-from-class="transform opacity-100 scale-100"
-                                                        leave-to-class="transform opacity-0 scale-95">
-                                                        <div v-if="activeDropdown === order.id" ref="dropdown"
-                                                            class="absolute right-0 z-20 w-48 mt-2 origin-top-right bg-white border border-gray-200 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                                            role="menu" aria-orientation="vertical"
-                                                            :aria-labelledby="'menu-button-' + order.id">
-                                                            <div class="py-1">
-                                                                <!-- Future -->
-                                                                <button v-if="order.status !== 'pending_approval'"
-                                                                    @click="updateStatus(order.id, 'pending_approval')"
-                                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-900 font-medium transition-colors duration-150 menue"
-                                                                    role="menuitem">
-                                                                    <svg class="w-4 h-4 mr-3 text-yellow-500"
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        viewBox="0 0 20 20" fill="currentColor">
-                                                                        <path fill-rule="evenodd"
-                                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 1 1 0 001.415 1.414z"
-                                                                            clip-rule="evenodd" />
-                                                                    </svg>
-                                                                    {{ $t('Mark as Future') }}
-                                                                </button>
-
-                                                                <!-- Current -->
-                                                                <button
-                                                                    v-if="order.status !== 'rented' && order.status !== 'approved'"
-                                                                    @click="updateStatus(order.id, 'rented')"
-                                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-900 font-medium transition-colors duration-150 menue"
-                                                                    role="menuitem">
-                                                                    <svg class="w-4 h-4 mr-3 text-green-500"
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        viewBox="0 0 20 20" fill="currentColor">
-                                                                        <path fill-rule="evenodd"
-                                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                                            clip-rule="evenodd" />
-                                                                    </svg>
-                                                                    {{ $t('Mark as Current') }}
-                                                                </button>
-
-                                                                <!-- Finished -->
-                                                                <button v-if="order.status !== 'available'"
-                                                                    @click="updateStatus(order.id, 'available')"
-                                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-900 font-medium transition-colors duration-150 menue"
-                                                                    role="menuitem">
-                                                                    <svg class="w-4 h-4 mr-3 text-gray-500"
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        viewBox="0 0 20 20" fill="currentColor">
-                                                                        <path fill-rule="evenodd"
-                                                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                                                                            clip-rule="evenodd" />
-                                                                    </svg>
-                                                                    {{ $t('Mark as Finished') }}
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -216,6 +135,45 @@
             </div>
         </div>
 
+        <!-- Accept Order Modal -->
+        <Modal :show="showAcceptModal" @close="closeAcceptModal">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
+                <div class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg w-full">
+                    <div class="p-6">
+                        <h2 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Accept Rental Order') }}</h2>
+                        <p class="mb-4 text-sm text-gray-600">{{ $t('Select a branch for this rental order.') }}</p>
+
+                        <form @submit.prevent="acceptOrder">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Branch') }}</label>
+                                <select v-model="acceptForm.branch_id"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="" disabled>{{ $t('Select a branch') }}</option>
+                                    <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                                        {{ branch.name }}
+                                    </option>
+                                </select>
+                                <p v-if="acceptForm.errors.branch_id" class="mt-1 text-sm text-red-600">
+                                    {{ acceptForm.errors.branch_id }}
+                                </p>
+                            </div>
+
+                            <div class="flex justify-end space-x-3 pt-4">
+                                <button type="button" @click="closeAcceptModal"
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                                    {{ $t('Cancel') }}
+                                </button>
+                                <button type="submit" :disabled="acceptForm.processing"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+                                    {{ acceptForm.processing ? $t('Processing...') : $t('Accept') }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </Modal>
+
         <!-- Order Details Modal -->
         <Modal :show="showDetailsModal" @close="closeDetailsModal">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
@@ -226,15 +184,20 @@
                         <div v-if="selectedOrder" class="mt-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
+                                <p><strong>{{ $t('id') }}:</strong>
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.id ?
+                                            selectedOrder.gold_piece.id :
+                                        '--' }}
+                                    </p>
                                     <p><strong>{{ $t('Name') }}:</strong>
                                         {{ selectedOrder.gold_piece && selectedOrder.gold_piece.name ?
                                             selectedOrder.gold_piece.name :
-                                        'N/A' }}
+                                        '--' }}
                                     </p>
                                     <p><strong>{{ $t('Description') }}:</strong>
                                         {{ selectedOrder.gold_piece && selectedOrder.gold_piece.description ?
                                             selectedOrder.gold_piece.description :
-                                        'N/A' }}
+                                        '--' }}
                                     </p>
                                     <p><strong>{{ $t('Type') }}:</strong> {{ selectedOrder.goldPiece?.type === 'rent' ?
                                         $t('Rental') : $t('Sale') }}</p>
@@ -243,18 +206,18 @@
                                     <p><strong>{{ $t('Weight') }}:</strong>
                                         {{ selectedOrder.gold_piece && selectedOrder.gold_piece.weight ?
                                             selectedOrder.gold_piece.weight :
-                                        'N/A' }}
+                                        '--' }}
                                         {{
                                             $t('grams') }}</p>
-                                    <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || 'N/A' }}</p>
+                                    <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || '--' }}</p>
                                     <p><strong>{{ $t('Status') }}:</strong> {{ getDisplayStatus(selectedOrder.status) }}
                                     </p>
                                 </div>
                                 <div>
                                     <p><strong>{{ $t('Images') }}:</strong></p>
-                                    <div v-if="selectedOrder.gold_piece?.images?.length" class="flex flex-wrap gap-2">
-                                        <img v-for="image in selectedOrder.gold_piece.images" :key="image.id"
-                                            :src="image.url" class="h-20 w-20 object-cover rounded"
+                                    <div v-if="selectedOrder.gold_piece?.media?.length" class="flex flex-wrap gap-2">
+                                        <img v-for="media in selectedOrder.gold_piece.media.filter(m => m.collection_name === 'images')" :key="media.id"
+                                            :src="media.original_url" class="h-20 w-20 object-cover rounded"
                                             alt="Gold piece image" />
                                     </div>
                                     <p v-else>{{ $t('No images available') }}</p>
@@ -324,7 +287,6 @@ const acceptForm = useForm({
 
 const showRejectModal = ref(false);
 const showDetailsModal = ref(false);
-const activeDropdown = ref(null);
 
 const debouncedSearch = debounce(() => {
     form.get(route('vendor.orders.rental.index'), {
@@ -354,21 +316,22 @@ const resetFilters = () => {
 
 const getDisplayStatus = (status) => {
     const statusMap = {
-        'pending_approval': t('Future'),
-        'rejected': t('Future'),
-        'rented': t('Current'),
-        "approved": t('Current'),
-        'available': t('Finished'),
+        'pending_approval': t('Pending Approval'),
+        'approved': t('Approved'),
+        'piece_sent': t('Piece Sent'),
+        'rented': t('Rented'),
+        'rejected': t('Rejected'),
     };
     return statusMap[status] || status;
 };
 
 const getStatusClass = (status) => {
     const statusClasses = {
-        'pending_approval': 'bg-yellow-100 text-yellow-800', // Future
-        'rented': 'bg-green-100 text-green-800', // Current
-        "approved": 'bg-green-100 text-green-800',
-        'available': 'bg-gray-100 text-gray-800', // Finished
+        'pending_approval': 'bg-yellow-100 text-yellow-800',
+        'approved': 'bg-blue-100 text-blue-800',
+        'piece_sent': 'bg-purple-100 text-purple-800',
+        'rented': 'bg-green-100 text-green-800',
+        'rejected': 'bg-red-100 text-red-800',
     };
     return statusClasses[status] || 'bg-gray-100 text-gray-800';
 };
@@ -419,17 +382,20 @@ const rejectOrder = () => {
 const updateStatus = (orderId, status) => {
     if (!status) return;
 
-    // Close the dropdown after selection
-    activeDropdown.value = null;
+    selectedOrderId.value = orderId;
+    updating.value = true;
 
     router.patch(route('vendor.orders.rental.updateStatus', orderId), {
         status: status
     }, {
         preserveScroll: true,
         onSuccess: () => {
-            // Optional: Add any success handling
+            updating.value = false;
+            selectedOrderId.value = null;
         },
         onError: (errors) => {
+            updating.value = false;
+            selectedOrderId.value = null;
             console.error('Error updating status:', errors);
         }
     });
@@ -445,51 +411,17 @@ const closeDetailsModal = () => {
     selectedOrder.value = null;
 };
 
-const toggleOrderDropdown = (orderId) => {
-    if (activeDropdown.value === orderId) {
-        activeDropdown.value = null;
-    } else {
-        activeDropdown.value = orderId;
-    }
-};
-
 // Add these new refs
 const accepting = ref(false);
 const rejecting = ref(false);
+const updating = ref(false);
 const selectedOrderId = ref(null);
-
-// Direct accept function - Update to set status to 'rented' (Current)
-const acceptOrderDirect = (order) => {
-    if (!order.branch_id) {
-        alert('Please assign this order to a branch first');
-        return;
-    }
-
-    selectedOrderId.value = order.id;
-    accepting.value = true;
-
-    router.post(route('vendor.orders.rental.accept', order.id), {
-        branch_id: order.branch_id,
-        status: 'rented' // Add this to set status to Current
-    }, {
-        preserveScroll: true,
-        onSuccess: () => {
-            accepting.value = false;
-            selectedOrderId.value = null;
-        },
-        onError: (errors) => {
-            accepting.value = false;
-            selectedOrderId.value = null;
-            console.error('Error accepting order:', errors);
-        }
-    });
-};
 
 // Update the rejectOrderDirect function
 const rejectOrderDirect = async (order) => {
     const result = await Swal.fire({
         title: t('Are you sure?'),
-        text: t('You are about to reject this order and mark it as Finished.'),
+        text: t('You are about to reject this order.'),
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -504,14 +436,14 @@ const rejectOrderDirect = async (order) => {
 
         try {
             await router.post(route('vendor.orders.rental.reject', order.id), {
-                status: 'available'
+                status: 'rejected' // Changed from 'available' to 'rejected'
             }, {
                 preserveScroll: true
             });
 
             Swal.fire(
                 t('Rejected!'),
-                t('The order has been marked as Finished.'),
+                t('The order has been rejected.'),
                 'success'
             );
         } catch (errors) {
@@ -528,19 +460,14 @@ const rejectOrderDirect = async (order) => {
     }
 };
 
-// Close dropdown when clicking outside
-const onClickOutside = (event) => {
-    if (activeDropdown.value && !event.target.closest('.relative.inline-block')) {
-        activeDropdown.value = null;
-    }
-};
-
 onMounted(() => {
-    document.addEventListener('click', onClickOutside);
+    // Remove dropdown event listener
+    // document.addEventListener('click', onClickOutside);
 });
 
 onUnmounted(() => {
-    document.removeEventListener('click', onClickOutside);
+    // Remove dropdown event listener
+    // document.removeEventListener('click', onClickOutside);
 });
 </script>
 

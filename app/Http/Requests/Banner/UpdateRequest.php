@@ -11,58 +11,29 @@ class UpdateRequest extends FormRequest
         return true;
     }
 
-
     public function rules(): array
     {
-        return [
+        $rules = [
             'image' => 'nullable|image|mimes:webp,jpeg,png,jpg,gif|max:2048',
             'sort_order' => 'required|numeric|unique:banners,sort_order,' . $this->route('banner')->id,
-
             'is_active' => 'boolean'
         ];
+
         foreach (config('app.supported_languages') as $language) {
-            $nameRules = [
+            $rules["translations.{$language}.title"] = [
                 'required',
                 'string',
-                'min:20',
+                'min:2',
                 'max:255',
             ];
-            $descriptionRules = [
-                'required',
+            
+            $rules["translations.{$language}.description"] = [
+                'nullable',
                 'string',
-                'min:20',
+                'min:10',
                 'max:500',
             ];
-            if ($language === 'ar') {
-                $nameRules[] = function($attribute, $value, $fail) {
-                    if (!preg_match('/^[\p{Arabic}\p{N}\p{P}\p{Z}\s]+$/u', $value)) {
-                        $fail(__('messages.arabic_text_only'));
-                    }
-                };
-                $descriptionRules[] = function($attribute, $value, $fail) {
-                    $plainText = strip_tags($value);
-                    if (!preg_match('/[\p{Arabic}]/u', $plainText)) {
-                        $fail(__('messages.arabic_text_only'));
-                    }
-                };
-            } elseif ($language === 'en') {
-                $nameRules[] = function($attribute, $value, $fail) {
-                    if (!preg_match('/^[a-zA-Z0-9\s\-\_]+$/', $value)) {
-                        $fail(__('messages.english_text_only'));
-                    }
-                };
-                $descriptionRules[] = function($attribute, $value, $fail) {
-                    if (!preg_match('/^[a-zA-Z0-9\s\-\_]+$/', $value)) {
-
-                        $fail(__('messages.english_text_only'));
-                    }
-                };
-            }
-
-            $rules["translations.{$language}.title"] = $nameRules;
-            $rules["translations.{$language}.description"] = $descriptionRules;
         }
-
 
         return $rules;
     }
@@ -70,18 +41,18 @@ class UpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'translations.*.title.required' => 'الاسم مطلوب لجميع اللغات',
-            'translations.ar.title.required' => 'الاسم باللغة العربية مطلوب',
-            'translations.en.title.required' => 'الاسم باللغة الإنجليزية مطلوب',
-            'translations.*.title.min' => 'الاسم يجب أن يكون أكثر من 20 حرف',
-            'translations.*.description.min' => 'الوصف يجب أن يكون أكثر من 20 حرف',
-            'translations.*.description.max' => 'الوصف يجب أن يكون أقل من 500 حرف',
-            'translations.*.description.required' => 'الوصف مطلوب لجميع اللغات',
-            'translations.ar.description.required' => 'الوصف باللغة العربية مطلوب',
-            'translations.en.description.required' => 'الوصف باللغة الإنجليزية مطلوب',
-            'image.image' => 'يجب أن يكون الملف المرفق صورة',
-            'image.mimes' => 'يجب أن تكون الصورة من نوع: jpeg, png, jpg, gif',
-            'image.max' => 'حجم الصورة لا يجب أن يتجاوز 2 ميجابايت'
+            'translations.*.title.required' => __('messages.title_required_all_languages'),
+            'translations.ar.title.required' => __('messages.title_ar_required'),
+            'translations.en.title.required' => __('messages.title_en_required'),
+            'translations.*.title.min' => __('messages.title_min_length'),
+            'translations.*.description.min' => __('messages.description_min_length'),
+            'translations.*.description.max' => __('messages.description_max_length'),
+            'translations.ar.description.required' => __('messages.description_ar_required'),
+            'translations.en.description.required' => __('messages.description_en_required'),
+            'image.image' => __('messages.file_must_be_image'),
+            'image.mimes' => __('messages.image_format_invalid'),
+            'image.max' => __('messages.image_size_too_large'),
+            'sort_order.unique' => __('messages.sort_order_unique'),
         ];
     }
 
@@ -93,6 +64,7 @@ class UpdateRequest extends FormRequest
             ]);
         }
     }
+
     public function attributes(): array
     {
         return [

@@ -15,18 +15,27 @@ class Banner extends Model implements TranslatableContract
     protected $fillable = [
         'image',
         'is_active',
+        'sort_order',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
     ];
 
-    public $translatedAttributes = ['title'];
+    public $translatedAttributes = ['title', 'description'];
 
+
+    public function getImageUrlAttribute()
+    {
+        if ($this->attributes['image']) {
+            return asset('storage/' . $this->attributes['image']);
+        }
+        return null;
+    }
 
     public function getImageAttribute()
     {
-        return asset("/public/{$this->attributes['image']}");
+        return $this->attributes['image'];
     }
 
     public function scopeActive($query)

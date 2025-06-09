@@ -59,12 +59,20 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = Auth::user();
+        $isVendor = $user && $user->hasRole('vendor');
+        
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        // Redirect based on user role
+        if ($isVendor) {
+            return redirect()->route('login')->with('success', __('You have been logged out successfully.'));
+        }
+        
+        return redirect()->route('login')->with('success', __('You have been logged out successfully.'));
     }
 }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('banners', function (Blueprint $table) {
             $table->id();
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->boolean('is_active')->default(true);
             $table->integer('sort_order')->default(1);
             $table->timestamps();
@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('banner_id')->constrained('banners')->onDelete('cascade');
             $table->string('locale')->index();
             $table->string('title');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

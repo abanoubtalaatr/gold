@@ -72,6 +72,12 @@
                         :pagination-links="notifications.links"
                         @update:page="handlePageChange"
                     >
+                        <template #title="{ data }">
+                            {{ getLocalizedText(data.title) }}
+                        </template>
+                        <template #message="{ data }">
+                            {{ getLocalizedText(data.message) }}
+                        </template>
                         <template #created_at="{ data }">
                             {{ formatDate(data.created_at) }}
                         </template>
@@ -131,8 +137,10 @@ import DataTable from "@/Components/DataTable.vue";
 import ActivateToggle from "@/Components/ActivateToggle.vue";
 import DeleteAction from "@/Components/DeleteAction.vue";
 import EditButton from "@/Components/EditButton.vue";
+import { usePage } from "@inertiajs/vue3";
 
 const { t } = useI18n();
+const page = usePage();
 
 const props = defineProps({
     notifications: Object,
@@ -215,6 +223,24 @@ const getRecipientTypeLabel = (type) => {
             individual: t("notification.individual"),
         }[type] || type
     );
+};
+
+// Helper function to extract localized text
+const getLocalizedText = (textData, fallback = '') => {
+    if (!textData) return fallback;
+    
+    // If it's already a string, return it
+    if (typeof textData === 'string') {
+        return textData;
+    }
+    
+    // If it's an object with language keys, extract the appropriate one
+    if (typeof textData === 'object' && textData !== null) {
+        const locale = page.props.locale || 'en';
+        return textData[locale] || textData.en || textData.ar || fallback;
+    }
+    
+    return fallback;
 };
 
 // console.log(t("notification.all_users") + " " + JSON.stringify(props.notifications));

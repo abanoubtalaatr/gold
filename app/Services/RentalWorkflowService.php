@@ -70,9 +70,8 @@ class RentalWorkflowService
     /**
      * Approve a rental request with instant notification
      */
-    public function approve(OrderRental $order, int $branchId, $actor): bool
+    public function approve(OrderRental $order , $actor): bool
     {
-        $order->update(['branch_id' => $branchId]);
         
         // Use critical notification for approval
         $oldStatus = $order->status;

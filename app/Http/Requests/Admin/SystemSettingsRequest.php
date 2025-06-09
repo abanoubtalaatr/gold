@@ -41,13 +41,13 @@ class SystemSettingsRequest extends FormRequest
             'max_delivery_time_hours' => 'required|integer|min:1',
 
             // Website content
-            'privacy_policy' => 'required|string',
-            'terms_conditions' => 'required|string',
+            'privacy_policy' => 'nullable|string',
+            'terms_conditions' => 'nullable|string',
 
             // Contact info
-            'contact_phone' => 'required|string',
-            'contact_email' => 'required|email',
-            'location_map' => 'required|string',
+            'contact_phone' => 'nullable|string',
+            'contact_email' => 'nullable|email',
+            'location_map' => 'nullable|string',
        
         ];
     }

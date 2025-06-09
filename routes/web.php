@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\WalletController as AdminWalletController;
+use App\Http\Controllers\Admin\AdminWalletController as SuperAdminWalletController;
 use App\Events\NotificationSent;
 use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\SystemSettingsController;
@@ -66,7 +67,79 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
         Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
         Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+        
+        // Add polling endpoint for real-time notifications
+        Route::get('/poll', function() {
+            $user = request()->user();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+            
+            $lastCheck = request()->get('last_check');
+            
+            // If no last_check provided, use 5 minutes ago to catch recent notifications
+            if (!$lastCheck) {
+                $since = now()->subMinutes(5);
+            } else {
+                try {
+                    $since = \Carbon\Carbon::parse($lastCheck);
+                    // Ensure we don't go too far back to avoid performance issues
+                    $maxLookback = now()->subHours(1);
+                    if ($since->lt($maxLookback)) {
+                        $since = $maxLookback;
+                    }
+                } catch (\Exception $e) {
+                    // If invalid date, use 5 minutes ago as fallback
+                    $since = now()->subMinutes(5);
+                }
+            }
+            
+            // Get only unread notifications created AFTER the last check time
+            $newNotifications = $user->notifications()
+                ->where('created_at', '>', $since)
+                ->whereNull('read_at')
+                ->orderBy('created_at', 'desc')
+                ->limit(50) // Limit to prevent overwhelming the frontend
+                ->get()
+                ->map(function($notification) {
+                    return [
+                        'id' => $notification->id,
+                        'type' => $notification->type,
+                        'data' => $notification->data,
+                        'created_at' => $notification->created_at->toISOString(),
+                        'time_ago' => $notification->created_at->diffForHumans(),
+                    ];
+                });
+            
+            // Get total unread count
+            $totalUnread = $user->unreadNotifications()->count();
+            
+            return response()->json([
+                'notifications' => $newNotifications,
+                'count' => $newNotifications->count(),
+                'total_unread' => $totalUnread,
+                'timestamp' => now()->toISOString(),
+                'since' => $since->toISOString(),
+                'next_check_from' => $newNotifications->count() > 0 ? 
+                    $newNotifications->first()['created_at'] : 
+                    now()->toISOString(),
+                'debug' => [
+                    'user_id' => $user->id,
+                    'last_check_provided' => $lastCheck,
+                    'since_parsed' => $since->toISOString(),
+                    'notifications_found' => $newNotifications->count(),
+                    'server_time' => now()->toISOString(),
+                ]
+            ]);
+        })->name('notifications.poll');
     });
+    
+    // Add vendor notifications count route
+    Route::prefix('vendor')->group(function () {
+        Route::get('/notifications/count', [NotificationController::class, 'getVendorNotificationCount'])->name('vendor.notifications.count');
+    });
+    
+    
     /************************************************************************ */
 
     Route::resource('users', UsersController::class);
@@ -117,13 +190,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('banners', BannerController::class);
     Route::post('banners/{banner}/activate', [BannerController::class, 'activate'])->name('ba.activate');
-    Route::post('/banners/{banner}', [BannerController::class, 'update'])->name('banners.update');
 
     /************************************************************************ */
 
     Route::resource('faqs', FaqController::class);
     Route::post('faqs/{faq}/activate', [FaqController::class, 'activate'])->name('faqs.activate');
-    Route::post('/faqs/{faq}', [FaqController::class, 'update'])->name('faqs.update');
 
 });
 
@@ -180,6 +251,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 
     Route::put('/settlement/{settlement}/reject', [AdminWalletController::class, 'rejectSettlement'])
         ->name('admin.settlement.reject');
+
+     Route::get('/wallet', [SuperAdminWalletController::class, 'index'])->name('wallet.index');
 });
 
 /************************************************************************ */
@@ -288,9 +361,6 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
     });
 
     Route::middleware(['auth', 'role:vendor'])->group(function () {
-        Route::post('logout', [App\Http\Controllers\Vendor\Auth\LoginController::class, 'destroy'])
-            ->name('logout');
-
         Route::get('/dashboard', [App\Http\Controllers\Vendor\DashboardController::class, 'index'])->name('dashboard');
     });
 });
@@ -343,6 +413,8 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
         Route::get('/sale-orders', 'index')->name('orders.sale.index');
         Route::post('/sale-orders/{orderId}/accept', 'accept')->name('orders.sales.accept');
         Route::post('/sale-orders/{orderId}/reject', 'reject')->name('orders.sales.reject');
+        Route::post('/sale-orders/{orderId}/mark-sent', 'markAsSent')->name('orders.sales.mark-sent');
+        Route::post('/sale-orders/{orderId}/mark-sold', 'markAsSold')->name('orders.sales.mark-sold');
         Route::patch('/sale-orders/{orderId}/status', 'updateStatus')->name('orders.sales.updateStatus');
 
     });
@@ -351,7 +423,6 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::post('/rental-requests/{order}/reject', [RentalRequestController::class, 'reject'])->name('rental-requests.reject');
     Route::post('/rental-requests/{order}/mark-sent', [RentalRequestController::class, 'markAsSent'])->name('rental-requests.mark-sent');
     Route::post('/rental-requests/{order}/confirm-rental', [RentalRequestController::class, 'confirmRental'])->name('rental-requests.confirm-rental');
-    Route::post('/rental-requests/{order}/complete-rental', [RentalRequestController::class, 'completeRental'])->name('rental-requests.complete-rental');
 
     Route::resource('roles', \App\Http\Controllers\Vendor\RoleController::class);
     Route::get('roles/{role}/delete', [\App\Http\Controllers\Vendor\RoleController::class, 'destroy']);
@@ -366,7 +437,9 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
     Route::get('/wallet/transactions', [WalletController::class, 'transactions'])->name('wallet.transactions');
     Route::post('/wallet/settlement', [WalletController::class, 'requestSettlement'])->name('wallet.settlement.request');
-
+    
+    // Settlement Requests
+    Route::get('/settlement-requests', [SettlementController::class, 'index'])->name('settlement-requests.index');
 
     // Store management
     Route::get('/store', [StoreController::class, 'show'])->name('store.show');
@@ -391,14 +464,6 @@ Route::middleware(['auth', 'verified', 'role:vendor'])->group(function () {
 
 require __DIR__ . '/auth.php';
 
-
-// Route::get('/test-notification', function () {
-//     $user = User::find(1);
-//     $notification = new NotificationSent();
-//     $notification->broadcast();
-
-//     return response()->json(['message' => 'Notification sent successfully']);
-// });
 
 // Catch-all route for dynamic pages (must be last)
 Route::get('/{slug}', [LandingController::class, 'show'])->name('pages.show');

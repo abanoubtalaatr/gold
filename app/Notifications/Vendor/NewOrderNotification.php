@@ -1,0 +1,164 @@
+<?php
+
+namespace App\Notifications\Vendor;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Notification;
+
+class NewOrderNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    protected $order;
+    protected $orderType;
+    protected $branch;
+
+    public function __construct($order, $branch, string $orderType = 'rental')
+    {
+        $this->order = $order;
+        $this->branch = $branch;
+        $this->orderType = $orderType;
+        
+        // Set high priority queue for real-time experience
+        $this->onQueue('high');
+    }
+
+    /**
+     * Get the notification's delivery channels.
+     */
+    public function via($notifiable): array
+    {
+        $channels = ['database', 'broadcast'];
+        
+        // Add email for new orders if vendor has email notifications enabled
+        if ($notifiable->email && ($notifiable->email_notifications ?? true)) {
+            $channels[] = 'mail';
+        }
+        
+        return $channels;
+    }
+
+    /**
+     * Get the database representation of the notification.
+     */
+    public function toDatabase($notifiable): array
+    {
+        $goldPiece = $this->order->goldPiece;
+        $customer = $this->order->user;
+        
+        $typeAr = match($this->orderType) {
+            'rental' => 'تأجير',
+            'lease' => 'استئجار',
+            default => 'شراء'
+        };
+        $typeEn = match($this->orderType) {
+            'rental' => 'rental',
+            'lease' => 'lease',
+            default => 'purchase'
+        };
+
+        return [
+            'title' => [
+                'ar' => "طلب {$typeAr} جديد",
+                'en' => "New {$typeEn} order"
+            ],
+            'message' => [
+                'ar' => "طلب {$typeAr} جديد للقطعة {$goldPiece->name} من العميل {$customer->name} في فرع {$this->branch->name}",
+                'en' => "New {$typeEn} request for {$goldPiece->name} from customer {$customer->name} at {$this->branch->name} branch"
+            ],
+            'type' => 'new_order',
+            'priority' => 'high',
+            'sound_enabled' => true,
+            'data' => [
+                'order_id' => $this->order->id,
+                'order_type' => $this->orderType,
+                'branch_id' => $this->branch->id,
+                'branch_name' => $this->branch->name,
+                'gold_piece_id' => $goldPiece->id,
+                'gold_piece_name' => $goldPiece->name,
+                'customer_id' => $customer->id,
+                'customer_name' => $customer->name,
+                'customer_email' => $customer->email,
+                'price' => $this->orderType === 'rental' 
+                    ? $goldPiece->rental_price_per_day 
+                    : $goldPiece->sale_price,
+                'action_url' => $this->orderType === 'rental' 
+                    ? route('vendor.orders.rental.index') 
+                    : route('vendor.orders.index'),
+                'timestamp' => now()->toISOString(),
+            ]
+        ];
+    }
+
+    /**
+     * Get the broadcast representation of the notification.
+     */
+    public function toBroadcast($notifiable): BroadcastMessage
+    {
+        $data = $this->toDatabase($notifiable);
+        
+        // Add real-time specific data
+        $data['notification_id'] = $this->id;
+        $data['broadcast_timestamp'] = now()->toISOString();
+        
+        return new BroadcastMessage($data);
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail($notifiable): MailMessage
+    {
+        $goldPiece = $this->order->goldPiece;
+        $customer = $this->order->user;
+        
+        $typeEn = $this->orderType === 'rental' ? 'rental' : 'purchase';
+        $subject = "New {$typeEn} order for your branch: {$this->branch->name}";
+        
+        $price = $this->orderType === 'rental' 
+            ? $goldPiece->rental_price_per_day . ' SAR/day'
+            : $goldPiece->sale_price . ' SAR';
+
+        $actionUrl = $this->orderType === 'rental' 
+            ? route('vendor.orders.rental.index') 
+            : route('vendor.orders.index');
+
+        return (new MailMessage)
+            ->subject($subject)
+            ->greeting("Hello {$notifiable->name}!")
+            ->line("You have received a new {$typeEn} order:")
+            ->line("**Gold Piece:** {$goldPiece->name}")
+            ->line("**Customer:** {$customer->name} ({$customer->email})")
+            ->line("**Branch:** {$this->branch->name}")
+            ->line("**Weight:** {$goldPiece->weight}g")
+            ->line("**Carat:** {$goldPiece->carat}K")
+            ->line("**Price:** {$price}")
+            ->action("View Order Details", $actionUrl)
+            ->line("Please review and respond to this order as soon as possible.")
+            ->line("Thank you for using our platform!");
+    }
+
+    /**
+     * Get the channels the notification should broadcast on.
+     */
+    public function broadcastOn(): array
+    {
+        $vendorId = $this->branch->vendor_id ?? $this->branch->vendor->id ?? null;
+        
+        return $vendorId ? [
+            "vendor.{$vendorId}",
+            "vendor.notifications.{$vendorId}",
+        ] : [];
+    }
+
+    /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'vendor.new.order';
+    }
+} 

@@ -55,6 +55,26 @@ Route::get('pages/{slug}', [PageApiController::class, 'show']);
 
 Route::get('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'show'])->name('gold_pieces.show');
 Route::post('/contact-us', [ContactUsController::class, 'store'])->name('contact-us');
+
+// Debug route - remove after testing
+Route::get('/debug-auth', function () {
+    try {
+        $token = request()->bearerToken();
+        $headers = request()->headers->all();
+        
+        return response()->json([
+            'has_auth_header' => request()->hasHeader('Authorization'),
+            'bearer_token' => $token ? 'Token present' : 'No token',
+            'token_length' => $token ? strlen($token) : 0,
+            'headers' => array_keys($headers),
+            'jwt_secret_set' => config('jwt.secret') ? 'Yes' : 'No',
+            'auth_guard' => config('auth.guards.api'),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()]);
+    }
+});
+
 Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], function () {
 
     // insert device token Routes

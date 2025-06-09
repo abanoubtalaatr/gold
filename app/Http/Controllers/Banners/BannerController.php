@@ -8,6 +8,7 @@ use App\Models\Banner;
 use App\Repositories\BannerRepository ;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class BannerController extends Controller
 {
@@ -42,17 +43,11 @@ class BannerController extends Controller
 
     public function store(StoreRequest $request)
     {
-        try {
             $banner = $this->repository->create($request);
             return redirect()
                 ->route('banners.index')
                 ->with('success', __('messages.data_created_successfully'));
-        } catch (\Exception $e) {
-            \Log::error('Error creating main service: ' . $e->getMessage());
-            return back()
-                ->withInput()
-                ->with('error', $e->getMessage());
-        }
+      
     }
 
     public function show(Banner $banner)

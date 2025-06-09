@@ -94,7 +94,6 @@
                                             v-model="form.sort_order"
                                             type="number"
                                             :placeholder="$t('sort_order')"
-                                            :error="form.errors.sort_order"
                                         />
                                         <div
                                             v-if="form.errors.sort_order"
@@ -108,18 +107,23 @@
                                 <!-- Image Upload -->
                                 <div class="mb-3 col-md-6">
                                     <el-form-item :label="$t('image')">
+                                        <div v-if="props.banner.image" class="mb-2">
+                                            <img
+                                                :src="props.banner.image_url"
+                                                class="img-thumbnail"
+                                                width="80"
+                                                alt="Current image"
+                                            />
+                                            <p class="text-sm text-gray-600 mt-1">{{ $t('current_image') }}</p>
+                                        </div>
                                         <el-upload
                                             action=""
                                             :auto-upload="false"
                                             :on-change="handleFileChange"
                                             list-type="picture-card"
+                                            :limit="1"
                                         >
-                                            <img
-                                                v-if="props.banner.image"
-                                                :src="props.banner.image_url"
-                                                class="img-thumbnail"
-                                                width="80"
-                                            />
+                                            <i class="el-icon-plus"></i>
                                         </el-upload>
                                         <div
                                             v-if="form.errors.image"
@@ -130,8 +134,19 @@
                                     </el-form-item>
                                 </div>
 
+                                <!-- Active Status -->
+                                <div class="mb-3 col-md-6">
+                                    <el-form-item :label="$t('is_active')">
+                                        <el-switch
+                                            v-model="form.is_active"
+                                            :active-text="$t('active')"
+                                            :inactive-text="$t('inactive')"
+                                        />
+                                    </el-form-item>
+                                </div>
+
                                 <!-- Submit Button -->
-                                <div class="text-end">
+                                <div class="text-end col-12">
                                     <button
                                         type="submit"
                                         class="btn btn-primary"
@@ -161,13 +176,12 @@ import BreadcrumbComponent from "@/Components/BreadcrumbComponent.vue";
 
 const { t } = useI18n();
 const supportedLanguages = settings.supportedLanguages;
+
 const props = defineProps({
     banner: Object,
 });
 
-const isEdit = computed(() => !!props.banner);
 const fileList = ref([]);
-const formRef = ref(null);
 
 const form = useForm({
     image: null,
@@ -186,24 +200,13 @@ const form = useForm({
     }, {}),
 });
 
-onMounted(() => {
-    if (form.image) {
-        fileList.value = [
-            {
-                name: "Current Image",
-                url: `/storage/${form.image}`,
-            },
-        ];
-    }
-});
-
 const handleFileChange = (file) => {
     form.image = file.raw;
     fileList.value = [file];
 };
 
 const submitForm = () => {
-    form.post(route("banners.update", props.banner.id), {
+    form.put(route("banners.update", props.banner.id), {
         onSuccess: () => {
             ElMessage({
                 type: "success",
@@ -219,3 +222,11 @@ const submitForm = () => {
     });
 };
 </script>
+
+<style scoped>
+.error-message {
+    color: #f56565;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+</style>

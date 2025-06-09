@@ -16,7 +16,7 @@ class SystemSettingsController extends Controller
     // Show system settings form
     public function index()
     {
-        $settings = SystemSetting::firstOrNew();
+        $settings = SystemSetting::first();
         $sliders = HomeSlider::orderBy('display_order')->get();
 
         return Inertia::render('Admin/SystemSettings/Index', [
@@ -29,9 +29,11 @@ class SystemSettingsController extends Controller
     public function updateSettings(SystemSettingsRequest $request)
     {
         $validated = $request->validated();
-
-        SystemSetting::updateOrCreate(['id' => 1], $validated);
-
+        
+        $systemSetting = SystemSetting::first() ?? new SystemSetting();
+        $systemSetting->fill($validated);
+        $systemSetting->save();
+        
         return redirect()->back()->with('success', 'System settings updated successfully.');
     }
 

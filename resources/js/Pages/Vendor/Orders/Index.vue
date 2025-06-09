@@ -85,9 +85,10 @@
                         </div>
                       </td>
                       <td class="px-6 py-4 text-sm text-gray-500">
-                        <button @click="showDetails(order)" class="text-indigo-600 hover:text-indigo-800">
-                          {{ order.goldPiece?.name || 'N/A' }}
-                        </button>
+                        <strong @click="showDetails(order)"
+                          class="text-yellow-600 hover:text-yellow-200 hover:underline cursor-pointer transition-colors duration-200">
+                          {{ order.goldPiece?.name || '--' }}
+                        </strong>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.branch?.name || 'N/A' }}</td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.total_price }} {{ $t('SAR') }}</td>
@@ -166,9 +167,10 @@
                         </div>
                       </td>
                       <td class="px-6 py-4 text-sm text-gray-500">
-                        <button @click="showDetails(order)" class="text-indigo-600 hover:text-indigo-800">
-                          {{ order.goldPiece?.name || 'N/A' }}
-                        </button>
+                        <strong @click="showDetails(order)"
+                          class="text-yellow-600 hover:text-yellow-200 hover:underline cursor-pointer transition-colors duration-200">
+                          {{ order.goldPiece?.name || '--' }}
+                        </strong>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.branch?.name || 'N/A' }}</td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.total_price }} {{ $t('SAR') }}</td>
@@ -250,48 +252,80 @@
 
       <!-- Piece Details Modal -->
       <Modal :show="showDetailsModal" @close="closeDetailsModal">
-        <div class="p-6">
-          <h2 class="text-lg font-medium text-gray-900">{{ $t('Gold Piece Details') }}</h2>
-          <div v-if="selectedOrder" class="mt-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p><strong>{{ $t('Name') }}:</strong> {{ selectedOrder.goldPiece?.name || 'N/A' }}</p>
-                <p><strong>{{ $t('Description') }}:</strong> {{ selectedOrder.goldPiece?.description || 'N/A' }}</p>
-                <p><strong>{{ $t('Type') }}:</strong> {{ selectedOrder.goldPiece?.type === 'rent' ? $t('Rental') : $t('Sale') }}</p>
-                <p><strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR') }}</p>
-                <p><strong>{{ $t('Weight') }}:</strong> {{ selectedOrder.goldPiece?.weight || 'N/A' }} {{ $t('grams') }}</p>
-                <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || 'N/A' }}</p>
-                <p><strong>{{ $t('Status') }}:</strong> {{ formatStatus(selectedOrder.status) }}</p>
-              </div>
-              <div>
-                <p><strong>{{ $t('Images') }}:</strong></p>
-                <div v-if="selectedOrder.goldPiece?.images?.length" class="flex flex-wrap gap-2">
-                  <img
-                    v-for="image in selectedOrder.goldPiece.images"
-                    :key="image.id"
-                    :src="'/storage/' + image.path"
-                    class="h-20 w-20 object-cover rounded"
-                    alt="Gold piece image"
-                  />
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div
+            class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+              <h2 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Gold Piece Details') }}</h2>
+              <div v-if="selectedOrder" class="mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p><strong>{{ $t('id') }}:</strong>
+                      {{ selectedOrder.goldPiece && selectedOrder.goldPiece.id ?
+                        selectedOrder.goldPiece.id :
+                        '--' }}
+                    </p>
+                    <p><strong>{{ $t('Name') }}:</strong>
+                      {{ selectedOrder.goldPiece && selectedOrder.goldPiece.name ?
+                        selectedOrder.goldPiece.name :
+                        '--' }}
+                    </p>
+                    <p><strong>{{ $t('Description') }}:</strong>
+                      {{ selectedOrder.goldPiece && selectedOrder.goldPiece.description ?
+                        selectedOrder.goldPiece.description :
+                        '--' }}
+                    </p>
+                    <p><strong>{{ $t('Type') }}:</strong> {{ selectedOrder.goldPiece?.type === 'rent' ?
+                      $t('Rental') : $t('Sale') }}</p>
+                    <p><strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR')
+                      }}</p>
+                    <p><strong>{{ $t('Weight') }}:</strong>
+                      {{ selectedOrder.goldPiece && selectedOrder.goldPiece.weight ?
+                        selectedOrder.goldPiece.weight :
+                        '--' }}
+                      {{ $t('grams') }}</p>
+                    <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || '--' }}</p>
+                    <p><strong>{{ $t('Status') }}:</strong> {{ formatStatus(selectedOrder.status) }}
+                    </p>
+                  </div>
+                  <div>
+                    <p><strong>{{ $t('Images') }}:</strong></p>
+                    <div v-if="selectedOrder.goldPiece?.media?.length" class="flex flex-wrap gap-2">
+                      <img v-for="media in selectedOrder.goldPiece.media.filter(m => m.collection_name === 'images')" :key="media.id"
+                        :src="media.original_url" class="h-20 w-20 object-cover rounded"
+                        alt="Gold piece image" />
+                    </div>
+                    <div v-else-if="selectedOrder.goldPiece?.images?.length" class="flex flex-wrap gap-2">
+                      <img
+                        v-for="image in selectedOrder.goldPiece.images"
+                        :key="image.id"
+                        :src="'/storage/' + image.path"
+                        class="h-20 w-20 object-cover rounded"
+                        alt="Gold piece image"
+                      />
+                    </div>
+                    <p v-else>{{ $t('No images available') }}</p>
+                    <p class="mt-4"><strong>{{ $t('QR Code') }}:</strong></p>
+                    <img v-if="selectedOrder.goldPiece?.qr_code"
+                      :src="selectedOrder.goldPiece.qr_code" class="h-24 w-24" alt="QR Code" />
+                    <img
+                      v-else-if="selectedOrder.goldPiece?.qr_code"
+                      :src="'data:image/png;base64,' + selectedOrder.goldPiece.qr_code"
+                      class="h-24 w-24"
+                      alt="QR Code"
+                    />
+                  </div>
                 </div>
-                <p v-else>{{ $t('No images available') }}</p>
-                <p class="mt-4"><strong>{{ $t('QR Code') }}:</strong></p>
-                <img
-                  v-if="selectedOrder.goldPiece?.qr_code"
-                  :src="'data:image/png;base64,' + selectedOrder.goldPiece.qr_code"
-                  class="h-24 w-24"
-                  alt="QR Code"
-                />
+              </div>
+              <div class="mt-6 flex justify-end">
+                <button
+                  @click="closeDetailsModal"
+                  class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200"
+                >
+                  {{ $t('Close') }}
+                </button>
               </div>
             </div>
-          </div>
-          <div class="mt-6 flex justify-end">
-            <button
-              @click="closeDetailsModal"
-              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              {{ $t('Close') }}
-            </button>
           </div>
         </div>
       </Modal>

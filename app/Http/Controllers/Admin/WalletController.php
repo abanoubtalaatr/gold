@@ -9,8 +9,10 @@ use App\Models\Vendor;
 use App\Models\WalletTransaction;
 use App\Models\SettlementRequest;
 use App\Models\User;
+use App\Notifications\Vendor\SettlementStatusNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class WalletController extends Controller
 {
@@ -41,6 +43,7 @@ class WalletController extends Controller
             $settlementRequests = collect();
         }
 
+        
         return inertia('Admin/Vendor-Wallet/Index', [
             'wallet' => $wallet,
             'vendor' => $vendor,
@@ -69,7 +72,6 @@ class WalletController extends Controller
                 'amount' => $request->amount,
                 'type' => $request->type,
                 'description' => $request->reason,
-                'admin_id' => auth()->id(),
             ]);
 
             if ($request->type === 'credit') {
@@ -91,6 +93,7 @@ class WalletController extends Controller
         return DB::transaction(function () use ($settlement) {
             // Lock the wallet and settlement for update
             $wallet = Wallet::lockForUpdate()->findOrFail($settlement->wallet_id);
+           
             $settlement = SettlementRequest::lockForUpdate()->findOrFail($settlement->id);
 
             // Check if settlement is already processed
@@ -110,16 +113,16 @@ class WalletController extends Controller
                 ], 400);
             }
 
-            // Debit the wallet
+            // Debit the wallet - subtract the settlement amount from balance
             $wallet->decrement('balance', $settlement->amount);
+            $wallet->decrement('pending_balance', $settlement->amount);
+            $wallet->increment('total_earned', $settlement->amount);
 
             // Create transaction record
             $transaction = new WalletTransaction([
                 'amount' => $settlement->amount,
                 'type' => 'debit',
-                'description' => 'Settlement processed',
-                'admin_id' => auth()->id(),
-                'settlement_id' => $settlement->id,
+                'description' => 'Settlement processed - Request #' . $settlement->id,
             ]);
             $wallet->transactions()->save($transaction);
 
@@ -127,8 +130,16 @@ class WalletController extends Controller
             $settlement->update([
                 'status' => 'approved',
                 'processed_at' => now(),
-                'admin_id' => auth()->id()
+                'admin_id' => Auth::id()
             ]);
+
+            // Save wallet changes
+            $wallet->save();
+
+            // Notify the vendor
+            $vendor = $wallet->user;
+            $vendor->notify(new SettlementStatusNotification($settlement, 'approved'));
+
             return back()->with('success', __('Settlement approved successfully'));
 
         });
@@ -147,8 +158,12 @@ class WalletController extends Controller
             'status' => 'rejected',
             'admin_notes' => $request->reason,
             'processed_at' => now(),
-            'admin_id' => auth()->id(),
+            'admin_id' => Auth::id(),
         ]);
+
+        // Notify the vendor
+        $vendor = $settlement->wallet->user;
+        $vendor->notify(new SettlementStatusNotification($settlement, 'rejected', $request->reason));
 
         return back()->with('success', __('Settlement request rejected successfully'));
     }

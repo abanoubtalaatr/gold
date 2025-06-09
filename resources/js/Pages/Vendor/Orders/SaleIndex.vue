@@ -15,11 +15,7 @@
                     <div class="p-6 bg-white border-b border-gray-200">
                         <!-- Filters -->
                         <div class="flex flex-wrap items-center justify-between mb-6 gap-4">
-                            <div class="flex-1 min-w-0">
-                                <input v-model="form.search" type="text"
-                                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    :placeholder="$t('Search by user or piece name...')" @input="debouncedSearch" />
-                            </div>
+                            
                             <div class="flex items-center gap-4">
                                 <select v-model="form.branch_id"
                                     class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -35,6 +31,7 @@
                                     <option value="">{{ $t('All Statuses') }}</option>
                                     <option value="pending_approval">{{ $t('Pending Approval') }}</option>
                                     <option value="approved">{{ $t('Approved') }}</option>
+                                    <option value="piece_sent">{{ $t('Piece Sent') }}</option>
                                     <option value="sold">{{ $t('Sold') }}</option>
                                     <option value="rejected">{{ $t('Rejected') }}</option>
                                 </select>
@@ -83,8 +80,8 @@
                                                 <img v-if="order.user?.avatar" :src="order.user.avatar"
                                                     class="h-8 w-8 rounded-full object-cover mr-2" alt="User avatar" />
                                                 <div>
-                                                    {{ order.user?.name || 'N/A' }}<br />
-                                                    {{ order.user?.email || 'N/A' }}
+                                                    {{ order.user?.name || '--' }}<br />
+                                                    {{ order.user?.mobile || '--' }}
                                                 </div>
                                             </div>
                                         </td>
@@ -92,11 +89,11 @@
                                             <strong @click="showDetails(order)"
                                                 class="text-yellow-600 hover:text-yellow-200 hover:underline cursor-pointer transition-colors duration-200">
                                                 {{ order.gold_piece && order.gold_piece.name ? order.gold_piece.name :
-                                                    'N/A' }}
+                                                    '--' }}
                                             </strong>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ order.branch?.name || 'N/A' }}
+                                            {{ order.branch?.name || '--' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ order.total_price }} {{ $t('SAR') }}
@@ -120,8 +117,13 @@
                                                     {{ $t('Reject') }}
                                                 </button>
                                                 <button v-if="order.status === 'approved'"
-                                                    @click="updateStatus(order.id, 'sold')"
-                                                    class="px-3 py-1 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700 transition-colors duration-200">
+                                                    @click="markAsSent(order.id)"
+                                                    class="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-200">
+                                                    {{ $t('Mark as Sent') }}
+                                                </button>
+                                                <button v-if="order.status === 'piece_sent'"
+                                                    @click="markAsSold(order.id)"
+                                                    class="px-3 py-1 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 transition-colors duration-200">
                                                     {{ $t('Mark as Sold') }}
                                                 </button>
                                             </div>
@@ -198,8 +200,8 @@
                             <div v-if="selectedOrder" class="bg-gray-50 rounded-lg p-4 mb-4">
                                 <div class="text-sm text-gray-600">
                                     <p><strong>{{ $t('Order ID') }}:</strong> {{ selectedOrder.id }}</p>
-                                    <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || 'N/A' }}</p>
-                                    <p><strong>{{ $t('Gold Piece') }}:</strong> {{ selectedOrder.gold_piece?.name || 'N/A' }}</p>
+                                    <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || '--' }}</p>
+                                    <p><strong>{{ $t('Gold Piece') }}:</strong> {{ selectedOrder.gold_piece?.name || '--' }}</p>
                                     <p><strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR') }}</p>
                                 </div>
                             </div>
@@ -233,14 +235,14 @@
                                     <p><strong>{{ $t('Name') }}:</strong>
                                         {{ selectedOrder.gold_piece && selectedOrder.gold_piece.name ?
                                             selectedOrder.gold_piece.name :
-                                            'N/A' }}
+                                            '--' }}
                                     </p>
                                     <p><strong>{{ $t('Description') }}:</strong>
                                         {{ selectedOrder.gold_piece && selectedOrder.gold_piece.description ?
                                             selectedOrder.gold_piece.description :
-                                            'N/A' }}
+                                            '--' }}
                                     </p>
-                                    <p><strong>{{ $t('Type') }}:</strong> {{ selectedOrder.goldPiece?.type === 'rent' ?
+                                    <p><strong>{{ $t('Type') }}:</strong> {{ selectedOrder.gold_piece?.type === 'rent' ?
                                         $t('Rental') : $t('Sale') }}</p>
                                     <p><strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR')
                                     }}</p>
@@ -248,24 +250,23 @@
 
                                         {{ selectedOrder.gold_piece && selectedOrder.gold_piece.weight ?
                                             selectedOrder.gold_piece.weight :
-                                            'N/A' }}
+                                            '--' }}
                                         {{
                                             $t('grams') }}</p>
-                                    <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || 'N/A' }}</p>
-                                    <p><strong>{{ $t('Status') }}:</strong> {{ formatStatus(selectedOrder.status) }}</p>
+                                    <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || '--' }}</p>
+                                   
                                 </div>
                                 <div>
                                     <p><strong>{{ $t('Images') }}:</strong></p>
-                                    <div v-if="selectedOrder.goldPiece?.images?.length" class="flex flex-wrap gap-2">
-                                        <img v-for="image in selectedOrder.goldPiece.images" :key="image.id"
-                                            :src="'/storage/' + image.path" class="h-20 w-20 object-cover rounded"
+                                    <div v-if="selectedOrder.gold_piece?.media?.length" class="flex flex-wrap gap-2">
+                                        <img v-for="media in selectedOrder.gold_piece.media.filter(m => m.collection_name === 'images')" :key="media.id"
+                                            :src="media.original_url" class="h-20 w-20 object-cover rounded"
                                             alt="Gold piece image" />
                                     </div>
                                     <p v-else>{{ $t('No images available') }}</p>
                                     <p class="mt-4"><strong>{{ $t('QR Code') }}:</strong></p>
-                                    <img v-if="selectedOrder.goldPiece?.qr_code"
-                                        :src="'data:image/png;base64,' + selectedOrder.goldPiece.qr_code"
-                                        class="h-24 w-24" alt="QR Code" />
+                                    <img v-if="selectedOrder.gold_piece?.qr_code"
+                                        :src="selectedOrder.gold_piece.qr_code" class="h-24 w-24" alt="QR Code" />
                                 </div>
                             </div>
                         </div>
@@ -361,6 +362,8 @@ const getStatusClass = (status) => {
             return 'bg-yellow-100 text-yellow-800';
         case 'approved':
             return 'bg-green-100 text-green-800';
+        case 'piece_sent':
+            return 'bg-blue-100 text-blue-800';
         case 'sold':
             return 'bg-gray-100 text-gray-800';
         case 'rejected':
@@ -374,6 +377,7 @@ const formatStatus = (status) => {
     const statusMap = {
         'pending_approval': t('Pending Approval'),
         'approved': t('Approved'),
+        'piece_sent': t('Piece Sent'),
         'sold': t('Sold'),
         'rejected': t('Rejected'),
     };
@@ -437,16 +441,26 @@ const closeDetailsModal = () => {
     selectedOrder.value = null;
 };
 
-const updateStatus = (orderId, newStatus) => {
-    router.patch(route('vendor.orders.sales.updateStatus', orderId), {
-        status: newStatus
-    }, {
+const markAsSent = (orderId) => {
+    router.post(route('vendor.orders.sales.mark-sent', orderId), {}, {
         preserveScroll: true,
         onSuccess: () => {
             // Handle success
         },
         onError: (errors) => {
-            console.error('Error updating status:', errors);
+            console.error('Error marking order as sent:', errors);
+        }
+    });
+};
+
+const markAsSold = (orderId) => {
+    router.post(route('vendor.orders.sales.mark-sold', orderId), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Handle success
+        },
+        onError: (errors) => {
+            console.error('Error marking order as sold:', errors);
         }
     });
 };

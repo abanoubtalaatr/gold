@@ -16,6 +16,7 @@ class SettingsController extends Controller
 
     public function index()
     {
+            
         $settings = $this->settingsRepository->getAllGroupedByGroup();
         return Inertia::render('Settings/Index', [
             'settings' => $settings,

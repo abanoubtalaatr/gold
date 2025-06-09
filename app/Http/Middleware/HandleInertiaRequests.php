@@ -32,15 +32,22 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
+            'csrf_token' => $request->session()->token(),
             'auth' => $request->user() ? [
                 'id' => $request->user()->id,
                 'name' => $request->user()->name,
                 'email' => $request->user()->email,
                 'notificationCount' => $request->user()->unreadNotifications->count(),
                 'avatar' => $request->user()->avatar,
+                'is_vendor' => $request->user()->isVendor(),
+                'roles' => $request->user()->getRoleNames()->toArray(),
+                'vendor_id' => $request->user()->vendor_id,
+                'store_name_ar' => $request->user()->store_name_ar,
+                'store_name_en' => $request->user()->store_name_en,
             ] : null,
             'flash' => [
-                'success' => $request->session()->get('success')
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error')
             ],
             'locale' => app()->getLocale(),
             'auth_permissions'=>$request->user() ?  $request->user()->getPermissionsViaRoles()->pluck('name')->toArray() : []

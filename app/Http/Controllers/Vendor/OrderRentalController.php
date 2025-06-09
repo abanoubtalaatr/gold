@@ -2,19 +2,23 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
+use Inertia\Inertia;
 use App\Models\Branch;
+use App\Models\Wallet;
 use App\Models\GoldPiece;
-use App\Models\OrderRental;
 use App\Models\OrderSale;
+use App\Models\OrderRental;
+use Illuminate\Http\Request;
+use App\Models\SystemSetting;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Services\RentalWorkflowService;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Events\OrderRentalStatusChangeEvent;
 use App\Notifications\Client\GoldPieceAcceptedNotification;
 use App\Notifications\Client\GoldPieceRejectedNotification;
-use App\Services\RentalWorkflowService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Inertia\Inertia;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class OrderRentalController extends Controller
 {
@@ -50,10 +54,11 @@ class OrderRentalController extends Controller
                 // Handle all possible status values from the frontend
                 $query->where('status', $status);
             })
-            ->with(['user', 'goldPiece', 'goldPiece.user', 'branch'])
+            ->with(['user', 'goldPiece.media', 'goldPiece.user', 'branch'])
             ->orderBy('created_at', 'desc');
 
-        $rentalOrders = $rentalOrdersQuery->paginate(10)->appends($filters);
+
+        $rentalOrders = $rentalOrdersQuery->paginate(100)->appends($filters);
 
         return Inertia::render('Vendor/Orders/RentalIndex', [
             'rentalOrders' => $rentalOrders,
@@ -64,19 +69,20 @@ class OrderRentalController extends Controller
 
     public function accept(Request $request, $orderId)
     {
-
         $order = OrderRental::with(['goldPiece', 'goldPiece.user'])->findOrFail($orderId);
         $this->authorizeVendor($order);
 
-        // $request->validate([
-        //     'branch_id' => 'required|exists:branches,id',
-        // ]);
+        // remove this order renatal form other branches
+        OrderRental::where('gold_piece_id', $order->gold_piece_id)->where('id', '!=', $orderId)->delete();
 
         $order->update([
-            // 'branch_id' => $request->branch_id,
             'status' => OrderRental::STATUS_APPROVED,
+            'branch_id'=> $request->input('branch_id'),
         ]);
 
+
+        //real time for mobile app
+        event(new OrderRentalStatusChangeEvent($order));
         // Notify gold piece owner
         $goldPieceUser = $order->goldPiece?->user;
         if ($goldPieceUser) {
@@ -84,7 +90,6 @@ class OrderRentalController extends Controller
                 new GoldPieceAcceptedNotification($order, auth()->user()->name)
             );
         }
-        Log::info('Order accepted', ['order_id' => $order->id, 'vendor_id' => Auth::id()]);
 
         return back()->with('success', __('Order accepted successfully'));
     }
@@ -97,51 +102,67 @@ class OrderRentalController extends Controller
         $order->update(['status' => 'rented']);
 
         // Notify gold piece owner
+        //real time for mobile app
+        event(new OrderRentalStatusChangeEvent($order));
+
         $goldPieceUser = $order->goldPiece?->user;
         if ($goldPieceUser) {
             $goldPieceUser->notify(
                 new GoldPieceRejectedNotification($order, auth()->user()->name)
             );
         }
-        Log::info('Order rejected', ['order_id' => $order->id, 'vendor_id' => Auth::id()]);
 
         return back();
     }
 
     public function updateStatus(Request $request, $orderId)
     {
-        try {
-            $order = OrderRental::with(['user', 'branch', 'goldPiece'])->findOrFail($orderId);
-            $this->authorizeVendor($order);
+        $order = OrderRental::with(['user', 'branch', 'goldPiece'])->findOrFail($orderId);
+        $this->authorizeVendor($order);
 
-            // Validate the incoming status
-            $request->validate([
-                'status' => 'required|in:pending_approval,approved,piece_sent,rented,available,sold,rejected',
-            ]);
+        // Validate the incoming status
+        $request->validate([
+            'status' => 'required|in:pending_approval,approved,piece_sent,rented,available,sold,rejected',
+        ]);
 
-            $newStatus = $request->status;
-            $oldStatus = $order->status;
+        $newStatus = $request->status;
+        
+        if($newStatus == OrderRental::STATUS_RENTED){
+            
+            $totalPrice = $order->total_price;
+            $settings = SystemSetting::first();
+            $merchantCommission = $settings->merchant_commission_percentage ?? 0;
+            $platformCommission = $settings->platform_commission_percentage ?? 0;
 
-            // Use workflow service for proper status management and notifications
-            $this->rentalWorkflowService->updateStatus($order, $newStatus, Auth::user());
+            $vendorAmount = ($totalPrice * $merchantCommission) / 100;
+            $platformAmount = ($totalPrice * $platformCommission) / 100;
 
-            Log::info('Order status updated via workflow service', [
-                'order_id' => $order->id,
-                'old_status' => $oldStatus,
-                'new_status' => $newStatus,
-                'vendor_id' => Auth::id()
-            ]);
+            // i want for vendor first check if the wallet is exist or not if not create new one
+            $vendorWallet = Wallet::where('user_id', auth()->id())->first();
 
-            return back()->with('success', __('Order status updated successfully'));
+            if (!$vendorWallet) {
+                $vendorWallet = Wallet::create([
+                    'user_id' => $order->user_id,
+                ]);
+            }
+            // create wallet transaction for the vendor
+            $vendorWallet->credit($vendorAmount, 'Vendor commission for order #' . $order->id);
+            $vendorWallet->update(['balance' => $vendorWallet->balance + $vendorAmount,'pending_balance' => $vendorWallet->pending_balance + $vendorAmount]);
 
-        } catch (\Exception $e) {
-            Log::error('Failed to update order status', [
-                'order_id' => $orderId,
-                'error' => $e->getMessage(),
-            ]);
+            // create wallet transaction for the platform
+            $platformWallet = Wallet::where('user_id', User::where('email', 'admin@admin.com')->first()->id)->first();
 
-            return back()->with('error', __('Failed to update order status. Please try again.'));
+            $platformWallet->credit($platformAmount, 'Platform commission for order #' . $order->id);
+            $platformWallet->update(['balance' => $platformWallet->balance + $platformAmount,'total_earned' => $platformWallet->total_earned + $platformAmount]);
         }
+
+        // Use workflow service for proper status management and notifications
+        $this->rentalWorkflowService->updateStatus($order, $newStatus, Auth::user());
+
+        //real time for mobile app
+        event(new OrderRentalStatusChangeEvent($order));
+
+        return back()->with('success', __('Order status updated successfully'));
     }
 
     protected function authorizeVendor($order)
@@ -151,9 +172,4 @@ class OrderRentalController extends Controller
             abort(403, 'Unauthorized action.');
         }
     }
-
-
-
-
-
 }

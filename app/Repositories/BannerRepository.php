@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Banner;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BannerRepository
 {
@@ -37,11 +38,11 @@ class BannerRepository
     public function create($request)
     {
         DB::beginTransaction();
+        
         try {
             $data = [
-                'is_active' => $request->boolean('is_active'),
+                'is_active' => $request->boolean('is_active', true),
                 'image' => null,
-                'is_active' => true,
                 'sort_order' => $request->sort_order
             ];
 
@@ -55,18 +56,19 @@ class BannerRepository
             if ($request->has('translations')) {
                 foreach ($request->input('translations') as $locale => $translation) {
                     $banner->translateOrNew($locale)->title = $translation['title'];
+                    if (isset($translation['description'])) {
+                        $banner->translateOrNew($locale)->description = $translation['description'];
+                    }
                 }
                 $banner->save();
             }
 
-
             DB::commit();
-
             return $banner;
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error in banner create: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Error creating banner: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -92,32 +94,37 @@ class BannerRepository
             }
 
             $banner->sort_order = $request->sort_order;
-            $banner->is_active = true;
-
+            $banner->is_active = $request->boolean('is_active', true);
 
             $banner->save();
             DB::commit();
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error updating banner: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Error updating banner: ' . $e->getMessage());
             throw $e;
         }
     }
 
     public function getFilteredBanners($filters)
     {
-        $query = $this->model->query()->with('translations');
+        $query = $this->model->with('translations')->orderBy('sort_order');
 
-        if ($filters['title']) {
-            $query->whereTranslationLike('title', "%{$filters['title']}%");
+        if (!empty($filters['title'])) {
+            $query->whereHas('translations', function ($q) use ($filters) {
+                $q->where('title', 'like', '%' . $filters['title'] . '%');
+            });
         }
 
-        if (isset($filters['is_active'])) {
+        if (isset($filters['is_active']) && $filters['is_active'] !== '') {
             $query->where('is_active', $filters['is_active']);
         }
 
-        return $query->paginate();
+        if (!empty($filters['sort_order'])) {
+            $query->where('sort_order', $filters['sort_order']);
+        }
+
+        return $query->paginate(10);
     }
 
     public function delete($model)

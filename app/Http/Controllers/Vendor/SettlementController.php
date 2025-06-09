@@ -7,20 +7,31 @@ use App\Models\SettlementRequest;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+
 class SettlementController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Vendor/Wallet/Settlements', [
-            'requests' => SettlementRequest::with(['wallet.user'])
+        $user = auth()->user();
+        $wallet = $user->wallet;
+
+        if (!$wallet) {
+            return Inertia::render('Vendor/SettlementRequests/Index', [
+                'requests' => [],
+            ]);
+        }
+
+        return Inertia::render('Vendor/SettlementRequests/Index', [
+            'requests' => SettlementRequest::where('wallet_id', $wallet->id)
                 ->latest()
                 ->paginate(15)
                 ->through(fn($request) => [
                     'id' => $request->id,
                     'amount' => $request->amount,
                     'status' => $request->status,
+                    'admin_notes' => $request->admin_notes,
                     'created_at' => $request->created_at->format('Y-m-d H:i'),
-                    'user' => $request->wallet->user->name,
+                    'updated_at' => $request->updated_at->format('Y-m-d H:i'),
                 ]),
         ]);
     }
