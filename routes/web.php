@@ -67,16 +67,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
         Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
         Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
-        
+
         // Add polling endpoint for real-time notifications
-        Route::get('/poll', function() {
+        Route::get('/poll', function () {
             $user = request()->user();
             if (!$user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
-            
+
             $lastCheck = request()->get('last_check');
-            
+
             // If no last_check provided, use 5 minutes ago to catch recent notifications
             if (!$lastCheck) {
                 $since = now()->subMinutes(5);
@@ -93,7 +93,7 @@ Route::middleware(['auth'])->group(function () {
                     $since = now()->subMinutes(5);
                 }
             }
-            
+
             // Get only unread notifications created AFTER the last check time
             $newNotifications = $user->notifications()
                 ->where('created_at', '>', $since)
@@ -101,7 +101,7 @@ Route::middleware(['auth'])->group(function () {
                 ->orderBy('created_at', 'desc')
                 ->limit(50) // Limit to prevent overwhelming the frontend
                 ->get()
-                ->map(function($notification) {
+                ->map(function ($notification) {
                     return [
                         'id' => $notification->id,
                         'type' => $notification->type,
@@ -110,18 +110,18 @@ Route::middleware(['auth'])->group(function () {
                         'time_ago' => $notification->created_at->diffForHumans(),
                     ];
                 });
-            
+
             // Get total unread count
             $totalUnread = $user->unreadNotifications()->count();
-            
+
             return response()->json([
                 'notifications' => $newNotifications,
                 'count' => $newNotifications->count(),
                 'total_unread' => $totalUnread,
                 'timestamp' => now()->toISOString(),
                 'since' => $since->toISOString(),
-                'next_check_from' => $newNotifications->count() > 0 ? 
-                    $newNotifications->first()['created_at'] : 
+                'next_check_from' => $newNotifications->count() > 0 ?
+                    $newNotifications->first()['created_at'] :
                     now()->toISOString(),
                 'debug' => [
                     'user_id' => $user->id,
@@ -133,13 +133,13 @@ Route::middleware(['auth'])->group(function () {
             ]);
         })->name('notifications.poll');
     });
-    
+
     // Add vendor notifications count route
     Route::prefix('vendor')->group(function () {
         Route::get('/notifications/count', [NotificationController::class, 'getVendorNotificationCount'])->name('vendor.notifications.count');
     });
-    
-    
+
+
     /************************************************************************ */
 
     Route::resource('users', UsersController::class);
@@ -195,7 +195,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('faqs', FaqController::class);
     Route::post('faqs/{faq}/activate', [FaqController::class, 'activate'])->name('faqs.activate');
-
 });
 
 
@@ -252,7 +251,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::put('/settlement/{settlement}/reject', [AdminWalletController::class, 'rejectSettlement'])
         ->name('admin.settlement.reject');
 
-     Route::get('/wallet', [SuperAdminWalletController::class, 'index'])->name('wallet.index');
+    Route::get('/wallet', [SuperAdminWalletController::class, 'index'])->name('wallet.index');
 });
 
 /************************************************************************ */
@@ -275,7 +274,6 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
 
     Route::patch('gold-pieces/{goldPiece}/toggle-status', [AdminGoldPieceController::class, 'toggleStatus'])
         ->name('admin.gold-pieces.toggle-status');
-
 });
 
 
@@ -339,25 +337,25 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
         Route::get('verify', [VerifyController::class, 'show'])->name('verify');
         Route::post('verify', [VerifyController::class, 'verify'])->name('verify.submit');
         Route::post('verify/resend', [VerifyController::class, 'resend'])->name('verify.resend');
-        Route::get('login', [App\Http\Controllers\Vendor\Auth\LoginController::class, 'create'])
-            ->name('login');
-        Route::post('login', [App\Http\Controllers\Vendor\Auth\LoginController::class, 'store']);
+        // Route::get('login', [App\Http\Controllers\Vendor\Auth\LoginController::class, 'create'])
+        //     ->name('login');
+        // Route::post('login', [App\Http\Controllers\Vendor\Auth\LoginController::class, 'store']);
 
         // Password Reset Routes
-        Route::get('forgot-password', [App\Http\Controllers\Vendor\Auth\PasswordResetLinkController::class, 'create'])
-            ->name('password.request');
-        Route::post('forgot-password', [App\Http\Controllers\Vendor\Auth\PasswordResetLinkController::class, 'store'])
-            ->name('password.email');
-        Route::get('reset-password', [App\Http\Controllers\Vendor\Auth\NewPasswordController::class, 'create'])
-            ->name('password.reset');
-        Route::post('reset-password', [App\Http\Controllers\Vendor\Auth\NewPasswordController::class, 'store'])
-            ->name('password.store');
-        Route::get('reset-password/otp/form', [App\Http\Controllers\Vendor\Auth\PasswordResetLinkController::class, 'otpForm'])
-            ->name('password.otp.form');
-        Route::post('verify-otp', [App\Http\Controllers\Vendor\Auth\PasswordResetLinkController::class, 'verifyOtp'])
-            ->name('password.verify-otp');
-        Route::post('resend-otp', [App\Http\Controllers\Vendor\Auth\PasswordResetLinkController::class, 'resendOtp'])
-            ->name('password.resend-otp');
+        // Route::get('forgot-password', [App\Http\Controllers\Vendor\Auth\PasswordResetLinkController::class, 'create'])
+        //     ->name('password.request');
+        // Route::post('forgot-password', [App\Http\Controllers\Vendor\Auth\PasswordResetLinkController::class, 'store'])
+        //     ->name('password.email');
+        // Route::get('reset-password', [App\Http\Controllers\Vendor\Auth\NewPasswordController::class, 'create'])
+        //     ->name('password.reset');
+        // Route::post('reset-password', [App\Http\Controllers\Vendor\Auth\NewPasswordController::class, 'store'])
+        //     ->name('password.store');
+        // Route::get('reset-password/otp/form', [App\Http\Controllers\Vendor\Auth\PasswordResetLinkController::class, 'otpForm'])
+        //     ->name('password.otp.form');
+        // Route::post('verify-otp', [App\Http\Controllers\Vendor\Auth\PasswordResetLinkController::class, 'verifyOtp'])
+        //     ->name('password.verify-otp');
+        // Route::post('resend-otp', [App\Http\Controllers\Vendor\Auth\PasswordResetLinkController::class, 'resendOtp'])
+        //     ->name('password.resend-otp');
     });
 
     Route::middleware(['auth'])->group(function () {
@@ -399,7 +397,6 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
         Route::post('/rental-orders/{orderId}/accept', 'accept')->name('orders.rental.accept');
         Route::post('/rental-orders/{orderId}/reject', 'reject')->name('orders.rental.reject');
         Route::patch('/rental-orders/{orderId}/status', 'updateStatus')->name('orders.rental.updateStatus');
-
     });
 
     Route::resource('contacts', VendorContactController::class)->except("show");
@@ -416,7 +413,6 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
         Route::post('/sale-orders/{orderId}/mark-sent', 'markAsSent')->name('orders.sales.mark-sent');
         Route::post('/sale-orders/{orderId}/mark-sold', 'markAsSold')->name('orders.sales.mark-sold');
         Route::patch('/sale-orders/{orderId}/status', 'updateStatus')->name('orders.sales.updateStatus');
-
     });
     Route::get('/rental-requests', [RentalRequestController::class, 'index'])->name('rental-requests.index');
     Route::post('/rental-requests/{order}/accept', [RentalRequestController::class, 'accept'])->name('rental-requests.accept');
@@ -437,7 +433,7 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::get('/wallet', [WalletController::class, 'index'])->name('wallet.index');
     Route::get('/wallet/transactions', [WalletController::class, 'transactions'])->name('wallet.transactions');
     Route::post('/wallet/settlement', [WalletController::class, 'requestSettlement'])->name('wallet.settlement.request');
-    
+
     // Settlement Requests
     Route::get('/settlement-requests', [SettlementController::class, 'index'])->name('settlement-requests.index');
 
@@ -446,18 +442,14 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     Route::get('/store/edit', [StoreController::class, 'edit'])->name('store.edit');
     Route::post('/store/update', [StoreController::class, 'update'])->name('store.update');
     Route::post('/store/resubmit', [StoreController::class, 'resubmit'])->name('store.resubmit');
-});
 
-
-// Vendor Reports Routes
-Route::middleware(['auth', 'verified', 'role:vendor'])->group(function () {
-    Route::get('/vendor/reports', [ReportController::class, 'index'])
+    Route::get('/reports', [ReportController::class, 'index'])
         ->name('vendor.reports.index');
 
     Route::post('/vendor/reports/generate', [ReportController::class, 'generate'])
         ->name('vendor.reports.generate');
 
-    Route::get('/vendor/statistics', [StatisticsController::class, 'index'])
+    Route::get('/statistics', [StatisticsController::class, 'index'])
         ->name('vendor.statistics');
 });
 

@@ -96,12 +96,12 @@ class RentalRequestController extends Controller
                 if ($dateFilter === 'today') {
                     $query->whereDate('created_at', Carbon::today());
                 } elseif ($dateFilter === 'week') {
-                    $query->whereBetween('start_date', [
+                    $query->whereBetween('created_at', [
                         Carbon::now()->startOfWeek(),
                         Carbon::now()->endOfWeek(),
                     ]);
                 } elseif ($dateFilter === 'custom' && $filters['date_from'] && $filters['date_to']) {
-                    $query->whereBetween('start_date', [
+                    $query->whereBetween('created_at', [
                         Carbon::parse($filters['date_from']),
                         Carbon::parse($filters['date_to']),
                     ]);

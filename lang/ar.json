@@ -1610,5 +1610,7 @@
     "vendor delete reports": "حذف تقارير",
     "vendor view reports": "عرض تقارير",
     "vendor read wallet": "عرض المحفظة",
-    "vendor update wallet": "تحديث المحفظة"
+    "vendor update wallet": "تحديث المحفظة",
+    "Message Details": "تفاصيل الرسالة",
+    "Your Message": "رسالتك"
 }

@@ -132,7 +132,7 @@ class ReportController extends Controller
 
             case 'sales':
                 $query = OrderSale::whereBetween('created_at', [$startDate, $endDate])
-                    ->whereHas('branch', fn($q) => $q->where('vendor_id', auth()->id()));
+                    ->whereHas('branch', fn($q) => $q->where('vendor_id', auth()->user()->vendor_id ?? auth()->id()));
 
                 $headers = ['ID', 'Customer', 'Piece', 'Branch', 'Order Date', 'Total Price', 'Status'];
                 $data = $query->with(['user', 'goldPiece', 'branch'])
