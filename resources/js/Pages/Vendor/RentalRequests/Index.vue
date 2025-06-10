@@ -40,7 +40,7 @@
                                         </option>
                                     </select>
                                 </div>
-                                <div class="md:w-full">
+                                <!-- <div class="md:w-full">
                                     <select v-model="form.rental_status"
                                         class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         @change="applyFilters">
@@ -49,7 +49,7 @@
                                         <option value="finished">{{ $t('Finished Rentals') }}</option>
                                         <option value="future">{{ $t('Future Rentals') }}</option>
                                     </select>
-                                </div>
+                                </div> -->
                                 
                                 <div class="md:w-full">
                                     <select v-model="form.date_filter"
@@ -480,6 +480,10 @@
                 </div>
             </div>
         </Modal>
+
+
+        
+        
     </AuthenticatedLayout>
 </template>
 
@@ -902,4 +906,47 @@ onUnmounted(() => {
         echo.leaveChannel();
     }
 });
+
+// Accept modal and form
+const showAcceptModal = ref(false);
+const acceptForm = useForm({
+    branch_id: '',
+    type: 'rent',
+    status: 'approved',
+});
+
+const openAcceptModal = (order) => {
+    selectedOrder.value = order;
+    // Set default branch if only one exists
+    if (props.branches.length === 1) {
+        acceptForm.branch_id = props.branches[0].id;
+    }
+    showAcceptModal.value = true;
+};
+
+const closeAcceptModal = () => {
+    showAcceptModal.value = false;
+    acceptForm.reset();
+    selectedOrder.value = null;
+};
+
+const acceptOrder = () => {
+    if (!acceptForm.branch_id) {
+        acceptForm.setError('branch_id', t('Please select a branch'));
+        return;
+    }
+
+    acceptForm.post(route('vendor.rental-requests.accept', { order: selectedOrder.value.id }), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeAcceptModal();
+            applyFilters();
+            showNotification(t('Order accepted successfully'), 'success');
+        },
+        onError: (errors) => {
+            showNotification(errors.message || t('Failed to accept order'), 'error');
+        }
+    });
+};
+
 </script>

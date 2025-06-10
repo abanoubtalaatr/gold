@@ -18,7 +18,7 @@ class UsersController extends Controller
     {
         $this->middleware('permission:read users', ['only' => ['index']]);
         $this->middleware('permission:create users', ['only' => ['create']]);
-        $this->middleware('permission:update users', ['only' => ['update','edit']]);
+        $this->middleware('permission:update users', ['only' => ['update', 'edit']]);
         $this->middleware('permission:delete users', ['only' => ['destroy']]);
     }
 
@@ -36,7 +36,7 @@ class UsersController extends Controller
             'is_active' => $request->is_active,
         ];
 
-        $UsersQuery = User::with('roles')->excludeUsereAndVendor()->latest();
+        $UsersQuery = User::with('roles')->where('vendor_id', auth()->user()->vendor_id ?? auth()->user()->id)->latest();
 
 
         $UsersQuery->when($filters['name'], function ($query, $name) {
@@ -58,7 +58,6 @@ class UsersController extends Controller
             'filters' => $filters,
             'users' => $users,
         ]);
-
     }
 
     /**
@@ -67,8 +66,8 @@ class UsersController extends Controller
     public function create()
     {
         $roles = Role::whereNull('vendor_id')
-        ->where('name', '!=', 'user')
-        ->where('name', '!=', 'superadmin')
+            ->where('name', '!=', 'user')
+            ->where('name', '!=', 'superadmin')
 
             ->pluck('name')->toArray();
         return Inertia('Users/Create', ['roles' => $roles]);
@@ -84,7 +83,7 @@ class UsersController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
             'avatar' => 'avatars/default_avatar.png', // القيمة الافتراضية
-            // 'vendor_id' => auth()->user()->id
+            'vendor_id' => auth()->user()->id
         ];
 
         if ($request->hasFile('avatar')) {
@@ -118,8 +117,8 @@ class UsersController extends Controller
     public function edit(User $user)
     {
         $roles = Role::whereNull('vendor_id')
-        ->where('name', '!=', 'user')
-        ->where('name', '!=', 'superadmin')
+            ->where('name', '!=', 'user')
+            ->where('name', '!=', 'superadmin')
             ->pluck('name')->toArray();
         $userRoles = $user->roles->pluck('name')->all();
         return Inertia('Users/Edit', [
@@ -175,7 +174,6 @@ class UsersController extends Controller
             return redirect()
                 ->route('users.index')
                 ->with('success', __('messages.data_updated_successfully'));
-
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('User Update Error: ' . $e->getMessage());
@@ -192,32 +190,33 @@ class UsersController extends Controller
                 'is_active' => ($user->is_active) ? 0 : 1
             ]
         );
+        
         return redirect()->route('users.index')
-                ->with('success', __('messages.status_updated'));
+            ->with('success', __('messages.status_updated'));
     }
     /**
      * Remove the specified resource from storage.
      */
-   public function destroy(User $user)
-{
-    // Remove avatar file if exists
-    if ($user->avatar) {
-        Storage::delete($user->avatar);
+    public function destroy(User $user)
+    {
+        // Remove avatar file if exists
+        if ($user->avatar) {
+            Storage::delete($user->avatar);
+        }
+
+        // Remove logo file if exists
+        if ($user->logo) {
+            Storage::delete($user->logo);
+        }
+
+        // Remove commercial registration image if exists
+        if ($user->commercial_registration_image) {
+            Storage::delete($user->commercial_registration_image);
+        }
+
+        $user->delete();
+
+        return redirect()->route('users.index')
+            ->with('success', __('messages.data_deleted_successfully'));
     }
-
-    // Remove logo file if exists
-    if ($user->logo) {
-        Storage::delete($user->logo);
-    }
-
-    // Remove commercial registration image if exists
-    if ($user->commercial_registration_image) {
-        Storage::delete($user->commercial_registration_image);
-    }
-
-    $user->delete();
-
-    return redirect()->route('users.index')
-        ->with('success', __('messages.data_deleted_successfully'));
-}
 }

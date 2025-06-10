@@ -20,7 +20,7 @@
             </li>
 
             
-            <!-- admins -->
+            <!-- users -->
             <li class="nav-item" v-if="hasPermission('read users')">
                 <Link class="nav-link" :href="route('users.index')"
                     :class="{ collapsed: !$page.url.startsWith('/users') }">
@@ -28,34 +28,6 @@
                 <span>{{ $t("Admins") }}</span>
                 </Link>
             </li>
-
-            <!-- Clients -->
-            <li class="nav-item" v-if="hasPermission('read clients')">
-                <Link class="nav-link" :href="route('clients.index')"
-                    :class="{ collapsed: !$page.url.startsWith('/clients') }">
-                <i class="bi bi-person"></i>
-                <span>{{ $t("Clients") }}</span>
-                </Link>
-            </li>
-
-            <!-- gold pieces -->
-            <li class="nav-item" v-if="hasPermission('read gold-pieces')">
-                <Link class="nav-link" :href="route('admin.gold-pieces.index')"
-                    :class="{ collapsed: !$page.url.startsWith('/admin/gold-pieces') }">
-                <i class="bi bi-coin"></i>
-                <span>{{ $t("Gold Pieces") }}</span>
-                </Link>
-            </li>
-
-            <!-- admin order rental -->
-            <li class="nav-item" v-if="hasPermission('read order rentals')">
-                <Link class="nav-link" :href="route('admin.order-rentals.index')"
-                    :class="{ collapsed: !$page.url.startsWith('/admin/order-rentals') }">
-                <i class="bi bi-person"></i>
-                <span>{{ $t("Order Rentals") }}</span>
-                </Link>
-            </li>
-            
 
             <!-- vendor admins -->
             <li class="nav-item" v-if="hasPermission('vendor read users')">
@@ -200,13 +172,13 @@
             </li> -->
 
             <!-- Reports -->
-            <!-- <li class="nav-item" v-if="hasPermission('vendor read reports')">
+            <li class="nav-item" v-if="hasPermission('vendor read reports')">
                 <Link class="nav-link" :href="route('vendor.reports.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/reports') }">
                 <i class="bi bi-file-earmark-bar-graph"></i>
                 <span>{{ $t("Reports") }}</span>
                 </Link>
-            </li> -->
+            </li>
 
             <!-- Store Information -->
             <li class="nav-item" v-if="hasPermission('vendor read users')">

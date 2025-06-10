@@ -150,7 +150,7 @@
                                 </template>
                                 <template v-else>
                                     <ActivateToggle v-if="!isSuperAdmin(data)" :id="data.id"
-                                        :is-active="data.is_active == 1" :activate-url="`/users/${data.id}/activate`"
+                                        :is-active="data.is_active == 1" :activate-url="`/admin/users/${data.id}/activate`"
                                         @update:is-active="
                                             (newStatus) =>
                                                 updateStatus(data.id, newStatus)

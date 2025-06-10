@@ -205,7 +205,7 @@ const isSuperAdmin = (user) => {
 
 const update = () => {
     show_loader.value = true;
-    form.post(route("vendor.users.update", { user: props.user.id }), {
+    form.put(route("vendor.users.update", { user: props.user.id }), {
         onSuccess: () => {
             show_loader.value = false;
         },

@@ -28,7 +28,7 @@ class RentalRequestController extends Controller
 
     public function index(Request $request)
     {
-        $vendorId = $request->user()->vendor_id??$request->user()->id;
+        $vendorId = Auth::id();
         $branchIds = Branch::where('vendor_id', $vendorId)->pluck('id');
         $branches = Branch::where('vendor_id', $vendorId)->select('id', 'name')->get();
         $statuses = [
@@ -38,7 +38,6 @@ class RentalRequestController extends Controller
             OrderRental::STATUS_RENTED,
             OrderRental::STATUS_REJECTED
         ];
-
         // Filters
         $filters = $request->only([
             'search',
@@ -59,7 +58,7 @@ class RentalRequestController extends Controller
         // Query for rental orders with lease type only
         $ordersQuery = OrderRental::query()
             ->where('type', OrderRental::LEASE_TYPE)
-            ->whereIn('branch_id', $branchIds)
+            // ->whereIn('branch_id', $branchIds)
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->whereHas('user', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
@@ -168,6 +167,7 @@ class RentalRequestController extends Controller
             return $order;
         });
 
+
         return Inertia::render('Vendor/RentalRequests/Index', [
             'orders' => $orders,
             'branches' => $branches,
@@ -239,7 +239,7 @@ class RentalRequestController extends Controller
     public function accept(Request $request, $order)
     {
         $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
-        
+
         $this->authorizeVendor($order);
 
         $order->status = OrderRental::STATUS_APPROVED;
@@ -248,6 +248,9 @@ class RentalRequestController extends Controller
 
         return back()->with('success', __('Order accepted successfully'));
     }
+
+
+
 
     public function reject(Request $request, $order)
     {
@@ -316,7 +319,7 @@ class RentalRequestController extends Controller
         $order->status = OrderRental::STATUS_RENTED;
         $order->save();
         event(new OrderRentalStatusChangeEvent($order, $request->user()));
-        
+
         return back()->with('success', __('Rental confirmed successfully'));
     }
 
