@@ -117,7 +117,14 @@ class BannerRepository
         }
 
         if (isset($filters['is_active']) && $filters['is_active'] !== '') {
-            $query->where('is_active', $filters['is_active']);
+            // Convert string values to boolean/integer for proper database comparison
+            $isActive = filter_var($filters['is_active'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($isActive !== null) {
+                $query->where('is_active', $isActive);
+            } else {
+                // Handle string values "1" and "0"
+                $query->where('is_active', (int) $filters['is_active']);
+            }
         }
 
         if (!empty($filters['sort_order'])) {

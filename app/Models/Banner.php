@@ -22,6 +22,8 @@ class Banner extends Model implements TranslatableContract
         'is_active' => 'boolean',
     ];
 
+    protected $appends = ['image_url'];
+
     public $translatedAttributes = ['title', 'description'];
 
 

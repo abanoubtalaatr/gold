@@ -12,6 +12,14 @@ return [
     'liquidation_accepted' => 'تم قبول طلب التصفية الخاص بك',
     'wallet_profits' => 'لقد تلقيت أرباحاً بقيمة :amount في محفظتك',
 
+    // Wallet notifications
+    'wallet_balance_updated' => 'تم تحديث رصيد محفظتك',
+    'wallet_credit_added' => 'تم إضافة :amount ريال إلى محفظتك',
+    'wallet_debit_deducted' => 'تم خصم :amount ريال من محفظتك',
+    'wallet_transaction_approved' => 'تم قبول معاملة محفظتك',
+    'wallet_transaction_rejected' => 'تم رفض معاملة محفظتك',
+    'wallet_balance_current' => 'رصيدك الحالي: :balance ريال',
+
     // API responses
     'fetched_successfully' => 'تم جلب الإشعارات بنجاح',
     'count_fetched_successfully' => 'تم جلب عدد الإشعارات غير المقروءة بنجاح',

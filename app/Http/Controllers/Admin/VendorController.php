@@ -97,19 +97,25 @@ class VendorController extends Controller
     // Show vendor details
     public function show(User $vendor)
     {
-        // Eager load the city relationship
+        // Eager load the city and branches relationships
         $vendor->load([
             'city' => function ($query) {
                 $query->select('id', 'name'); // Only select needed columns
-            }
+            },
+            'branches' => function ($query) {
+                $query->select('id', 'vendor_id', 'name', 'city_id', 'address', 'is_active', 'working_days', 'working_hours', 'logo')
+                    ->with('city:id,name');
+            },
         ]);
 
+        
         return Inertia::render('Admin/Vendors/Show', [
             'vendor' => $vendor->append([
                 'commercial_registration_image_url',
                 'logo_url',
                 'store_name'
             ]),
+            'branches' => $vendor->branches,
         ]);
     }
 

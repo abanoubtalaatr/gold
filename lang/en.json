@@ -943,5 +943,7 @@
     "No notes": "No notes",
     "pending": "Pending",
     "approved": "Approved",
-    "rejected": "Rejected"
+    "rejected": "Rejected",
+    "Cannot delete city. It has active service providers.": "Cannot delete city. It has active service providers.   "
 }
+    

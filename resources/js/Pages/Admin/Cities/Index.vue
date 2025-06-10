@@ -220,9 +220,12 @@ const deleteCity = async (city) => {
                 );
             },
             onError: (errors) => {
+                activeDropdown.value = null;
+                // Handle validation errors
+                const errorMessage = errors.city || errors.message || t('Failed to delete city.');
                 Swal.fire(
                     t('Error'),
-                    errors.message || t('Failed to delete city.'),
+                    errorMessage,
                     'error'
                 );
             }

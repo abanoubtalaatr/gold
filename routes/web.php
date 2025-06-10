@@ -1,47 +1,48 @@
 <?php
 
-use App\Http\Controllers\Admin\WalletController as AdminWalletController;
-use App\Http\Controllers\Admin\AdminWalletController as SuperAdminWalletController;
+use App\Models\User;
+use Inertia\Inertia;
+use App\Models\State;
+use App\Models\Country;
 use App\Events\NotificationSent;
-use App\Http\Controllers\Admin\ComplaintController;
-use App\Http\Controllers\Admin\SystemSettingsController;
-use App\Http\Controllers\Admin\VendorController;
-use App\Http\Controllers\Banners\BannerController;
-use App\Http\Controllers\Contacts\ContactController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExportController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LangController;
-use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\ExportController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PageWebController;
-use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\Vendor\Auth\RegisterController;
-use App\Http\Controllers\Vendor\BranchController;
-use App\Http\Controllers\Vendor\ContactController as VendorContactController;
-use App\Http\Controllers\Vendor\GoldPieceController;
-use App\Http\Controllers\Admin\GoldPieceController as AdminGoldPieceController;
-use App\Http\Controllers\Vendor\OrderController;
-use App\Http\Controllers\Vendor\OrderRentalController;
-use App\Http\Controllers\Vendor\OrderSalesController;
-use App\Http\Controllers\Vendor\RentalRequestController;
-use App\Http\Controllers\Vendor\ReportController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\Vendor\RoleController;
-use App\Http\Controllers\Vendor\ServiceController;
-use App\Http\Controllers\Vendor\SettlementController;
-use App\Http\Controllers\Vendor\StatisticsController;
-use App\Http\Controllers\Vendor\StoreController;
 use App\Http\Controllers\Vendor\UserController;
+use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\VendorController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Vendor\OrderController;
+use App\Http\Controllers\Vendor\StoreController;
+use App\Http\Controllers\Vendor\BranchController;
+use App\Http\Controllers\Vendor\ReportController;
 use App\Http\Controllers\Vendor\VerifyController;
 use App\Http\Controllers\Vendor\WalletController;
-use App\Models\Country;
-use App\Models\State;
-use App\Models\User;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use App\Http\Controllers\LandingController;
+use App\Http\Controllers\Banners\BannerController;
+use App\Http\Controllers\Vendor\ServiceController;
+use App\Http\Controllers\Admin\ComplaintController;
+use App\Http\Controllers\Contacts\ContactController;
+use App\Http\Controllers\Vendor\GoldPieceController;
+use App\Http\Controllers\Vendor\OrderSalesController;
+use App\Http\Controllers\Vendor\SettlementController;
+use App\Http\Controllers\Vendor\StatisticsController;
+use App\Http\Controllers\Vendor\OrderRentalController;
+use App\Http\Controllers\Admin\SystemSettingsController;
+use App\Http\Controllers\Vendor\Auth\RegisterController;
+use App\Http\Controllers\Vendor\RentalRequestController;
+use App\Http\Controllers\Admin\WalletController as AdminWalletController;
+use App\Http\Controllers\Vendor\ContactController as VendorContactController;
+use App\Http\Controllers\Admin\GoldPieceController as AdminGoldPieceController;
+use App\Http\Controllers\Admin\AdminWalletController as SuperAdminWalletController;
 
 
 
@@ -252,6 +253,26 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
         ->name('admin.settlement.reject');
 
     Route::get('/wallet', [SuperAdminWalletController::class, 'index'])->name('wallet.index');
+
+    Route::get('/gold-pieces', [AdminGoldPieceController::class, 'index'])->name('gold-pieces.index');
+    
+    // Client routes
+    Route::resource('clients', ClientController::class)
+        ->names('clients');
+    
+    // Add missing client toggle status route
+    Route::patch('clients/{client}/toggle-status', [ClientController::class, 'toggleStatus'])
+        ->name('clients.toggle-status');
+    
+    // Client wallet management routes
+    Route::get('clients/{client}/wallet', [\App\Http\Controllers\Admin\WalletController::class, 'show'])
+        ->name('admin.wallet.show');
+    Route::post('clients/{client}/wallet/update-balance', [\App\Http\Controllers\Admin\WalletController::class, 'updateBalance'])
+        ->name('admin.wallet.update-balance');
+    Route::post('wallet-transactions/{transaction}/approve', [\App\Http\Controllers\Admin\WalletController::class, 'approveTransaction'])
+        ->name('admin.wallet.approve-transaction');
+    Route::post('wallet-transactions/{transaction}/reject', [\App\Http\Controllers\Admin\WalletController::class, 'rejectTransaction'])
+        ->name('admin.wallet.reject-transaction');
 });
 
 /************************************************************************ */

@@ -36,6 +36,7 @@ class CityController extends Controller
 
     public function create()
     {
+        // $states = State::where('country_id', 194)->get();
         $states = State::all();
         return Inertia::render('Admin/Cities/Create', [
             'states' => $states,
@@ -98,14 +99,33 @@ class CityController extends Controller
 
     public function destroy(City $city)
     {
-        // Check if city is associated with any orders or service providers
-        if ($city->usersWithOrders()->exists() || $city->activeVendors()->exists()) {
-            return back();
+        // Check if city has users with orders
+        $hasUsersWithOrders = $city->usersWithOrders()->exists();
+        
+        // Check if city has active vendors
+        $hasActiveVendors = $city->activeVendors()->exists();
+
+        if ($hasUsersWithOrders && $hasActiveVendors) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'city' => 'Cannot delete city. It has associated orders and active service providers.'
+            ]);
+        }
+
+        if ($hasUsersWithOrders) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'city' => __('Cannot delete city. It has associated orders.')
+            ]);
+        }
+
+        if ($hasActiveVendors) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'city' => __('Cannot delete city. It has active service providers.')
+            ]);
         }
 
         $city->delete();
 
-        return redirect()->route('admin.cities.index');
+        return redirect()->route('admin.cities.index')->with('success', 'City deleted successfully.');
     }
     public function toggleStatus(City $city)
     {
@@ -113,9 +133,9 @@ class CityController extends Controller
         $currentStatus = $city->getRawOriginal('status');
 
         // Check if we're trying to deactivate (current status is true)
-        if ($currentStatus && ($city->usersWithOrders()->exists() || $city->activeVendors()->exists())) {
-            return back()->with('error', 'Cannot deactivate city associated with active orders or service providers.');
-        }
+        // if ($currentStatus && ($city->usersWithOrders()->exists() || $city->activeVendors()->exists())) {
+        //     return back()->with('error', 'Cannot deactivate city associated with active orders or service providers.');
+        // }
 
         // Toggle the status
         $city->update(['status' => !$currentStatus]);

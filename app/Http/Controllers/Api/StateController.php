@@ -21,7 +21,7 @@ class StateController extends Controller
         }
         // i want to get all cities for this all states for this country  
         $states = State::where('country_id', $country->id)->pluck('id')->toArray();
-        $cities = City::whereIn('state_id',$states)->get();
+        $cities = City::whereIn('state_id',$states)->where('status',1)->get();
         
         return $this->successResponse(SimpleCityResource::collection($cities));
     }

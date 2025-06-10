@@ -95,11 +95,14 @@ import DeleteAction from "@/Components/DeleteAction.vue";
 import DataTable from "@/Components/DataTable.vue";
 
 const { t } = useI18n();
-const props = defineProps({ items: Object });
+const props = defineProps({ 
+    items: Object,
+    filters: Object 
+});
 
 const filterForm = reactive({
-    title: "",
-    is_active: "",
+    title: props.filters?.title || "",
+    is_active: props.filters?.is_active ?? "",
 });
 console.log(props.items);
 const filterFields = [
@@ -113,13 +116,14 @@ const filterFields = [
         type: "select",
         placeholder: t("status"),
         options: [
-            { label: t("active"), value: 1 },
-            { label: t("not_active"), value: 0 },
+            { label: t("all"), value: "" },
+            { label: t("active"), value: "1" },
+            { label: t("not_active"), value: "0" },
         ],
     },
 ];
 const updateStatus = (id, newStatus) => {
-    const updatedStatus = items.data.find((item) => item.id === id);
+    const updatedStatus = props.items.data.find((item) => item.id === id);
     if (updatedStatus) {
         updatedStatus.is_active = newStatus ? 1 : 0;
     }
