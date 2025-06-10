@@ -203,125 +203,130 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/export-users', [ExportController::class, 'export'])->name('export.users');
 /************************************************************************ */
 
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    // System Settings
-    Route::get('/system-settings', [SystemSettingsController::class, 'index'])->name('system-settings');
-    Route::put('/system-settings', [SystemSettingsController::class, 'updateSettings'])->name('system-settings.update');
-
-    // Slider Routes
-    Route::post('/system-settings/sliders', [SystemSettingsController::class, 'storeSlider'])->name('system-settings.sliders.store');
-    Route::put('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'updateSlider'])->name('system-settings.sliders.update');
-    Route::delete('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'destroySlider'])->name('system-settings.sliders.destroy');
+Route::middleware(['role:admin|superadmin'])->group(function () {
 
 
-    /************************************************************************ */
+    Route::middleware(['auth', 'verified'])->group(function () {
+        // System Settings
+        Route::get('/system-settings', [SystemSettingsController::class, 'index'])->name('system-settings');
+        Route::put('/system-settings', [SystemSettingsController::class, 'updateSettings'])->name('system-settings.update');
+
+        // Slider Routes
+        Route::post('/system-settings/sliders', [SystemSettingsController::class, 'storeSlider'])->name('system-settings.sliders.store');
+        Route::put('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'updateSlider'])->name('system-settings.sliders.update');
+        Route::delete('/system-settings/sliders/{slider}', [SystemSettingsController::class, 'destroySlider'])->name('system-settings.sliders.destroy');
 
 
-
-    Route::resource('admin/vendors', VendorController::class)->except('update');
-
-    Route::post('/vendors/{vendor}/update', [VendorController::class, 'update'])->name('vendors.update');
-    // Vendor status management
-    Route::post('/vendors/{vendor}/approve', [VendorController::class, 'approve'])->name('vendors.approve');
-    Route::post('/vendors/{vendor}/reject', [VendorController::class, 'reject'])->name('vendors.reject');
-    Route::patch('/vendors/{vendor}/toggle-status', [VendorController::class, 'toggleStatus'])->name('vendors.toggle-status');
-});
-
-
-/************************************************************************ */
+        /************************************************************************ */
 
 
 
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
-    // Vendor Wallet
-    Route::get('/vendors/{vendor}/wallet', action: [AdminWalletController::class, 'show'])
-        ->name('admin.wallet.show');
+        Route::resource('admin/vendors', VendorController::class)->except('update');
 
-    Route::post('/wallet/adjust', [AdminWalletController::class, 'adjustBalance'])
-        ->name('admin.wallet.adjust');
-
-    Route::get('/wallet/{wallet}/transactions', [AdminWalletController::class, 'transactions'])
-        ->name('admin.wallet.transactions');
-
-    // Settlement Requests
-    Route::put('/settlement/{settlement}/approve', [AdminWalletController::class, 'approveSettlement'])
-        ->name('admin.settlement.approve');
-
-    Route::put('/settlement/{settlement}/reject', [AdminWalletController::class, 'rejectSettlement'])
-        ->name('admin.settlement.reject');
-
-    Route::get('/wallet', [SuperAdminWalletController::class, 'index'])->name('wallet.index');
-});
-
-/************************************************************************ */
-
-
-Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
-    Route::get('/complaints', [ComplaintController::class, 'index'])->name('admin.complaints.index');
-    Route::post('/complaints/{complaint}/reply', [ComplaintController::class, 'reply'])->name('admin.complaints.reply');
-    Route::patch('/complaints/{complaint}/status', [ComplaintController::class, 'updateStatus'])->name('admin.complaints.update-status');
+        Route::post('/vendors/{vendor}/update', [VendorController::class, 'update'])->name('vendors.update');
+        // Vendor status management
+        Route::post('/vendors/{vendor}/approve', [VendorController::class, 'approve'])->name('vendors.approve');
+        Route::post('/vendors/{vendor}/reject', [VendorController::class, 'reject'])->name('vendors.reject');
+        Route::patch('/vendors/{vendor}/toggle-status', [VendorController::class, 'toggleStatus'])->name('vendors.toggle-status');
+    });
 
 
     /************************************************************************ */
 
 
-    Route::resource('gold-pieces', AdminGoldPieceController::class)
-        ->names('admin.gold-pieces')->except('update');
 
-    Route::post('gold-pieces/{goldPiece}/update', [AdminGoldPieceController::class, 'update'])
-        ->name('admin.gold-pieces.update');
+    Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+        // Vendor Wallet
+        Route::get('/vendors/{vendor}/wallet', action: [AdminWalletController::class, 'show'])
+            ->name('admin.wallet.show');
 
-    Route::patch('gold-pieces/{goldPiece}/toggle-status', [AdminGoldPieceController::class, 'toggleStatus'])
-        ->name('admin.gold-pieces.toggle-status');
-});
+        Route::post('/wallet/adjust', [AdminWalletController::class, 'adjustBalance'])
+            ->name('admin.wallet.adjust');
 
+        Route::get('/wallet/{wallet}/transactions', [AdminWalletController::class, 'transactions'])
+            ->name('admin.wallet.transactions');
 
-/************************************************************************ */
+        // Settlement Requests
+        Route::put('/settlement/{settlement}/approve', [AdminWalletController::class, 'approveSettlement'])
+            ->name('admin.settlement.approve');
 
+        Route::put('/settlement/{settlement}/reject', [AdminWalletController::class, 'rejectSettlement'])
+            ->name('admin.settlement.reject');
 
-Route::middleware(['auth'])->prefix('admin')->group(function () {
-    // ... other admin routes
+        Route::get('/wallet', [SuperAdminWalletController::class, 'index'])->name('wallet.index');
+    });
 
-    Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])
-        ->name('admin.reports.index');
-
-    Route::post('/reports/generate', [\App\Http\Controllers\Admin\ReportController::class, 'generate'])
-        ->name('admin.reports.generate');
-});
-
-/************************************************************************ */
+    /************************************************************************ */
 
 
-
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
-    // Orders
-    Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders.index');
-    Route::get('/orders/{id}/{type}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('admin.orders.show');
-});
+    Route::prefix('admin')->middleware(['auth', 'verified'])->group(function () {
+        Route::get('/complaints', [ComplaintController::class, 'index'])->name('admin.complaints.index');
+        Route::post('/complaints/{complaint}/reply', [ComplaintController::class, 'reply'])->name('admin.complaints.reply');
+        Route::patch('/complaints/{complaint}/status', [ComplaintController::class, 'updateStatus'])->name('admin.complaints.update-status');
 
 
-Route::middleware(['auth', 'verified'])->prefix('admin/orders')->group(function () {
-    Route::get('/rental', [\App\Http\Controllers\Admin\OrderController::class, 'rentalIndex'])->name('admin.orders.rental.index');
-    Route::get('/rental/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'showRental'])->name('admin.orders.rental.show');
+        /************************************************************************ */
 
-    Route::get('/sale', [\App\Http\Controllers\Admin\OrderController::class, 'saleIndex'])->name('admin.orders.sale.index');
-    Route::get('/sale/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'showSale'])->name('admin.orders.sale.show');
-});
-/************************************************************************ */
 
-//
+        Route::resource('gold-pieces', AdminGoldPieceController::class)
+            ->names('admin.gold-pieces')->except('update');
 
-Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
-    // Cities
-    Route::get('/cities', [\App\Http\Controllers\Admin\CityController::class, 'index'])->name('admin.cities.index');
-    Route::get('/cities/create', [\App\Http\Controllers\Admin\CityController::class, 'create'])->name('admin.cities.create');
-    Route::post('/cities', [\App\Http\Controllers\Admin\CityController::class, 'store'])->name('admin.cities.store');
-    Route::get('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'show'])->name('admin.cities.show');
-    Route::get('/cities/{city}/edit', [\App\Http\Controllers\Admin\CityController::class, 'edit'])->name('admin.cities.edit');
-    Route::put('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'update'])->name('admin.cities.update');
-    Route::delete('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'destroy'])->name('admin.cities.destroy');
-    Route::patch('/cities/{city}/toggle-status', [\App\Http\Controllers\Admin\CityController::class, 'toggleStatus'])->name('admin.cities.toggle-status');
+        Route::post('gold-pieces/{goldPiece}/update', [AdminGoldPieceController::class, 'update'])
+            ->name('admin.gold-pieces.update');
+
+        Route::patch('gold-pieces/{goldPiece}/toggle-status', [AdminGoldPieceController::class, 'toggleStatus'])
+            ->name('admin.gold-pieces.toggle-status');
+    });
+
+
+    /************************************************************************ */
+
+
+    Route::middleware(['auth'])->prefix('admin')->group(function () {
+        // ... other admin routes
+
+        Route::get('/reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])
+            ->name('admin.reports.index');
+
+        Route::post('/reports/generate', [\App\Http\Controllers\Admin\ReportController::class, 'generate'])
+            ->name('admin.reports.generate');
+    });
+
+    /************************************************************************ */
+
+
+
+    Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+        // Orders
+        Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders.index');
+        Route::get('/orders/{id}/{type}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('admin.orders.show');
+    });
+
+
+    Route::middleware(['auth', 'verified'])->prefix('admin/orders')->group(function () {
+        Route::get('/rental', [\App\Http\Controllers\Admin\OrderController::class, 'rentalIndex'])->name('admin.orders.rental.index');
+        Route::get('/rental/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'showRental'])->name('admin.orders.rental.show');
+
+        Route::get('/sale', [\App\Http\Controllers\Admin\OrderController::class, 'saleIndex'])->name('admin.orders.sale.index');
+        Route::get('/sale/{id}', [\App\Http\Controllers\Admin\OrderController::class, 'showSale'])->name('admin.orders.sale.show');
+    });
+    /************************************************************************ */
+
+    //
+
+    Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+        // Cities
+        Route::get('/cities', [\App\Http\Controllers\Admin\CityController::class, 'index'])->name('admin.cities.index');
+        Route::get('/cities/create', [\App\Http\Controllers\Admin\CityController::class, 'create'])->name('admin.cities.create');
+        Route::post('/cities', [\App\Http\Controllers\Admin\CityController::class, 'store'])->name('admin.cities.store');
+        Route::get('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'show'])->name('admin.cities.show');
+        Route::get('/cities/{city}/edit', [\App\Http\Controllers\Admin\CityController::class, 'edit'])->name('admin.cities.edit');
+        Route::put('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'update'])->name('admin.cities.update');
+        Route::delete('/cities/{city}', [\App\Http\Controllers\Admin\CityController::class, 'destroy'])->name('admin.cities.destroy');
+        Route::patch('/cities/{city}/toggle-status', [\App\Http\Controllers\Admin\CityController::class, 'toggleStatus'])->name('admin.cities.toggle-status');
+    });
+
+
 });
 
 /************************************************************************ */

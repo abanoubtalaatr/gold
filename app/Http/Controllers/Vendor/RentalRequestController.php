@@ -29,7 +29,7 @@ class RentalRequestController extends Controller
     public function index(Request $request)
     {
         $vendorId = Auth::id();
-        $branchIds = Branch::where('vendor_id', $vendorId)->select('id')->pluck('id')->toArray();
+        $branchIds = Branch::where('vendor_id', $vendorId)->pluck('id');
         $branches = Branch::where('vendor_id', $vendorId)->select('id', 'name')->get();
         $statuses = [
             OrderRental::STATUS_PENDING_APPROVAL,
@@ -236,40 +236,21 @@ class RentalRequestController extends Controller
         return $actions;
     }
 
-    // public function accept(Request $request, $order)
-    // {
-    //     $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
-
-    //     $this->authorizeVendor($order);
-
-    //     $order->status = OrderRental::STATUS_APPROVED;
-    //     $order->type = OrderRental::TYPE_RENTAL;
-    //     $order->save();
-    //     event(new OrderRentalStatusChangeEvent($order, $request->user()));
-
-    //     return back()->with('success', __('Order accepted successfully'));
-    // }
-
-
     public function accept(Request $request, $order)
     {
         $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
+
         $this->authorizeVendor($order);
 
-        $validated = $request->validate([
-            'branch_id' => 'required|exists:branches,id'
-        ]);
-
-        $order->update([
-            'branch_id' => $validated['branch_id'],
-            'type' => OrderRental::RENT_TYPE,
-            'status' => OrderRental::STATUS_APPROVED,
-        ]);
-
+        $order->status = OrderRental::STATUS_APPROVED;
+        $order->save();
         event(new OrderRentalStatusChangeEvent($order, $request->user()));
 
         return back()->with('success', __('Order accepted successfully'));
     }
+
+
+
 
     public function reject(Request $request, $order)
     {

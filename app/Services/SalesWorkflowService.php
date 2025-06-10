@@ -177,8 +177,8 @@ class SalesWorkflowService
     protected function getAdminUser(): ?User
     {
         // Try to find a user with super admin role first
-        $admin = User::role('super admin')->first();
-        
+        $admin = User::role('superadmin')->first();
+
         // If no super admin, try admin role
         if (!$admin) {
             $admin = User::role('admin')->first();
@@ -247,4 +247,4 @@ class SalesWorkflowService
 
         return $actions;
     }
-} 
+}
