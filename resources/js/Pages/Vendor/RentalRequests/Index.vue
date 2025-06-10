@@ -238,6 +238,96 @@
             <source src="/sounds/notification.wav" type="audio/wav">
         </audio>
 
+        <!-- Accept Order Modal -->
+        <Modal :show="showAcceptModal" @close="closeAcceptModal" max-width="md">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">{{ $t('Accept Rental Request') }}</h2>
+                    <button @click="closeAcceptModal" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div v-if="selectedOrder" class="space-y-6">
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <h3 class="text-lg font-medium text-blue-800 mb-2">{{ $t('Order Summary') }}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                            <div>
+                                <p class="font-medium text-gray-700">{{ $t('Order ID') }}:</p>
+                                <p>{{ selectedOrder.id }}</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700">{{ $t('User') }}:</p>
+                                <p>{{ selectedOrder.user?.name || 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700">{{ $t('Gold Piece') }}:</p>
+                                <p>{{ selectedOrder.gold_piece?.name || 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700">{{ $t('Requested Price') }}:</p>
+                                <p>{{ selectedOrder.total_price }} {{ $t('SAR') }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Select Branch') }}</label>
+                        <select v-model="acceptForm.branch_id"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                            <option value="" disabled>{{ $t('Select a branch') }}</option>
+                            <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                                {{ branch.name }}
+                            </option>
+                        </select>
+                        <p v-if="acceptForm.errors.branch_id" class="mt-1 text-sm text-red-600">
+                            {{ acceptForm.errors.branch_id }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Rental Type') }}</label>
+                        <select v-model="acceptForm.type"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                            <option value="rent">{{ $t('Rent') }}</option>
+                            <option value="lease">{{ $t('Lease') }}</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Status') }}</label>
+                        <select v-model="acceptForm.status"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                            <option value="approved">{{ $t('Approved') }}</option>
+                            <option value="piece_sent">{{ $t('Piece Sent') }}</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button @click="closeAcceptModal"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                            {{ $t('Cancel') }}
+                        </button>
+                        <button @click="acceptOrder" :disabled="acceptForm.processing"
+                            class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:bg-green-400 transition-colors duration-200">
+                            <span v-if="acceptForm.processing">
+                                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                {{ $t('Processing...') }}
+                            </span>
+                            <span v-else>
+                                {{ $t('Confirm Acceptance') }}
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </Modal>
+
         <!-- Details Modal -->
         <Modal :show="showDetailsModal" @close="closeDetailsModal">
             <div class="p-6">
@@ -480,6 +570,10 @@
                 </div>
             </div>
         </Modal>
+
+
+        
+        
     </AuthenticatedLayout>
 </template>
 
@@ -902,4 +996,47 @@ onUnmounted(() => {
         echo.leaveChannel();
     }
 });
+
+// Accept modal and form
+const showAcceptModal = ref(false);
+const acceptForm = useForm({
+    branch_id: '',
+    type: 'rent',
+    status: 'approved',
+});
+
+const openAcceptModal = (order) => {
+    selectedOrder.value = order;
+    // Set default branch if only one exists
+    if (props.branches.length === 1) {
+        acceptForm.branch_id = props.branches[0].id;
+    }
+    showAcceptModal.value = true;
+};
+
+const closeAcceptModal = () => {
+    showAcceptModal.value = false;
+    acceptForm.reset();
+    selectedOrder.value = null;
+};
+
+const acceptOrder = () => {
+    if (!acceptForm.branch_id) {
+        acceptForm.setError('branch_id', t('Please select a branch'));
+        return;
+    }
+
+    acceptForm.post(route('vendor.rental-requests.accept', { order: selectedOrder.value.id }), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeAcceptModal();
+            applyFilters();
+            showNotification(t('Order accepted successfully'), 'success');
+        },
+        onError: (errors) => {
+            showNotification(errors.message || t('Failed to accept order'), 'error');
+        }
+    });
+};
+
 </script>
