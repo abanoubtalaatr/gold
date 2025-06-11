@@ -42,6 +42,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\Api\V1\InvoiceController;
+use App\Http\Controllers\GoldPieceDetailsController;
 
 
 
@@ -467,3 +469,8 @@ require __DIR__ . '/auth.php';
 
 // Catch-all route for dynamic pages (must be last)
 Route::get('/{slug}', [LandingController::class, 'show'])->name('pages.show');
+
+Route::get('invoice/{order}', [InvoiceController::class, 'index'])->name('invoice.show');
+
+// Gold piece details route for QR code scanning
+Route::get('gold-piece/{goldPiece}', [GoldPieceDetailsController::class, 'show'])->name('gold-piece.show');

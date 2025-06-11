@@ -244,4 +244,21 @@ return [
     'order_deleted_success' => 'Order deleted successfully',
     'order_fetched_success' => 'Order fetched successfully',
     'order_count_fetched_success' => 'Order count fetched successfully',
+    
+    // Gold piece details translations
+    'gold_piece_details' => 'Gold Piece Details',
+    'type' => 'Type',
+    'for_rent' => 'For Rent',
+    'for_sale' => 'For Sale',
+    'rental_price_per_day' => 'Rental Price Per Day',
+    'deposit_amount' => 'Deposit Amount',
+    'owner' => 'Owner',
+    'description' => 'Description',
+    'status' => 'Status',
+    'pending' => 'Pending',
+    'available' => 'Available',
+    'rented' => 'Rented',
+    'sold' => 'Sold',
+    'created_date' => 'Created Date',
+    'print_details' => 'Print Details',
 ];

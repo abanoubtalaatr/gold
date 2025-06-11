@@ -4,27 +4,22 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Models\User;
 use App\Models\Branch;
-use App\Models\Address;
 use App\Models\GoldPiece;
 use App\Models\OrderSale;
 use App\Models\OrderRental;
 use Illuminate\Http\Request;
 use App\Filters\GoldPieceFilter;
 use App\Traits\ApiResponseTrait;
-use App\Events\NewGoldPieceEvent;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Event;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Resources\Api\GoldPieceResource;
 use App\Http\Resources\Api\OrderRentalResource;
-use App\Notifications\NewGoldPieceNotification;
 use App\Http\Requests\Api\V1\StoreGoldPieceRequest;
 use App\Http\Requests\Api\V1\UpdateGoldPieceRequest;
-use App\Notifications\Vendor\NewGoldPieceAvailableNotification;
 use App\Services\VendorNotificationService;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class GoldPieceController extends Controller
 {
@@ -120,6 +115,11 @@ class GoldPieceController extends Controller
                 'sale_price' => $request->type === 'for_sale' ? $request->sale_price : null,
                 'deposit_amount' => $request->type === 'for_rent' ? $request->deposit_amount : null,
             ]);
+
+            // Generate QR code for the gold piece
+            $qrCodeUrl = route('gold-piece.show', $goldPiece->id);
+            $qrCode = base64_encode(QrCode::format('png')->size(200)->generate($qrCodeUrl));
+            $goldPiece->update(['qr_code' => $qrCode]);
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {

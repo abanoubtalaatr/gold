@@ -197,4 +197,21 @@ return [
     'order_deleted_success' => 'تم حذف الطلب بنجاح',
     'order_fetched_success' => 'تم استرجاع الطلب بنجاح',
     'order_count_fetched_success' => 'تم استرجاع عدد الطلبات بنجاح',
+    
+    // Gold piece details translations
+    'gold_piece_details' => 'تفاصيل القطعة الذهبية',
+    'type' => 'النوع',
+    'for_rent' => 'للإيجار',
+    'for_sale' => 'للبيع',
+    'rental_price_per_day' => 'سعر الإيجار لليوم',
+    'deposit_amount' => 'مبلغ التأمين',
+    'owner' => 'المالك',
+    'description' => 'الوصف',
+    'status' => 'الحالة',
+    'pending' => 'في الانتظار',
+    'available' => 'متاح',
+    'rented' => 'مؤجر',
+    'sold' => 'مباع',
+    'created_date' => 'تاريخ الإنشاء',
+    'print_details' => 'طباعة التفاصيل',
 ];
