@@ -214,4 +214,5 @@ return [
     'sold' => 'مباع',
     'created_date' => 'تاريخ الإنشاء',
     'print_details' => 'طباعة التفاصيل',
+    'view_details' => 'عرض التفاصيل',
 ];

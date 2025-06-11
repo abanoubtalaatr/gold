@@ -52,6 +52,13 @@ class GoldPieceResource extends JsonResource
                     'medium' => $media->getUrl('medium'),
                 ];
             }),
+            'qr_code_media' => $this->getMedia('qr_codes')->map(function ($media) {
+                return [
+                    'id' => $media->id,
+                    'url' => $media->getUrl(),
+                    'name' => $media->name,
+                ];
+            })->first(),
             'rating' => [
                 'average' => $this->average_rating,
                 'count' => $this->rating_count,

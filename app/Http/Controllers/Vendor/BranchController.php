@@ -33,17 +33,14 @@ class BranchController extends Controller
     }
 
     public function create()
-    {
-        //saudi arabia country id is 194
+    {        
         
         $country = Country::find(194);
-        
-        // i want to get all cities for this all states for this country  
-        // $states = State::where('country_id', $country->id)->pluck('id')->toArray();
-        $cities = City::select(['id as value', 'name as label'])->limit(10)->get()->toArray();
 
-        // $cities = City::whereIn('state_id',$states)->get()->toArray();
-     
+        // i want to get all cities for this all states for this country  
+        $states = State::where('country_id', $country->id)->pluck('id')->toArray();
+        
+        $cities = City::whereIn('state_id',$states)->where('status',1)->select(['id as value', 'name as label'])->get()->toArray();
 
         return Inertia::render('Vendor/Branches/Create', [
             'cities' => $cities,
@@ -95,10 +92,16 @@ class BranchController extends Controller
     {
         // Load the branch with city relationship
         $branch->load('city');
+        $country = Country::find(194);
+
+        // i want to get all cities for this all states for this country  
+        $states = State::where('country_id', $country->id)->pluck('id')->toArray();
         
+        $cities = City::whereIn('state_id',$states)->where('status',1)->select(['id as value', 'name as label'])->get()->toArray();
+
         return Inertia::render('Vendor/Branches/Edit', [
             'branch' => $branch,
-            'cities' => City::select(['id as value', 'name as label'])->limit(10)->get()->toArray(),
+            'cities' =>$cities,
         ]);
     }
 

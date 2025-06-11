@@ -8,7 +8,7 @@ return [
     */
     'api' => [
         'url' => env('GOLD_API_URL', 'https://www.goldapi.io/api/XAU/SAR'),
-        'token' => env('GOLD_API_TOKEN', 'goldapi-1giwusmbeuudi4-io'),
+        'token' => env('GOLD_API_TOKEN', 'goldapi-43fm8jl19mbrnvxzg-io'),
         'timeout' => env('GOLD_API_TIMEOUT', 10),
     ],
 

@@ -261,4 +261,5 @@ return [
     'sold' => 'Sold',
     'created_date' => 'Created Date',
     'print_details' => 'Print Details',
+    'view_details' => 'View Details',
 ];

@@ -53,9 +53,10 @@ class ComplaintController extends Controller
             'reply' => $request->message,
             'read' => true,
             'read_at' => now(),
+            'status' => 'replied',
         ]);
 
-        return back()->with('success', 'Reply sent successfully.');
+        return back()->with('success', __('Reply sent successfully.'));
     }
 
     public function updateStatus(Request $request, Contact $complaint)

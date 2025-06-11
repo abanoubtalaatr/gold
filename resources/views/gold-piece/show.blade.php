@@ -43,7 +43,30 @@
             @if($goldPiece->qr_code)
                 <div class="flex justify-center mb-6">
                     <div class="w-32 h-32">
-                        <img src="data:image/png;base64,{{ $goldPiece->qr_code }}" alt="QR Code" class="w-full h-full">
+                        @php
+                            $qrCode = $goldPiece->qr_code;
+                            $qrCodeMedia = $goldPiece->getMedia('qr_codes')->first();
+                        @endphp
+                        
+                        @if($qrCodeMedia)
+                            {{-- Display QR code from media library --}}
+                            <img src="{{ $qrCodeMedia->getUrl() }}" alt="QR Code" class="w-full h-full">
+                        @elseif(str_starts_with($qrCode, '<svg'))
+                            {{-- Display SVG QR code directly --}}
+                            <div class="w-full h-full flex items-center justify-center">
+                                {!! $qrCode !!}
+                            </div>
+                        @elseif(str_starts_with($qrCode, 'http'))
+                            {{-- Display QR code as URL (fallback) --}}
+                            <div class="w-full h-full flex items-center justify-center bg-gray-100 rounded">
+                                <a href="{{ $qrCode }}" class="text-xs text-center p-2 text-blue-600 hover:text-blue-800">
+                                    @lang('mobile.view_details')
+                                </a>
+                            </div>
+                        @else
+                            {{-- Legacy base64 format --}}
+                            <img src="data:image/png;base64,{{ $qrCode }}" alt="QR Code" class="w-full h-full">
+                        @endif
                     </div>
                 </div>
             @endif

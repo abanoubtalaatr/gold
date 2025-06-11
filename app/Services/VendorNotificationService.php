@@ -31,11 +31,18 @@ class VendorNotificationService
             $vendor = $order->branch->vendor;
             $branch = $order->branch;
 
+            // Check if this vendor has multiple orders for the same gold piece
+            $goldPieceId = $order->goldPiece->id;
+            $vendorId = $vendor->id;
+            
+            // Count how many branches this vendor has orders for this gold piece
+            $branchCount = $this->getVendorBranchCountForGoldPiece($vendorId, $goldPieceId, $orderType);
+
             // 1. Send database notification with email
-            $vendor->notify(new NewOrderNotification($order, $branch, $orderType));
+            $vendor->notify(new NewOrderNotification($order, $branch, $orderType, $branchCount));
 
             // 2. Broadcast real-time event
-            broadcast(new NewOrderForVendorEvent($order, $vendor->id, $orderType))->toOthers();
+            // broadcast(new NewOrderForVendorEvent($order, $vendor->id, $orderType))->toOthers();
 
             // 3. Mark vendor as having new notifications
             $this->markVendorHasNewNotifications($vendor->id);
@@ -47,6 +54,7 @@ class VendorNotificationService
                 'order_type' => $orderType,
                 'branch_id' => $branch->id,
                 'branch_name' => $branch->name,
+                'branch_count' => $branchCount,
             ]);
 
         } catch (\Exception $e) {
@@ -56,6 +64,38 @@ class VendorNotificationService
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+        }
+    }
+
+    /**
+     * Get the count of branches for a vendor that have orders for a specific gold piece
+     */
+    private function getVendorBranchCountForGoldPiece(int $vendorId, int $goldPieceId, string $orderType): int
+    {
+        try {
+            if ($orderType === 'rental') {
+                return OrderRental::whereHas('branch', function ($query) use ($vendorId) {
+                    $query->where('vendor_id', $vendorId);
+                })
+                ->where('gold_piece_id', $goldPieceId)
+                ->distinct('branch_id')
+                ->count();
+            } else {
+                return OrderSale::whereHas('branch', function ($query) use ($vendorId) {
+                    $query->where('vendor_id', $vendorId);
+                })
+                ->where('gold_piece_id', $goldPieceId)
+                ->distinct('branch_id')
+                ->count();
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to get vendor branch count', [
+                'vendor_id' => $vendorId,
+                'gold_piece_id' => $goldPieceId,
+                'order_type' => $orderType,
+                'error' => $e->getMessage(),
+            ]);
+            return 1; // Default to 1 if we can't determine the count
         }
     }
 

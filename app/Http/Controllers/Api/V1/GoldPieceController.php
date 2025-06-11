@@ -116,10 +116,43 @@ class GoldPieceController extends Controller
                 'deposit_amount' => $request->type === 'for_rent' ? $request->deposit_amount : null,
             ]);
 
-            // Generate QR code for the gold piece
+            // Generate QR code for the gold piece and store as media
             $qrCodeUrl = route('gold-piece.show', $goldPiece->id);
-            $qrCode = base64_encode(QrCode::format('png')->size(200)->generate($qrCodeUrl));
-            $goldPiece->update(['qr_code' => $qrCode]);
+            
+            try {
+                // Generate QR code as SVG (doesn't require imagick extension)
+                $qrCodeImage = QrCode::format('svg')->size(200)->generate($qrCodeUrl);
+                
+                // Create a temporary file stream in memory
+                $tempStream = fopen('php://temp', 'r+');
+                fwrite($tempStream, $qrCodeImage);
+                rewind($tempStream);
+                
+                // Add QR code as media using the stream
+                $qrCodeMedia = $goldPiece->addMediaFromStream($tempStream)
+                    ->usingName('QR Code for ' . $goldPiece->name)
+                    ->usingFileName('qr_code_' . $goldPiece->id . '.svg')
+                    ->toMediaCollection('qr_codes', 'public');
+                
+                // Close the stream
+                fclose($tempStream);
+                
+                // Store the media URL in the qr_code field for backward compatibility
+                $goldPiece->update(['qr_code' => $qrCodeMedia->getUrl()]);
+                
+            } catch (\Exception $e) {
+                Log::error('Failed to generate QR code with media library: ' . $e->getMessage());
+                
+                try {
+                    // Secondary fallback: store SVG content directly in database
+                    $qrCodeImage = QrCode::format('svg')->size(200)->generate($qrCodeUrl);
+                    $goldPiece->update(['qr_code' => $qrCodeImage]);
+                } catch (\Exception $e2) {
+                    Log::error('Failed to generate QR code completely: ' . $e2->getMessage());
+                    // Final fallback: store QR code URL directly in database
+                    $goldPiece->update(['qr_code' => $qrCodeUrl]);
+                }
+            }
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
@@ -135,6 +168,7 @@ class GoldPieceController extends Controller
 
             // Create orders for each branch
             $createdOrders = [];
+            $vendorOrders = []; // Group orders by vendor
             foreach ($branches as $branch) {
                 if ($request->type === 'for_rent') {
                     $order = OrderRental::create([
@@ -146,6 +180,12 @@ class GoldPieceController extends Controller
                         'type' => OrderRental::RENT_TYPE,
                     ]);
                     $createdOrders[] = ['order' => $order, 'type' => 'rental'];
+                    
+                    // Group by vendor for notifications
+                    if (!isset($vendorOrders[$branch->vendor_id])) {
+                        $vendorOrders[$branch->vendor_id] = [];
+                    }
+                    $vendorOrders[$branch->vendor_id][] = ['order' => $order, 'type' => 'rental'];
                 } else {
                     $order = OrderSale::create([
                         'user_id' => $user->id,
@@ -155,23 +195,32 @@ class GoldPieceController extends Controller
                         'total_price' => $goldPiece->sale_price,
                     ]);
                     $createdOrders[] = ['order' => $order, 'type' => 'sale'];
+                    
+                    // Group by vendor for notifications
+                    if (!isset($vendorOrders[$branch->vendor_id])) {
+                        $vendorOrders[$branch->vendor_id] = [];
+                    }
+                    $vendorOrders[$branch->vendor_id][] = ['order' => $order, 'type' => 'sale'];
                 }
             }
 
             DB::commit();
 
-            // Send vendor notifications for the created orders
-            foreach ($createdOrders as $orderData) {
+            // Send vendor notifications - one per vendor instead of per branch
+            foreach ($vendorOrders as $vendorId => $orders) {
                 try {
+                    // Send notification using the first order for this vendor
+                    // This ensures one notification per vendor regardless of how many branches they have
+                    $firstOrder = $orders[0];
                     $this->vendorNotificationService->notifyVendorOfNewOrder(
-                        $orderData['order'], 
-                        $orderData['type']
+                        $firstOrder['order'], 
+                        $firstOrder['type']
                     );
                 } catch (\Exception $e) {
                     // Log notification failure but don't fail the entire request
                     Log::error('Failed to send vendor notification for new order', [
-                        'order_id' => $orderData['order']->id,
-                        'order_type' => $orderData['type'],
+                        'vendor_id' => $vendorId,
+                        'orders_count' => count($orders),
                         'error' => $e->getMessage(),
                     ]);
                 }
@@ -224,6 +273,7 @@ class GoldPieceController extends Controller
 
             // Delete associated media first
             $goldPiece->clearMediaCollection('images');
+            $goldPiece->clearMediaCollection('qr_codes');
 
             // Delete the gold piece
             $goldPiece->delete();
