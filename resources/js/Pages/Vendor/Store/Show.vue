@@ -14,12 +14,13 @@
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
                         <!-- Status alerts -->
-                        <div v-if="store.status === 'pending'"
+                        <div v-if="store.status === 'pending' && user.role === 'vendor'"
                             class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
                             <div class="flex">
                                 <div class="flex-shrink-0">
                                     <ExclamationTriangleIcon class="h-5 w-5 text-yellow-400" />
                                 </div>
+
                                 <div class="ml-3">
                                     <p class="text-sm text-yellow-700">
                                         {{ $t('Your store is pending approval. You will be notified once approved.') }}
@@ -79,7 +80,7 @@
                                         <p class="mt-1 text-sm text-gray-900">{{ store.store_name_en }}</p>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Store Name (Arabic)')
+                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Store Name(Arabic)')
                                             }}</label>
                                         <p class="mt-1 text-sm text-gray-900">{{ store.store_name_ar }}</p>
                                     </div>
@@ -142,17 +143,18 @@
                             </div>
 
                             <!-- Working Hours -->
-<div>
-    <h3 class="text-lg font-medium text-gray-900 mb-3">{{ $t('Working Hours') }}</h3>
-    <div class="space-y-2">
-        <div v-for="(day, index) in store.working_hours" :key="index"
-            class="flex items-center justify-between">
-            <span class="text-sm font-medium text-gray-700">{{ $t(day.day) }}</span>
-            <span v-if="day.closed" class="text-sm text-gray-500">{{ $t('Closed') }}</span>
-            <span v-else class="text-sm text-gray-900">{{ day.open }} - {{ day.close }}</span>
-        </div>
-    </div>
-</div>
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 mb-3">{{ $t('Working Hours') }}</h3>
+                                <div class="space-y-2">
+                                    <div v-for="(day, index) in store.working_hours" :key="index"
+                                        class="flex items-center justify-between">
+                                        <span class="text-sm font-medium text-gray-700">{{ $t(day.day) }}</span>
+                                        <span v-if="day.closed" class="text-sm text-gray-500">{{ $t('Closed') }}</span>
+                                        <span v-else class="text-sm text-gray-900">{{ day.open }} - {{ day.close
+                                        }}</span>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Working Hours -->
                             <!-- <div>
                                 <h3 class="text-lg font-medium text-gray-900 mb-3">{{ $t('Working Hours') }}</h3>
@@ -182,7 +184,7 @@
 </template>
 
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { ExclamationTriangleIcon, XCircleIcon } from '@heroicons/vue/24/outline';
 
@@ -190,7 +192,12 @@ const props = defineProps({
     store: Object
 });
 
+
+const { props: page } = usePage();
+const user = page.auth?.user ?? { role: '' };
+
 const resubmit = () => {
     Inertia.post(route('vendor.store.resubmit'));
 };
+
 </script>
