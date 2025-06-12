@@ -20,6 +20,7 @@ class OrderRental extends Model
         'status',
         'type',
         'is_suspended',
+        'is_including_lobes',
     ];
 
     protected $casts = [

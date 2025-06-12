@@ -249,10 +249,19 @@
                             <p><strong>{{ $t('Order Type') }}:</strong> {{ selectedOrder.order_type === 'rental' ?
                                 $t('Rental')
                                 : $t('Sale') }}</p>
+                                <p><strong>{{ $t('Piece Name') }}:</strong> {{ selectedOrder.goldPiece?.name || 'N/A' }}</p>
+                            <p v-if="selectedOrder.gold_piece && selectedOrder.gold_piece.is_including_lobes">
+                                <strong>{{ $t('Is Including Lobe') }}:</strong>
+                                {{ selectedOrder.gold_piece.is_including_lobes ? $t('Yes') : $t('No') }}
+                            </p>
+                            <p v-if="selectedOrder.gold_piece && selectedOrder.gold_piece.carat">
+                                <strong>{{ $t('Carat') }}:</strong>
+                                {{ selectedOrder.gold_piece.carat }}
+                            </p>
                             <p><strong>{{ $t('Created At') }}:</strong> {{ formatDate(selectedOrder.created_at) }}</p>
                             <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || 'N/A' }}</p>
                             <p><strong>{{ $t('User Email') }}:</strong> {{ selectedOrder.user?.email || 'N/A' }}</p>
-                            <p><strong>{{ $t('Piece Name') }}:</strong> {{ selectedOrder.goldPiece?.name || 'N/A' }}</p>
+                            
                             <p><strong>{{ $t('Description') }}:</strong> {{ selectedOrder.goldPiece?.description ||
                                 'N/A' }}</p>
                             <p><strong>{{ $t('Weight') }}:</strong> {{ selectedOrder.goldPiece?.weight || 'N/A' }} {{

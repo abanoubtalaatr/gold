@@ -30,8 +30,8 @@ class RentalRequestController extends Controller
     public function index(Request $request)
     {
         $vendorId = Auth::id();
-        $branchIds = Branch::where('vendor_id', $vendorId)->pluck('id');
         $branches = Branch::where('vendor_id', $vendorId)->select('id', 'name')->get();
+        $branchIds = $branches->pluck('id');
         $statuses = [
             OrderRental::STATUS_PENDING_APPROVAL,
             OrderRental::STATUS_APPROVED,
@@ -59,7 +59,7 @@ class RentalRequestController extends Controller
         // Query for rental orders with lease type only
         $ordersQuery = OrderRental::query()
             ->where('type', OrderRental::LEASE_TYPE)
-            // ->whereIn('branch_id', $branchIds)
+            ->whereIn('branch_id', $branchIds)
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->whereHas('user', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")

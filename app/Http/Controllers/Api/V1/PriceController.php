@@ -30,33 +30,28 @@ class PriceController extends Controller
             );
 
             return $this->successResponse([
-                'total_price' => $totalPrice,
+                'total_price' => round($totalPrice, 2),
                 'carat' => $request->carat,
                 'weight' => $request->weight,
-                'rental_days' => $request->number_rental_day
+                'rental_days' => $request->number_rental_day,
+                'deposit' => 100,
             ]);
         } catch (\Exception $e) {
             // Log the error for debugging
-            Log::warning('Gold API unavailable for price calculation', [
-                'error' => $e->getMessage(),
-                'endpoint' => 'index',
-                'carat' => $request->carat,
-                'weight' => $request->weight,
-                'rental_days' => $request->number_rental_day
-            ]);
             
             // Calculate fallback total price
             $fallbackTotalPrice = $this->calculateFallbackTotalPrice(
                 $request->carat,
                 $request->weight,
-                $request->number_rental_day
+                $request->number_rental_day,
             );
             
             return $this->successResponse([
-                'total_price' => $fallbackTotalPrice,
+                'total_price' => round($fallbackTotalPrice, 2),
                 'carat' => $request->carat,
                 'weight' => $request->weight,
-                'rental_days' => $request->number_rental_day
+                'rental_days' => $request->number_rental_day,
+                'deposit' => 100,
             ]);
         }
     }

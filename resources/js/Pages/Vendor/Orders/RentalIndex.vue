@@ -194,21 +194,34 @@
                                             selectedOrder.gold_piece.name :
                                         '--' }}
                                     </p>
-                                    <p><strong>{{ $t('Description') }}:</strong>
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.description ?
-                                            selectedOrder.gold_piece.description :
-                                        '--' }}
+
+                                    
+                                    <p v-if="selectedOrder && selectedOrder.gold_piece && selectedOrder.gold_piece.is_including_lobes">
+                                        <strong>{{ $t('Is Including Lobe') }}:</strong>
+                                        {{ selectedOrder.gold_piece.is_including_lobes ? $t('Yes') : $t('No') }}
                                     </p>
-                                    <p><strong>{{ $t('Type') }}:</strong> {{ selectedOrder.goldPiece?.type === 'rent' ?
-                                        $t('Rental') : $t('Sale') }}</p>
-                                    <p><strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR')
-                                        }}</p>
-                                    <p><strong>{{ $t('Weight') }}:</strong>
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.weight ?
-                                            selectedOrder.gold_piece.weight :
-                                        '--' }}
+
+                                    
+                                    <p v-if="selectedOrder.gold_piece && selectedOrder.gold_piece.carat">
+                                        <strong>{{ $t('Carat') }}:</strong>
+                                        {{ selectedOrder.gold_piece.carat }}
+                                    </p>
+                                    <p>
+                                        <strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR')
+                                        }}
+                                    </p>
+
+                                    <p v-if="selectedOrder.gold_piece && selectedOrder.gold_piece.description">
+                                        <strong>{{ $t('Description') }}:</strong>
+                                        {{ selectedOrder.gold_piece.description }}
+                                    </p>
+                                    
+                                    <p v-if="selectedOrder.gold_piece && selectedOrder.gold_piece.weight">
+                                        <strong>{{ $t('Weight') }}:</strong>
+                                        {{ selectedOrder.gold_piece.weight }}
                                         {{
                                             $t('grams') }}</p>
+
                                     <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || '--' }}</p>
                                     <p><strong>{{ $t('Status') }}:</strong> {{ getDisplayStatus(selectedOrder.status) }}
                                     </p>
