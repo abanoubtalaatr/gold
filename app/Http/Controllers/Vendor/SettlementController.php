@@ -8,12 +8,13 @@ use App\Models\Wallet;
 use Illuminate\Http\Request;
 use App\Models\SettlementRequest;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class SettlementController extends Controller
 {
     public function index()
     {
-        $user = auth()->user()->vendor_id??auth()->user()->id;
+        $user = Auth::user()->vendor_id??Auth::user()->id;
         $wallet = User::find($user)->wallet;
 
         if (!$wallet) {

@@ -27,6 +27,8 @@ class VendorNotificationService
                 ]);
                 return;
             }
+            $order->load('goldPiece');
+             
 
             $vendor = $order->branch->vendor;
             $branch = $order->branch;
@@ -47,15 +49,7 @@ class VendorNotificationService
             // 3. Mark vendor as having new notifications
             $this->markVendorHasNewNotifications($vendor->id);
 
-            Log::info('Vendor notification sent successfully', [
-                'vendor_id' => $vendor->id,
-                'vendor_name' => $vendor->name,
-                'order_id' => $order->id,
-                'order_type' => $orderType,
-                'branch_id' => $branch->id,
-                'branch_name' => $branch->name,
-                'branch_count' => $branchCount,
-            ]);
+           
 
         } catch (\Exception $e) {
             Log::error('Failed to send vendor notification', [

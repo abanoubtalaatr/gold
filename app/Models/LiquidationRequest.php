@@ -24,6 +24,18 @@ class LiquidationRequest extends Model
         'bank_account_swift',
         'bank_account_iban',
         'bank_account_holder_name',
+        'admin_notes',
+        'admin_id',
+        'processed_at',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'processed_at' => 'datetime',
     ];
 
     /**
@@ -32,5 +44,13 @@ class LiquidationRequest extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the admin that processed the liquidation request.
+     */
+    public function admin(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'admin_id');
     }
 }

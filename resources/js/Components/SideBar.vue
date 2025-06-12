@@ -9,6 +9,52 @@
                 </Link>
             </li>
 
+                        <!-- admin roles -->
+                        <li class="nav-item" v-if="hasPermission('read roles') || hasPermission('read permissions')">
+                <a class="nav-link" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#" :class="{
+                    collapsed:
+                        !$page.url.startsWith('/roles') &&
+                        !$page.url.startsWith('/permissions'),
+                }">
+                    <i class="bi bi-lock"></i><span>{{ $t("roles_control") }}</span><i
+                        class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="components-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                    <li>
+                        <Link :href="route('roles.index')" :class="{
+                            collapsed: !$page.url.startsWith('/roles'),
+                        }">
+                        <i class="bi bi-circle"></i>
+                        <span>{{ $t("roles") }}</span>
+                        </Link>
+                    </li>
+                    <!-- <li>
+                <Link   :href="route('permissions.index')"  :class="{ 'collapsed':  !$page.url.startsWith('/permissions') }" >
+            <i class="bi bi-circle"></i>
+            <span>{{$t('permissions') }}</span>
+               </Link>
+            </li> -->
+                </ul>
+            </li>
+
+            <!-- admin users -->
+            <li class="nav-item" v-if="hasPermission('read users')">
+                <Link class="nav-link" :href="route('users.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/users') }">
+                <i class="bi bi-person"></i>
+                <span>{{ $t("Admins") }}</span>
+                </Link>
+            </li>
+
+
+            <li class="nav-item" v-if="hasPermission('read clients')">
+                <Link class="nav-link" :href="route('clients.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/clients') }">
+                <i class="bi bi-person"></i>
+                <span>{{ $t("Clients") }}</span>
+                </Link>
+            </li>
+
             <!-- Admin vendors -->
             <li class="nav-item" v-if="hasPermission('read vendors')">
                 <Link class="nav-link" :href="route('vendors.index')" :class="{
@@ -18,16 +64,62 @@
                 <span>{{ $t("vendors") }}</span>
                 </Link>
             </li>
-
             
-            <!-- users -->
-            <li class="nav-item" v-if="hasPermission('read users')">
-                <Link class="nav-link" :href="route('users.index')"
-                    :class="{ collapsed: !$page.url.startsWith('/users') }">
-                <i class="bi bi-person"></i>
-                <span>{{ $t("Admins") }}</span>
+            <!-- Admin gold pieces -->
+            <li class="nav-item" v-if="hasPermission('read gold-pieces')">
+                <Link class="nav-link" :href="route('admin.gold-pieces.index')" :class="{
+                    collapsed: !$page.url.startsWith('/admin/gold-pieces'),
+                }">
+                <i class="bi bi-shop"></i>
+                <span>{{ $t("Gold pieces") }}</span>
                 </Link>
             </li>
+
+            <li class="nav-item" v-if="hasPermission('read orders')">
+                <Link class="nav-link" :href="route('admin.orders.rental.index')" :class="{
+                    collapsed: !$page.url.startsWith('/admin/orders/rental'),
+                }">
+                <i class="bi bi-shop"></i>
+                <span>{{ $t("Order Rentals") }}</span>
+                </Link>
+            </li>
+
+            <li class="nav-item" v-if="hasPermission('read orders')">
+                <Link class="nav-link" :href="route('admin.orders.sale.index')" :class="{
+                    collapsed: !$page.url.startsWith('/admin/orders/sale'),
+                }">
+                <i class="bi bi-shop"></i>
+                <span>{{ $t("Order sales") }}</span>
+                </Link>
+            </li>
+
+        
+            <!-- admin wallet -->
+            <li class="nav-item" v-if="hasPermission('read wallet')">
+                <Link class="nav-link" :href="route('wallet.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/admin/wallet') }">
+                <i class="bi bi-wallet"></i>
+                <span>{{ $t("Wallet") }}</span>
+                </Link>
+            </li>
+
+            <!-- admin settlement requests -->
+            <li class="nav-item" v-if="hasPermission('read settlement-requests')">
+                <Link class="nav-link" :href="route('admin.settlement-requests-vendor.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/admin/settlement-requests-vendor') }">
+                <i class="bi bi-wallet"></i>
+                <span>{{ $t("Settlement Requests for vendors") }}</span>
+                </Link>
+            </li>
+
+            <li class="nav-item" v-if="hasPermission('read settlement-requests')">
+                <Link class="nav-link" :href="route('admin.settlement-requests-user.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/admin/settlement-requests-user') }">
+                <i class="bi bi-wallet"></i>
+                <span>{{ $t("Settlement Requests for users") }}</span>
+                </Link>
+            </li>
+
 
             <!-- vendor admins -->
             <li class="nav-item" v-if="hasPermission('vendor read users')">
@@ -77,8 +169,7 @@
                 </Link>
             </li>
 
-
-
+            <!-- Vendor branches -->
             <li class="nav-item" v-if="hasPermission('vendor read branches')">
                 <Link class="nav-link" :href="route('vendor.branches.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/branches') }">
@@ -87,33 +178,7 @@
                 </Link>
             </li>
 
-            <!-- roles -->
-            <li class="nav-item" v-if="hasPermission('read roles') || hasPermission('read permissions')">
-                <a class="nav-link" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#" :class="{
-                    collapsed:
-                        !$page.url.startsWith('/roles') &&
-                        !$page.url.startsWith('/permissions'),
-                }">
-                    <i class="bi bi-lock"></i><span>{{ $t("roles_control") }}</span><i
-                        class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="components-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-                    <li>
-                        <Link :href="route('roles.index')" :class="{
-                            collapsed: !$page.url.startsWith('/roles'),
-                        }">
-                        <i class="bi bi-circle"></i>
-                        <span>{{ $t("roles") }}</span>
-                        </Link>
-                    </li>
-                    <!-- <li>
-                <Link   :href="route('permissions.index')"  :class="{ 'collapsed':  !$page.url.startsWith('/permissions') }" >
-            <i class="bi bi-circle"></i>
-            <span>{{$t('permissions') }}</span>
-               </Link>
-            </li> -->
-                </ul>
-            </li>
+            
 
 
             <!-- Complaints -->
@@ -126,7 +191,7 @@
             </li>
 
 
-            <!-- Wallet -->
+            <!-- Vendor wallet -->
             <li class="nav-item" v-if="hasPermission('vendor read wallet')">
                 <Link class="nav-link" :href="route('vendor.wallet.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/wallet') }">
@@ -135,14 +200,7 @@
                 </Link>
             </li>
 
-            <!-- admin wallet -->
-            <li class="nav-item" v-if="hasPermission('read wallet')">
-                <Link class="nav-link" :href="route('wallet.index')"
-                    :class="{ collapsed: !$page.url.startsWith('/admin/wallet') }">
-                <i class="bi bi-wallet"></i>
-                <span>{{ $t("Wallet") }}</span>
-                </Link>
-            </li>
+            
 
             <!-- vendor Settlement Requests -->
             <li class="nav-item" v-if="hasPermission('vendor read settlement-requests')">
@@ -153,23 +211,6 @@
                 </Link>
             </li>
 
-            <!-- admin Wallet -->
-            <!-- <li class="nav-item" v-if="hasPermission('read wallet')">
-                <Link class="nav-link" :href="route('admin.wallet.index')"
-                    :class="{ collapsed: !$page.url.startsWith('/admin/wallet') }">
-                <i class="bi bi-wallet"></i>
-                <span>{{ $t("Settlement Requests") }}</span>
-                </Link>
-            </li> -->
-
-            <!-- admin Wallet -->
-            <!-- <li class="nav-item" v-if="hasPermission('read settlement-requests')">
-                <Link class="nav-link" :href="route('admin.settlement-requests.index')"
-                    :class="{ collapsed: !$page.url.startsWith('/admin/settlement-requests') }">
-                <i class="bi bi-wallet"></i>
-                <span>{{ $t("Settlement Requests") }}</span>
-                </Link>
-            </li> -->
 
             <!-- Reports -->
             <li class="nav-item" v-if="hasPermission('vendor read reports')">

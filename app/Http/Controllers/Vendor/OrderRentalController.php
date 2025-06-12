@@ -2,19 +2,16 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Http\Controllers\Controller;
+use Inertia\Inertia;
 use App\Models\Branch;
-use App\Models\GoldPiece;
 use App\Models\OrderRental;
-use App\Models\OrderSale;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Services\RentalWorkflowService;
+use App\Events\OrderRentalStatusChangeEvent;
 use App\Notifications\Client\GoldPieceAcceptedNotification;
 use App\Notifications\Client\GoldPieceRejectedNotification;
-use App\Services\RentalWorkflowService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Inertia\Inertia;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class OrderRentalController extends Controller
 {
@@ -64,27 +61,19 @@ class OrderRentalController extends Controller
 
     public function accept(Request $request, $orderId)
     {
-
         $order = OrderRental::with(['goldPiece', 'goldPiece.user'])->findOrFail($orderId);
+
         $this->authorizeVendor($order);
-
-        // $request->validate([
-        //     'branch_id' => 'required|exists:branches,id',
-        // ]);
-
-        $order->update([
-            // 'branch_id' => $request->branch_id,
-            'status' => OrderRental::STATUS_APPROVED,
-        ]);
-
         // Notify gold piece owner
         $goldPieceUser = $order->goldPiece?->user;
+
         if ($goldPieceUser) {
-            $goldPieceUser->notify(
-                new GoldPieceAcceptedNotification($order, auth()->user()->name)
-            );
+            $goldPieceUser->notify(new GoldPieceAcceptedNotification($order, Auth::user()->name));
         }
-        Log::info('Order accepted', ['order_id' => $order->id, 'vendor_id' => Auth::id()]);
+
+        $order->update(['status' => OrderRental::STATUS_APPROVED]);
+
+        event(new OrderRentalStatusChangeEvent($order));
 
         return back()->with('success', __('Order accepted successfully'));
     }
@@ -98,50 +87,31 @@ class OrderRentalController extends Controller
 
         // Notify gold piece owner
         $goldPieceUser = $order->goldPiece?->user;
+        event(new OrderRentalStatusChangeEvent($order));
         if ($goldPieceUser) {
             $goldPieceUser->notify(
-                new GoldPieceRejectedNotification($order, auth()->user()->name)
+                new GoldPieceRejectedNotification($order, Auth::user()->name)
             );
         }
-        Log::info('Order rejected', ['order_id' => $order->id, 'vendor_id' => Auth::id()]);
 
         return back();
     }
 
     public function updateStatus(Request $request, $orderId)
     {
-        try {
-            $order = OrderRental::with(['user', 'branch', 'goldPiece'])->findOrFail($orderId);
-            $this->authorizeVendor($order);
+        $order = OrderRental::with(['user', 'branch', 'goldPiece'])->findOrFail($orderId);
+        $this->authorizeVendor($order);
 
-            // Validate the incoming status
-            $request->validate([
-                'status' => 'required|in:pending_approval,approved,piece_sent,rented,available,sold,rejected',
-            ]);
+        // Validate the incoming status
+        $request->validate(['status' => 'required|in:pending_approval,approved,piece_sent,rented,available,sold,rejected',]);
 
-            $newStatus = $request->status;
-            $oldStatus = $order->status;
+        $newStatus = $request->status;
 
-            // Use workflow service for proper status management and notifications
-            $this->rentalWorkflowService->updateStatus($order, $newStatus, Auth::user());
+        // Use workflow service for proper status management and notifications
+        $this->rentalWorkflowService->updateStatus($order, $newStatus, Auth::user());
 
-            Log::info('Order status updated via workflow service', [
-                'order_id' => $order->id,
-                'old_status' => $oldStatus,
-                'new_status' => $newStatus,
-                'vendor_id' => Auth::id()
-            ]);
 
-            return back()->with('success', __('Order status updated successfully'));
-
-        } catch (\Exception $e) {
-            Log::error('Failed to update order status', [
-                'order_id' => $orderId,
-                'error' => $e->getMessage(),
-            ]);
-
-            return back()->with('error', __('Failed to update order status. Please try again.'));
-        }
+        return back()->with('success', __('Order status updated successfully'));
     }
 
     protected function authorizeVendor($order)
@@ -151,9 +121,4 @@ class OrderRentalController extends Controller
             abort(403, 'Unauthorized action.');
         }
     }
-
-
-
-
-
 }

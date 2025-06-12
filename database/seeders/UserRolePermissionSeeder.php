@@ -45,6 +45,7 @@ class UserRolePermissionSeeder extends Seeder
             'reports' => ['create', 'read', 'update', 'delete', 'view'],
             'wallet'=>['read','update'],
             'clients' => ['create', 'read', 'update', 'delete', 'view'],
+            'orders' => ['read', 'update'],
             // Vendor-prefixed permissions
             'vendor' => [
                 'roles' => ['vendor create', 'vendor read', 'vendor update', 'vendor delete', 'vendor view'],
@@ -110,6 +111,7 @@ class UserRolePermissionSeeder extends Seeder
                 'read wallet', 'update wallet',
                 'create gold-pieces', 'read gold-pieces', 'view gold-pieces', 'update gold-pieces', 'delete gold-pieces',
                 'create clients', 'read clients', 'view clients', 'update clients', 'delete clients',
+                'read orders', 'update orders',
             ],
             'admin' => [
                 'create roles', 'read roles', 'view roles', 'update roles', 'delete roles',

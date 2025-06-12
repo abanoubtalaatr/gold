@@ -6,19 +6,15 @@ use App\Models\User;
 use Inertia\Inertia;
 use App\Models\Branch;
 use App\Models\Wallet;
-use App\Models\GoldPiece;
 use App\Models\OrderSale;
 use Illuminate\Http\Request;
 use App\Models\SystemSetting;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\SalesWorkflowService;
 use App\Events\OrderSaleStatusChangedEvent;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Notifications\OrderSaleNotification;
-use App\Notifications\Client\GoldPieceAcceptedNotification;
-use App\Notifications\Client\GoldPieceRejectedNotification;
+use App\Notifications\Client\ChangeOrderStatusNotification;
 
 class OrderSalesController extends Controller
 {
@@ -31,7 +27,7 @@ class OrderSalesController extends Controller
 
     public function index(Request $request)
     {
-        $vendorId = $request->user()->vendor_id??$request->user()->id;
+        $vendorId = $request->user()->vendor_id ?? $request->user()->id;
         $branchIds = Branch::where('vendor_id', $vendorId)->pluck('id');
         $branches = Branch::where('vendor_id', $vendorId)->select('id', 'name')->get();
 
@@ -85,9 +81,6 @@ class OrderSalesController extends Controller
 
         $branch = Branch::findOrFail($request->branch_id);
 
-        // Use the workflow service for proper status management
-        $this->salesWorkflowService->approve($order, $request->branch_id, $request->user());
-
         // send notification to gold piece owner
         $order->user->notify(
             new OrderSaleNotification($order, 'accepted', Auth::user()->name, ['branch_name' => $branch->name])
@@ -95,6 +88,10 @@ class OrderSalesController extends Controller
         // send event to update the order status
         event(new OrderSaleStatusChangedEvent($order));
 
+        $order->update([
+            'branch_id' => $branch->id,
+            'status' => OrderSale::STATUS_APPROVED,
+        ]);
         // delete from order sales except for this accepted branch
         OrderSale::where('id', '!=', $orderId)->where('gold_piece_id', $order->gold_piece_id)->delete();
 
@@ -115,142 +112,111 @@ class OrderSalesController extends Controller
 
     public function reject(Request $request, $orderId)
     {
-        try {
-            $orderId = $orderId; // Store the original ID
-            $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
-            $this->authorizeVendor($order);
+        $orderId = $orderId; // Store the original ID
+        $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
 
-            // Use the workflow service for proper status management
-            $this->salesWorkflowService->reject($order, $request->user());
+        $this->authorizeVendor($order);
 
-            event(new OrderSaleStatusChangedEvent($order));
-            // Notify gold piece owner using the new unified notification
-            if ($order->goldPiece && $order->goldPiece->user) {
-                $order->goldPiece->user->notify(
-                    new OrderSaleNotification(
-                        $order,
-                        'rejected',
-                        Auth::user()->name
-                    )
-                );
-            }
+        $order->update(['status' => OrderSale::STATUS_REJECTED]);
 
-            return back()->with('success', __('Order rejected successfully'));
-        } catch (\Exception $e) {
-            Log::error('Failed to reject sale order', [
-                'order_id' => $orderId ?? $orderId,
-                'error' => $e->getMessage(),
-            ]);
-
-            return back()->with('error', __('Failed to reject order. Please try again.'));
+        event(new OrderSaleStatusChangedEvent($order));
+        $order->user->notify(new ChangeOrderStatusNotification($order, OrderSale::STATUS_REJECTED));
+        if ($order->goldPiece && $order->goldPiece->user) {
+            $order->goldPiece->user->notify(
+                new OrderSaleNotification(
+                    $order,
+                    'rejected',
+                    Auth::user()->name
+                )
+            );
         }
+
+        return back()->with('success', __('Order rejected successfully'));
     }
 
     public function markAsSent(Request $request, $orderId)
     {
-        try {
-            $orderId = $orderId; // Store the original ID
-            $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
-            $this->authorizeVendor($order);
+        $orderId = $orderId; // Store the original ID
+        $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
+        $this->authorizeVendor($order);
 
-            if ($order->status !== OrderSale::STATUS_APPROVED) {
-                return back()->with('error', __('Order must be approved before marking as sent.'));
-            }
-
-            // Use the workflow service for proper status management
-            $this->salesWorkflowService->markAsSent($order, $request->user());
-            event(new OrderSaleStatusChangedEvent($order));
-            // Notify gold piece owner using the new unified notification
-            if ($order->goldPiece && $order->goldPiece->user) {
-                $order->goldPiece->user->notify(
-                    new OrderSaleNotification(
-                        $order,
-                        'piece_sent',
-                        Auth::user()->name
-                    )
-                );
-            }
-
-            return back()->with('success', __('Order marked as sent successfully'));
-        } catch (\Exception $e) {
-            Log::error('Failed to mark sale order as sent', [
-                'order_id' => $orderId ?? $orderId,
-                'error' => $e->getMessage(),
-            ]);
-
-            return back()->with('error', __('Failed to mark order as sent. Please try again.'));
+        if ($order->status !== OrderSale::STATUS_APPROVED) {
+            return back()->with('error', __('Order must be approved before marking as sent.'));
         }
+
+        event(new OrderSaleStatusChangedEvent($order));
+        
+        $order->update(['status' => OrderSale::STATUS_PIECE_SENT]);
+        // Notify gold piece owner using the new unified notification
+        if ($order->goldPiece && $order->goldPiece->user) {
+            $order->goldPiece->user->notify(
+                new OrderSaleNotification(
+                    $order,
+                    'piece_sent',
+                    Auth::user()->name
+                )
+            );
+        }
+
+        return back()->with('success', __('Order marked as sent successfully'));
     }
 
     public function markAsSold(Request $request, $orderId)
     {
-            $orderId = $orderId; // Store the original ID
-            $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
-            $this->authorizeVendor($order);
+        $orderId = $orderId; // Store the original ID
+        $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
+        $this->authorizeVendor($order);
 
-            if ($order->status !== OrderSale::STATUS_PIECE_SENT) {
-                return back()->with('error', __('Order must be marked as sent before marking as sold.'));
-            }
+        if ($order->status !== OrderSale::STATUS_PIECE_SENT) {
+            return back()->with('error', __('Order must be marked as sent before marking as sold.'));
+        }
 
-            event(new OrderSaleStatusChangedEvent($order));
+        event(new OrderSaleStatusChangedEvent($order));
 
-            // Use the workflow service for proper status management and wallet transactions
-            $result = $this->salesWorkflowService->markAsSold($order, $request->user());
+        $order->update(['status' => OrderSale::STATUS_SOLD]);
 
-            // Notify gold piece owner using the new unified notification
-            if ($order->goldPiece && $order->goldPiece->user) {
-                $order->goldPiece->user->notify(
-                    new OrderSaleNotification(
-                        $order,
-                        'sold',
-                        Auth::user()->name,
-                        ['commission_amount' => $result['commission_amount']]
-                    )
-                );
-            }
+        // Notify gold piece owner using the new unified notification
+        if ($order->goldPiece && $order->goldPiece->user) {
+            $order->user->notify(new ChangeOrderStatusNotification($order, OrderSale::STATUS_SOLD));
+        }
 
-            // Get commission details for success message
-            $totalPrice = $order->total_price;
-            $settings = SystemSetting::first();
-            $merchantCommission = $settings->merchant_commission_percentage ?? 0;
-            $platformCommission = $settings->platform_commission_percentage ?? 0;
+        // Get commission details for success message
+        $totalPrice = $order->total_price;
+        $settings = SystemSetting::first();
+        $merchantCommission = $settings->merchant_commission_percentage ?? 0;
+        $platformCommission = $settings->platform_commission_percentage ?? 0;
 
-            $vendorAmount = ($totalPrice * $merchantCommission) / 100;
-            $platformAmount = ($totalPrice * $platformCommission) / 100;
+        $vendorAmount = ($totalPrice * $merchantCommission) / 100;
+        $platformAmount = ($totalPrice * $platformCommission) / 100;
 
-            // dd($order->total_price,$vendorAmount, $platformAmount,$merchantCommission, $platformCommission  );
+        $successMessage = __(
+            'Order marked as sold successfully! Vendor commission: :vendor_amount SAR (:vendor_percent%), Platform commission: :platform_amount SAR (:platform_percent%)',
+            [
+                'vendor_amount' => number_format($vendorAmount, 2),
+                'vendor_percent' => $merchantCommission,
+                'platform_amount' => number_format($platformAmount, 2),
+                'platform_percent' => $platformCommission
+            ]
+        );
 
-            $successMessage = __(
-                'Order marked as sold successfully! Vendor commission: :vendor_amount SAR (:vendor_percent%), Platform commission: :platform_amount SAR (:platform_percent%)',
-                [
-                    'vendor_amount' => number_format($vendorAmount, 2),
-                    'vendor_percent' => $merchantCommission,
-                    'platform_amount' => number_format($platformAmount, 2),
-                    'platform_percent' => $platformCommission
-                ]
-            );
+        $vendorWallet = Wallet::where('user_id', Auth::id())->first();
 
-            // i want for vendor first check if the wallet is exist or not if not create new one
-            $vendorWallet = Wallet::where('user_id', auth()->id())->first();
+        if (!$vendorWallet) {
+            $vendorWallet = Wallet::create([
+                'user_id' => $order->user_id,
+            ]);
+        }
 
-            if (!$vendorWallet) {
-                $vendorWallet = Wallet::create([
-                    'user_id' => $order->user_id,
-                ]);
-            }
+        $vendorWallet->credit($vendorAmount, 'Vendor commission for order #' . $order->id);
+        $vendorWallet->update(['balance' => $vendorWallet->balance + $vendorAmount, 'pending_balance' => $vendorWallet->pending_balance + $vendorAmount]);
 
+        // create wallet transaction for the platform
+        $platformWallet = Wallet::where('user_id', User::where('email', 'admin@admin.com')->first()->id)->first();
 
-            // create wallet transaction for the vendor
-            $vendorWallet->credit($vendorAmount, 'Vendor commission for order #' . $order->id);
-            $vendorWallet->update(['balance' => $vendorWallet->balance + $vendorAmount,'pending_balance' => $vendorWallet->pending_balance + $vendorAmount]);
+        $platformWallet->credit($platformAmount, 'Platform commission for order #' . $order->id);
+        $platformWallet->update(['balance' => $platformWallet->balance + $platformAmount, 'pending_balance' => $platformWallet->pending_balance + $platformAmount]);
 
-            // create wallet transaction for the platform
-            $platformWallet = Wallet::where('user_id', User::where('email', 'admin@admin.com')->first()->id)->first();
-
-            $platformWallet->credit($platformAmount, 'Platform commission for order #' . $order->id);
-            $platformWallet->update(['balance' => $platformWallet->balance + $platformAmount,'pending_balance' => $platformWallet->pending_balance + $platformAmount]);
-        
-            return back()->with('success', $successMessage);
+        return back()->with('success', $successMessage);
     }
 
     public function updateStatus(Request $request, $orderId)
@@ -263,11 +229,11 @@ class OrderSalesController extends Controller
             'status' => 'required|in:pending_approval,approved,piece_sent,sold,rejected',
         ]);
 
-        // Update the order with the new status directly (no need for mapping since we're using the same values)
-        $order->update(['status' => $request->status]);
         event(new OrderSaleStatusChangedEvent($order));
-        // Log the status update
-        Log::info('Order status updated', ['order_id' => $order->id, 'status' => $request->status]);
+
+        $order->user->notify(new ChangeOrderStatusNotification($order, $request->status));
+        
+        $order->update(['status' => $request->status]);
 
         return back()->with('success', __('Order status updated successfully'));
     }

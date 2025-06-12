@@ -121,18 +121,18 @@
                                         <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Rental Period') }}</th>
-                                        <th
+                                        <!-- <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $t('Days') }}</th>
+                                            {{ $t('Days') }}</th> -->
                                         <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Price') }}</th>
                                         <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Status') }}</th>
-                                        <th
+                                        <!-- <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $t('Actions') }}</th>
+                                            {{ $t('Actions') }}</th> -->
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -148,16 +148,16 @@
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
-                                            <button @click="showDetails(order)" class="order-name">
-                                                {{ order.gold_piece?.name || 'N/A' }}
+                                            <button class="bg-none border-none">
+                                                {{ order.gold_piece?.name || '--' }}
                                             </button>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ formatDate(order.start_date) }} - {{ formatDate(order.end_date) }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ order.rental_days }}
-                                        </td>
+                                        </td> -->
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ order.total_price }} {{ $t('SAR') }}
                                         </td>
@@ -167,11 +167,11 @@
                                                 {{ getStatusGroupClass(order.status).text }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <!-- <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <button @click="showDetails(order)" class="show-button py-2 px-4 rounded">
                                                 {{ $t('View') }}
                                             </button>
-                                        </td>
+                                        </td> -->
                                     </tr>
                                 </tbody>
                             </table>

@@ -16,6 +16,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\RentalWorkflowService;
 use App\Events\OrderRentalStatusChangeEvent;
+use App\Notifications\Client\ChangeOrderStatusNotification;
 
 class RentalRequestController extends Controller
 {
@@ -244,41 +245,45 @@ class RentalRequestController extends Controller
 
         $order->status = OrderRental::STATUS_APPROVED;
         $order->save();
+               
         event(new OrderRentalStatusChangeEvent($order, $request->user()));
+
+        $order->user->notify(new ChangeOrderStatusNotification($order, OrderRental::STATUS_APPROVED));
 
         return back()->with('success', __('Order accepted successfully'));
     }
 
-
-
-
     public function reject(Request $request, $order)
-    {
-        $orderId = $order; // Store the original ID
+    { 
         $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
+      
         $this->authorizeVendor($order);
 
-        // Use the workflow service for proper status management
-        $this->rentalWorkflowService->reject($order, $request->user());
+        event(new OrderRentalStatusChangeEvent($order, $request->user()));
+
+        $order->user->notify(new ChangeOrderStatusNotification($order, OrderRental::STATUS_REJECTED));
+      
+        $order->update(['status' => OrderRental::STATUS_REJECTED]);
 
         return back()->with('success', __('Order rejected successfully'));
     }
 
     public function markAsSent(Request $request, $order)
     {
-
-        $orderId = $order; // Store the original ID
         $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
+     
         $this->authorizeVendor($order);
 
         if ($order->status !== OrderRental::STATUS_APPROVED) {
             return back()->with('error', __('Order must be approved before marking as sent.'));
         }
-
-        // Use the workflow service for proper status management
+       
         $order->status = OrderRental::STATUS_PIECE_SENT;
         $order->save();
+
         event(new OrderRentalStatusChangeEvent($order, $request->user()));
+        $order->user->notify(new ChangeOrderStatusNotification($order, OrderRental::STATUS_PIECE_SENT));
+
         return back()->with('success', __('Order marked as sent successfully'));
     }
 
@@ -299,7 +304,7 @@ class RentalRequestController extends Controller
         $platformAmount = ($totalPrice * $platformCommission) / 100;
 
         // i want for vendor first check if the wallet is exist or not if not create new one
-        $vendorWallet = Wallet::where('user_id', auth()->id())->first();
+        $vendorWallet = Wallet::where('user_id', Auth::id())->first();
 
         if (!$vendorWallet) {
             $vendorWallet = Wallet::create([
@@ -318,7 +323,10 @@ class RentalRequestController extends Controller
         // Use the workflow service for proper status management
         $order->status = OrderRental::STATUS_RENTED;
         $order->save();
+      
         event(new OrderRentalStatusChangeEvent($order, $request->user()));
+
+        $order->user->notify(new ChangeOrderStatusNotification($order, OrderRental::STATUS_RENTED));
 
         return back()->with('success', __('Rental confirmed successfully'));
     }

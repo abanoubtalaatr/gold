@@ -54,11 +54,13 @@ class NewOrderNotification extends Notification implements ShouldQueue
         $typeAr = match($this->orderType) {
             'rental' => 'تأجير',
             'lease' => 'استئجار',
+            'sale' => 'بيع',
             default => 'شراء'
         };
         $typeEn = match($this->orderType) {
             'rental' => 'rental',
             'lease' => 'lease',
+            'sale' => 'sale',
             default => 'purchase'
         };
 

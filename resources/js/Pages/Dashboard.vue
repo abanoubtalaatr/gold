@@ -43,7 +43,7 @@
                                         <input type="date" class="form-control" v-model="filters.end_date">
                                     </div>
                                     <div class="col-md-3 d-flex align-items-end">
-                                        <button type="submit" class="btn btn-primary me-2">{{ $t('apply') }}</button>
+                                        <button type="submit" class="btn btn-primary me-2">{{ $t('Apply') }}</button>
                                         <button type="button" class="btn btn-secondary" @click="resetFilters">{{
                                             $t('reset') }}</button>
                                     </div>

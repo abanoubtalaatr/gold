@@ -7,6 +7,7 @@ use App\Traits\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Services\GoldPriceService;
 use App\Http\Requests\Api\V1\PriceRequest;
+use Illuminate\Support\Facades\Log;
 
 class PriceController extends Controller
 {
@@ -35,7 +36,28 @@ class PriceController extends Controller
                 'rental_days' => $request->number_rental_day
             ]);
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to calculate price: ' . $e->getMessage(), 500);
+            // Log the error for debugging
+            Log::warning('Gold API unavailable for price calculation', [
+                'error' => $e->getMessage(),
+                'endpoint' => 'index',
+                'carat' => $request->carat,
+                'weight' => $request->weight,
+                'rental_days' => $request->number_rental_day
+            ]);
+            
+            // Calculate fallback total price
+            $fallbackTotalPrice = $this->calculateFallbackTotalPrice(
+                $request->carat,
+                $request->weight,
+                $request->number_rental_day
+            );
+            
+            return $this->successResponse([
+                'total_price' => $fallbackTotalPrice,
+                'carat' => $request->carat,
+                'weight' => $request->weight,
+                'rental_days' => $request->number_rental_day
+            ]);
         }
     }
 
@@ -48,7 +70,15 @@ class PriceController extends Controller
             $data = $this->goldPriceService->getStructuredGoldPrices();
             return $this->successResponse($data);
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to fetch structured prices: ' . $e->getMessage(), 500);
+            // Log the error for debugging
+            Log::warning('Gold API unavailable for structured prices', [
+                'error' => $e->getMessage(),
+                'endpoint' => 'structuredPrices'
+            ]);
+            
+            // Return fallback structured data
+            $fallbackData = $this->getFallbackStructuredPrices();
+            return $this->successResponse($fallbackData);
         }
     }
 
@@ -61,6 +91,12 @@ class PriceController extends Controller
             $data = $this->goldPriceService->getMobileFormattedPrices();
             return $this->successResponse($data);
         } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::warning('Gold API unavailable, using fallback data', [
+                'error' => $e->getMessage(),
+                'endpoint' => 'mobileFormattedPrices'
+            ]);
+            
             // Return fallback data with same structure when API fails
             $fallbackData = $this->getFallbackMobileFormattedPrices();
             return $this->successResponse($fallbackData);
@@ -172,7 +208,24 @@ class PriceController extends Controller
 
             return $this->successResponse($breakdown);
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to get price breakdown: ' . $e->getMessage(), 500);
+            // Log the error for debugging
+            Log::warning('Gold API unavailable for price breakdown by type', [
+                'error' => $e->getMessage(),
+                'endpoint' => 'priceBreakdownByType',
+                'carat' => $request->carat,
+                'weight' => $request->weight,
+                'type' => $request->type,
+                'rental_days' => $request->rental_days
+            ]);
+            
+            // Return fallback price breakdown by type
+            $fallbackBreakdown = $this->getFallbackPriceBreakdownByType(
+                $request->carat,
+                $request->weight,
+                $request->type,
+                $request->rental_days
+            );
+            return $this->successResponse($fallbackBreakdown);
         }
     }
 
@@ -197,7 +250,15 @@ class PriceController extends Controller
             $adjustedData = $this->goldPriceService->getFormattedRealTimePricesWithAdjustments();
             return $this->successResponse($adjustedData);
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to fetch real-time prices: ' . $e->getMessage(), 500);
+            // Log the error for debugging
+            Log::warning('Gold API unavailable for real-time prices', [
+                'error' => $e->getMessage(),
+                'endpoint' => 'realTimePrice'
+            ]);
+            
+            // Return fallback real-time data
+            $fallbackData = $this->getFallbackRealTimePrices();
+            return $this->successResponse($fallbackData);
         }
     }
 
@@ -210,7 +271,15 @@ class PriceController extends Controller
             $data = $this->goldPriceService->getFormattedRealTimePrices();
             return $this->successResponse($data);
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to fetch raw real-time prices: ' . $e->getMessage(), 500);
+            // Log the error for debugging
+            Log::warning('Gold API unavailable for raw real-time prices', [
+                'error' => $e->getMessage(),
+                'endpoint' => 'rawRealTimePrice'
+            ]);
+            
+            // Return fallback raw data
+            $fallbackData = $this->getFallbackRawRealTimePrices();
+            return $this->successResponse($fallbackData);
         }
     }
 
@@ -223,7 +292,15 @@ class PriceController extends Controller
             $data = $this->goldPriceService->getMarketDataWithAdjustments();
             return $this->successResponse($data);
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to fetch adjusted prices: ' . $e->getMessage(), 500);
+            // Log the error for debugging
+            Log::warning('Gold API unavailable for adjusted prices', [
+                'error' => $e->getMessage(),
+                'endpoint' => 'adjustedPrices'
+            ]);
+            
+            // Return fallback adjusted data
+            $fallbackData = $this->getFallbackAdjustedPrices();
+            return $this->successResponse($fallbackData);
         }
     }
 
@@ -245,7 +322,20 @@ class PriceController extends Controller
                 'currency' => 'SAR'
             ]);
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to fetch price for carat: ' . $e->getMessage(), 500);
+            // Log the error for debugging
+            Log::warning('Gold API unavailable for price per carat', [
+                'error' => $e->getMessage(),
+                'endpoint' => 'priceForCarat',
+                'carat' => $request->carat
+            ]);
+            
+            // Return fallback price for the requested carat
+            $fallbackPrice = $this->getFallbackPriceForCarat($request->carat);
+            return $this->successResponse([
+                'carat' => $request->carat,
+                'price_per_gram' => $fallbackPrice,
+                'currency' => 'SAR'
+            ]);
         }
     }
 
@@ -263,7 +353,359 @@ class PriceController extends Controller
 
             return $this->successResponse($breakdown);
         } catch (\Exception $e) {
-            return $this->errorResponse('Failed to get price breakdown: ' . $e->getMessage(), 500);
+            // Log the error for debugging
+            Log::warning('Gold API unavailable for price breakdown', [
+                'error' => $e->getMessage(),
+                'endpoint' => 'priceBreakdown',
+                'carat' => $request->carat,
+                'weight' => $request->weight,
+                'rental_days' => $request->number_rental_day
+            ]);
+            
+            // Return fallback price breakdown
+            $fallbackBreakdown = $this->getFallbackPriceBreakdown(
+                $request->carat,
+                $request->weight,
+                $request->number_rental_day
+            );
+            return $this->successResponse($fallbackBreakdown);
         }
+    }
+
+    /**
+     * Get fallback structured prices when API is unavailable
+     */
+    private function getFallbackStructuredPrices(): array
+    {
+        return [
+            'timestamp' => now()->toISOString(),
+            'currency' => 'SAR',
+            'prices' => [
+                '24' => [
+                    'carat' => '24',
+                    'original_price' => 403.39,
+                    'buy_price' => 393.39,
+                    'sell_price' => 418.39,
+                    'rental_price_per_day' => 4.03,
+                    'buy_adjustment' => -10,
+                    'sell_adjustment' => 15,
+                    'price_change_indicator' => 'same',
+                ],
+                '22' => [
+                    'carat' => '22',
+                    'original_price' => 369.78,
+                    'buy_price' => 354.78,
+                    'sell_price' => 389.78,
+                    'rental_price_per_day' => 3.70,
+                    'buy_adjustment' => -15,
+                    'sell_adjustment' => 20,
+                    'price_change_indicator' => 'same',
+                ],
+                '21' => [
+                    'carat' => '21',
+                    'original_price' => 352.97,
+                    'buy_price' => 332.97,
+                    'sell_price' => 377.97,
+                    'rental_price_per_day' => 3.53,
+                    'buy_adjustment' => -20,
+                    'sell_adjustment' => 25,
+                    'price_change_indicator' => 'same',
+                ],
+                '20' => [
+                    'carat' => '20',
+                    'original_price' => 336.16,
+                    'buy_price' => 311.16,
+                    'sell_price' => 366.16,
+                    'rental_price_per_day' => 3.36,
+                    'buy_adjustment' => -25,
+                    'sell_adjustment' => 30,
+                    'price_change_indicator' => 'same',
+                ],
+                '18' => [
+                    'carat' => '18',
+                    'original_price' => 302.54,
+                    'buy_price' => 272.54,
+                    'sell_price' => 337.54,
+                    'rental_price_per_day' => 3.03,
+                    'buy_adjustment' => -30,
+                    'sell_adjustment' => 35,
+                    'price_change_indicator' => 'same',
+                ],
+                '16' => [
+                    'carat' => '16',
+                    'original_price' => 268.93,
+                    'buy_price' => 233.93,
+                    'sell_price' => 308.93,
+                    'rental_price_per_day' => 2.69,
+                    'buy_adjustment' => -35,
+                    'sell_adjustment' => 40,
+                    'price_change_indicator' => 'same',
+                ],
+                '14' => [
+                    'carat' => '14',
+                    'original_price' => 235.31,
+                    'buy_price' => 195.31,
+                    'sell_price' => 280.31,
+                    'rental_price_per_day' => 2.35,
+                    'buy_adjustment' => -40,
+                    'sell_adjustment' => 45,
+                    'price_change_indicator' => 'same',
+                ],
+                '10' => [
+                    'carat' => '10',
+                    'original_price' => 168.08,
+                    'buy_price' => 123.08,
+                    'sell_price' => 218.08,
+                    'rental_price_per_day' => 1.68,
+                    'buy_adjustment' => -45,
+                    'sell_adjustment' => 50,
+                    'price_change_indicator' => 'same',
+                ],
+            ],
+            'market_info' => [
+                'metal' => 'XAU',
+                'exchange' => 'LBMA',
+                'symbol' => 'XAU/SAR',
+            ]
+        ];
+    }
+
+    /**
+     * Get fallback real-time prices when API is unavailable
+     */
+    private function getFallbackRealTimePrices(): array
+    {
+        return [
+            'timestamp' => now()->timestamp,
+            'metal' => 'XAU',
+            'currency' => 'SAR',
+            'exchange' => 'LBMA',
+            'symbol' => 'XAU/SAR',
+            'ask' => 408.39,
+            'bid' => 398.39,
+            'price' => 403.39,
+            'ch' => 0.00,
+            'price_gram_24k' => 418.39,
+            'price_gram_22k' => 389.78,
+            'price_gram_21k' => 377.97,
+            'price_gram_20k' => 366.16,
+            'price_gram_18k' => 337.54,
+            'price_gram_16k' => 308.93,
+            'price_gram_14k' => 280.31,
+            'price_gram_10k' => 218.08,
+        ];
+    }
+
+    /**
+     * Get fallback raw real-time prices when API is unavailable
+     */
+    private function getFallbackRawRealTimePrices(): array
+    {
+        return [
+            'timestamp' => now()->timestamp,
+            'metal' => 'XAU',
+            'currency' => 'SAR',
+            'exchange' => 'LBMA',
+            'symbol' => 'XAU/SAR',
+            'ask' => 403.39,
+            'bid' => 393.39,
+            'price' => 398.39,
+            'ch' => 0.00,
+            'price_gram_24k' => 403.39,
+            'price_gram_22k' => 369.78,
+            'price_gram_21k' => 352.97,
+            'price_gram_20k' => 336.16,
+            'price_gram_18k' => 302.54,
+            'price_gram_16k' => 268.93,
+            'price_gram_14k' => 235.31,
+            'price_gram_10k' => 168.08,
+        ];
+    }
+
+    /**
+     * Get fallback adjusted prices when API is unavailable
+     */
+    private function getFallbackAdjustedPrices(): array
+    {
+        return [
+            'timestamp' => now()->timestamp,
+            'metal' => 'XAU',
+            'currency' => 'SAR',
+            'exchange' => 'LBMA',
+            'symbol' => 'XAU/SAR',
+            'original_prices' => [
+                'price_gram_24k' => 403.39,
+                'price_gram_22k' => 369.78,
+                'price_gram_21k' => 352.97,
+                'price_gram_20k' => 336.16,
+                'price_gram_18k' => 302.54,
+                'price_gram_16k' => 268.93,
+                'price_gram_14k' => 235.31,
+                'price_gram_10k' => 168.08,
+            ],
+            'adjusted_prices' => [
+                '24' => 408.39,
+                '22' => 374.78,
+                '21' => 362.97,
+                '20' => 351.16,
+                '18' => 322.54,
+                '16' => 293.93,
+                '14' => 265.31,
+                '10' => 203.08,
+            ],
+            'adjustments' => [
+                '24' => 5,
+                '22' => 5,
+                '21' => 10,
+                '20' => 15,
+                '18' => 20,
+                '16' => 25,
+                '14' => 30,
+                '10' => 35,
+            ]
+        ];
+    }
+
+    /**
+     * Get fallback price for specific carat
+     */
+    private function getFallbackPriceForCarat(string $carat): float
+    {
+        $fallbackPrices = [
+            '24' => 408.39,
+            '22' => 374.78,
+            '21' => 362.97,
+            '20' => 351.16,
+            '18' => 322.54,
+            '16' => 293.93,
+            '14' => 265.31,
+            '10' => 203.08,
+        ];
+
+        return $fallbackPrices[$carat] ?? 0;
+    }
+
+    /**
+     * Get fallback price breakdown
+     */
+    private function getFallbackPriceBreakdown(string $carat, float $weight, ?int $rentalDays = null): array
+    {
+        $fallbackBasePrices = [
+            '24' => 403.39,
+            '22' => 369.78,
+            '21' => 352.97,
+            '20' => 336.16,
+            '18' => 302.54,
+            '16' => 268.93,
+            '14' => 235.31,
+            '10' => 168.08,
+        ];
+
+        $adjustments = [
+            '24' => 5,
+            '22' => 5,
+            '21' => 10,
+            '20' => 15,
+            '18' => 20,
+            '16' => 25,
+            '14' => 30,
+            '10' => 35,
+        ];
+
+        $basePrice = $fallbackBasePrices[$carat] ?? 0;
+        $adjustment = $adjustments[$carat] ?? 0;
+        $adjustedPricePerGram = $basePrice + $adjustment;
+        $subtotal = round($adjustedPricePerGram * $weight, 2);
+        
+        $breakdown = [
+            'carat' => $carat,
+            'weight' => $weight,
+            'base_price_per_gram' => $basePrice,
+            'adjustment_per_gram' => $adjustment,
+            'final_price_per_gram' => $adjustedPricePerGram,
+            'subtotal' => $subtotal,
+            'rental_days' => $rentalDays,
+            'rental_cost' => 0,
+            'total' => $subtotal
+        ];
+
+        if ($rentalDays) {
+            $dailyRate = 0.01; // 1% per day
+            $rentalCostPerDay = $adjustedPricePerGram * $dailyRate;
+            $rentalCost = round($rentalCostPerDay * $weight * $rentalDays, 2);
+            $breakdown['rental_cost'] = $rentalCost;
+            $breakdown['total'] = round($subtotal + $rentalCost, 2);
+        }
+
+        return $breakdown;
+    }
+
+    /**
+     * Calculate fallback total price
+     */
+    private function calculateFallbackTotalPrice(string $carat, float $weight, ?int $rentalDays = null): float
+    {
+        $fallbackPrices = [
+            '24' => 408.39,
+            '22' => 374.78,
+            '21' => 362.97,
+            '20' => 351.16,
+            '18' => 322.54,
+            '16' => 293.93,
+            '14' => 265.31,
+            '10' => 203.08,
+        ];
+
+        $pricePerGram = $fallbackPrices[$carat] ?? 0;
+        $totalPrice = $pricePerGram * $weight;
+
+        // Add rental cost if applicable
+        if ($rentalDays) {
+            $dailyRate = 0.01; // 1% per day
+            $rentalCostPerDay = $pricePerGram * $dailyRate;
+            $totalPrice += $rentalCostPerDay * $weight * $rentalDays;
+        }
+
+        return round($totalPrice, 2);
+    }
+
+    /**
+     * Get fallback price breakdown by type
+     */
+    private function getFallbackPriceBreakdownByType(string $carat, float $weight, string $type = 'buy', ?int $rentalDays = null): array
+    {
+        $fallbackStructuredPrices = $this->getFallbackStructuredPrices();
+        
+        if (!isset($fallbackStructuredPrices['prices'][$carat])) {
+            throw new \InvalidArgumentException("Price for {$carat}k carat not found");
+        }
+        
+        $caratData = $fallbackStructuredPrices['prices'][$carat];
+        $pricePerGram = match($type) {
+            'buy' => $caratData['buy_price'],
+            'sell' => $caratData['sell_price'],
+            'rental' => $caratData['rental_price_per_day'],
+            default => throw new \InvalidArgumentException("Invalid transaction type: {$type}")
+        };
+        
+        $breakdown = [
+            'carat' => $carat,
+            'weight' => $weight,
+            'transaction_type' => $type,
+            'original_price_per_gram' => $caratData['original_price'],
+            'final_price_per_gram' => $pricePerGram,
+            'adjustment' => $caratData["{$type}_adjustment"] ?? 0,
+            'subtotal' => round($pricePerGram * $weight, 2),
+            'rental_days' => $rentalDays,
+            'total' => 0
+        ];
+        
+        if ($type === 'rental' && $rentalDays) {
+            $breakdown['total'] = round($pricePerGram * $weight * $rentalDays, 2);
+        } else {
+            $breakdown['total'] = $breakdown['subtotal'];
+        }
+        
+        return $breakdown;
     }
 }

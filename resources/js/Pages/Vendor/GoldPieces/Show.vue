@@ -90,17 +90,7 @@
                                                 </span>
                                             </dd>
                                         </div>
-                                        <div>
-                                            <dt class="text-sm font-medium text-gray-500">{{ $t('Status') }}</dt>
-                                            <dd class="mt-1 text-sm text-gray-900">
-                                                <span :class="[
-                                                    'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
-                                                    statusClass(goldPiece.status)
-                                                ]">
-                                                    {{ $t(statusText(goldPiece.status)) }}
-                                                </span>
-                                            </dd>
-                                        </div>
+                                       
                                     </dl>
                                 </div>
 

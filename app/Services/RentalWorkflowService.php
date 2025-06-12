@@ -38,31 +38,14 @@ class RentalWorkflowService
             $this->handleStatusTransition($order, $oldStatus, $newStatus);
 
             // Send enhanced real-time notifications
-            $this->sendRealTimeNotifications($order, $oldStatus, $newStatus, $actor);
+            // $this->sendRealTimeNotifications($order, $oldStatus, $newStatus, $actor);
 
             DB::commit();
-
-            Log::info('Rental status updated successfully', [
-                'order_id' => $order->id,
-                'old_status' => $oldStatus,
-                'new_status' => $newStatus,
-                'actor_id' => $actor?->id,
-                'actor_type' => $actor ? class_basename($actor) : null,
-            ]);
-
             return true;
 
         } catch (\Exception $e) {
             DB::rollBack();
             
-            Log::error('Failed to update rental status', [
-                'order_id' => $order->id,
-                'old_status' => $oldStatus,
-                'new_status' => $newStatus,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
             throw $e;
         }
     }
@@ -78,7 +61,7 @@ class RentalWorkflowService
         $order->update(['status' => OrderRental::STATUS_APPROVED]);
         
         $this->handleStatusTransition($order, $oldStatus, OrderRental::STATUS_APPROVED);
-        $this->realTimeNotificationService->sendCriticalNotification($order, $oldStatus, OrderRental::STATUS_APPROVED, $actor);
+        // $this->realTimeNotificationService->sendCriticalNotification($order, $oldStatus, OrderRental::STATUS_APPROVED, $actor);
         
         return true;
     }
