@@ -53,24 +53,49 @@ class AdminOrderRentalController extends Controller
         ]);
     }
 
+    // public function accept(Request $request, $orderId)
+    // {
+    //     $order = OrderRental::with(['goldPiece', 'goldPiece.user'])->findOrFail($orderId);
+
+    //     // Notify gold piece owner
+    //     $goldPieceUser = $order->goldPiece?->user;
+
+    //     if ($goldPieceUser) {
+    //         $goldPieceUser->notify(new GoldPieceAcceptedNotification($order, 'Admin'));
+    //     }
+
+    //     $order->update(['status' => OrderRental::STATUS_APPROVED]);
+
+    //     event(new OrderRentalStatusChangeEvent($order));
+
+    //     return back()->with('success', __('Order accepted successfully'));
+    // }
+
+
     public function accept(Request $request, $orderId)
-    {
-        $order = OrderRental::with(['goldPiece', 'goldPiece.user'])->findOrFail($orderId);
+{
+    $request->validate([
+        'branch_id' => 'required|exists:branches,id'
+    ]);
 
-        // Notify gold piece owner
-        $goldPieceUser = $order->goldPiece?->user;
+    $order = OrderRental::with(['goldPiece', 'goldPiece.user'])->findOrFail($orderId);
 
-        if ($goldPieceUser) {
-            $goldPieceUser->notify(new GoldPieceAcceptedNotification($order, 'Admin'));
-        }
+    // Update order with branch_id and status
+    $order->update([
+        'branch_id' => $request->branch_id,
+        'status' => OrderRental::STATUS_APPROVED
+    ]);
 
-        $order->update(['status' => OrderRental::STATUS_APPROVED]);
-
-        event(new OrderRentalStatusChangeEvent($order));
-
-        return back()->with('success', __('Order accepted successfully'));
+    // Notify gold piece owner
+    $goldPieceUser = $order->goldPiece?->user;
+    if ($goldPieceUser) {
+        $goldPieceUser->notify(new GoldPieceAcceptedNotification($order, 'Admin'));
     }
 
+    event(new OrderRentalStatusChangeEvent($order));
+
+    return back()->with('success', __('Order accepted successfully'));
+}
     public function reject(Request $request, $orderId)
     {
         $order = OrderRental::with(['goldPiece', 'goldPiece.user'])->findOrFail($orderId);

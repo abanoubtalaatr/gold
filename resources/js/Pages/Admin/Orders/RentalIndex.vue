@@ -1,4 +1,5 @@
 <template>
+
     <Head title="Rental Orders" />
 
     <AuthenticatedLayout>
@@ -30,6 +31,7 @@
                                     <option value="pending_approval">{{ $t('Pending Approval') }}</option>
                                     <option value="approved">{{ $t('Approved') }}</option>
                                     <option value="rejected">{{ $t('Rejected') }}</option>
+                                    <option value="rented">{{ $t('rented') }}</option>
                                 </select>
                                 <button @click="resetFilters"
                                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
@@ -43,25 +45,32 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Order ID') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('User') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Gold Piece') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Branch') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Price') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Status') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Actions') }}
                                         </th>
                                     </tr>
@@ -91,14 +100,15 @@
                                             {{ order.total_price }} {{ $t('SAR') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(order.status)]">
+                                            <span
+                                                :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(order.status)]">
                                                 {{ formatStatus(order.status) }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex items-center space-x-2">
                                                 <button v-if="order.status === 'pending_approval'"
-                                                    @click="acceptOrder(order)"
+                                                    @click="openAcceptModal(order)"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors duration-200">
                                                     {{ $t('Accept') }}
                                                 </button>
@@ -107,16 +117,16 @@
                                                     class="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors duration-200">
                                                     {{ $t('Reject') }}
                                                 </button>
-                                                <button v-if="order.status === 'approved'"
+                                                <!-- <button v-if="order.status === 'approved'"
                                                     @click="updateStatus(order.id, 'piece_sent')"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-200">
                                                     {{ $t('Mark as Sent') }}
-                                                </button>
-                                                <button v-if="order.status === 'piece_sent'"
+                                                </button> -->
+                                                <!-- <button v-if="order.status === 'piece_sent'"
                                                     @click="updateStatus(order.id, 'rented')"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 transition-colors duration-200">
                                                     {{ $t('Mark as Rented') }}
-                                                </button>
+                                                </button> -->
                                             </div>
                                         </td>
                                     </tr>
@@ -131,6 +141,45 @@
                 </div>
             </div>
         </div>
+
+        <!-- Accept Order Modal -->
+        <Modal :show="showAcceptModal" @close="closeAcceptModal">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
+                <div class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg w-full">
+                    <div class="p-6">
+                        <h2 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Accept Rental Order') }}</h2>
+                        <p class="mb-4 text-sm text-gray-600">{{ $t('Select a branch for this rental order.') }}</p>
+
+                        <form @submit.prevent="acceptOrder">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Branch') }}</label>
+                                <select v-model="acceptForm.branch_id" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="" disabled>{{ $t('Select a branch') }}</option>
+                                    <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                                        {{ branch.name }}
+                                    </option>
+                                </select>
+                                <p v-if="acceptForm.errors.branch_id" class="mt-1 text-sm text-red-600">
+                                    {{ acceptForm.errors.branch_id }}
+                                </p>
+                            </div>
+
+                            <div class="flex justify-end space-x-3 pt-4">
+                                <button type="button" @click="closeAcceptModal"
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                                    {{ $t('Cancel') }}
+                                </button>
+                                <button type="submit" :disabled="acceptForm.processing"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+                                    {{ acceptForm.processing ? $t('Processing...') : $t('Accept') }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </Modal>
     </AuthenticatedLayout>
 </template>
 
@@ -139,6 +188,9 @@ import { ref } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
+import Modal from '@/Components/Modal.vue';
+import Swal from 'sweetalert2';
+
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -162,6 +214,12 @@ const form = useForm({
     search: props.filters.search || '',
     branch_id: props.filters.branch_id || '',
     status: props.filters.status || '',
+});
+
+const showAcceptModal = ref(false);
+const selectedOrder = ref(null);
+const acceptForm = useForm({
+    branch_id: '',
 });
 
 const applyFilters = () => {
@@ -211,20 +269,63 @@ const formatStatus = (status) => {
     return statusMap[status] || status;
 };
 
-const acceptOrder = (order) => {
-    if (!confirm(t('Are you sure you want to accept this order?'))) return;
+const openAcceptModal = (order) => {
+    selectedOrder.value = order;
+    acceptForm.reset();
+    showAcceptModal.value = true;
+};
 
-    router.post(route('admin.orders.rental.accept', order.id), {}, {
+const closeAcceptModal = () => {
+    showAcceptModal.value = false;
+    selectedOrder.value = null;
+    acceptForm.reset();
+};
+
+const acceptOrder = () => {
+    if (!selectedOrder.value) return;
+
+    acceptForm.post(route('admin.orders.rental.accept', selectedOrder.value.id), {
         preserveScroll: true,
+        onSuccess: () => {
+            closeAcceptModal();
+        },
     });
 };
 
-const rejectOrder = (order) => {
-    if (!confirm(t('Are you sure you want to reject this order?'))) return;
-
-    router.post(route('admin.orders.rental.reject', order.id), {}, {
-        preserveScroll: true,
+const rejectOrder = async (order) => {
+    const result = await Swal.fire({
+        title: t('Are you sure?'),
+        text: t('You are about to reject this rental order. This action cannot be undone.'),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: t('Yes, reject it!'),
+        cancelButtonText: t('Cancel'),
+        reverseButtons: true,
     });
+
+    if (result.isConfirmed) {
+        try {
+            await router.post(route('admin.orders.rental.reject', order.id), {}, {
+                preserveScroll: true,
+            });
+
+            Swal.fire({
+                title: t('Rejected!'),
+                text: t('The rental order has been rejected.'),
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+        } catch (error) {
+            Swal.fire({
+                title: t('Error!'),
+                text: t('Something went wrong while rejecting the order.'),
+                icon: 'error',
+            });
+        }
+    }
 };
 
 const updateStatus = (orderId, status) => {
