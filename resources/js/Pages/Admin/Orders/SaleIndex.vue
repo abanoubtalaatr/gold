@@ -1,4 +1,5 @@
 <template>
+
     <Head title="Sale Orders" />
 
     <AuthenticatedLayout>
@@ -54,28 +55,36 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Order ID') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('User') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Gold Piece') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Branch') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Order Date') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Price') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Status') }}
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Actions') }}
                                         </th>
                                     </tr>
@@ -106,7 +115,8 @@
                                             {{ order.total_price }} {{ $t('SAR') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(order.status).class]">
+                                            <span
+                                                :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(order.status).class]">
                                                 {{ $t(getStatusClass(order.status).text) }}
                                             </span>
                                         </td>
@@ -172,6 +182,49 @@
                 </div>
             </div>
         </Modal>
+
+        <!-- Reject Order Modal -->
+        <Modal :show="showRejectModal" @close="showRejectModal = false">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                        <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <h2 class="text-lg font-medium text-gray-900 mb-2">
+                        {{ $t('Reject Order') }}
+                    </h2>
+                    <p class="mb-4 text-sm text-gray-600">
+                        {{ $t('Are you sure you want to reject this order? This action cannot be undone.') }}
+                    </p>
+                    <div v-if="selectedOrder" class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <div class="text-sm text-gray-600">
+                            <p><strong>{{ $t('Order ID') }}:</strong> {{ selectedOrder.id }}</p>
+                            <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || '--' }}</p>
+                            <p><strong>{{ $t('Gold Piece') }}:</strong> {{ selectedOrder.gold_piece?.name || '--' }}</p>
+                            <p><strong>{{ $t('Price') }}:</strong> {{ selectedOrder.total_price }} {{ $t('SAR') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button @click="showRejectModal = false"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 mr-3">
+                        {{ $t('Cancel') }}
+                    </button>
+                    <button @click="confirmReject"
+                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">
+                        {{ $t('Reject Order') }}
+                    </button>
+                </div>
+            </div>
+        </Modal>
+
     </AuthenticatedLayout>
 </template>
 
@@ -237,28 +290,37 @@ const confirmAccept = () => {
     });
 };
 
+const showRejectModal = ref(false);
+// const selectedOrder = ref(null);
+
 const rejectOrder = (order) => {
-    if (confirm(t('Are you sure you want to reject this order?'))) {
-        router.post(route('admin.orders.sale.reject', order.id), {}, {
-            preserveScroll: true
-        });
-    }
+    selectedOrder.value = order;
+    showRejectModal.value = true;
+};
+
+const confirmReject = () => {
+    router.post(route('admin.orders.sale.reject', selectedOrder.value.id), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showRejectModal.value = false;
+        }
+    });
 };
 
 const markAsSent = (order) => {
-    if (confirm(t('Are you sure you want to mark this order as sent?'))) {
-        router.post(route('admin.orders.sale.markAsSent', order.id), {}, {
-            preserveScroll: true
-        });
-    }
+    // if (confirm(t('Are you sure you want to mark this order as sent?'))) {
+    router.post(route('admin.orders.sale.markAsSent', order.id), {}, {
+        preserveScroll: true
+    });
+    // }
 };
 
 const markAsSold = (order) => {
-    if (confirm(t('Are you sure you want to mark this order as sold?'))) {
-        router.post(route('admin.orders.sale.markAsSold', order.id), {}, {
-            preserveScroll: true
-        });
-    }
+    // if (confirm(t('Are you sure you want to mark this order as sold?'))) {
+    router.post(route('admin.orders.sale.markAsSold', order.id), {}, {
+        preserveScroll: true
+    });
+    // }
 };
 
 const applyFilters = () => {
