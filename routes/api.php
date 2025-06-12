@@ -36,6 +36,8 @@ Route::get('settings', [SettingsApiController::class, 'index'])->name('settings'
 
 Route::get('faqs', [FaqController::class, 'index'])->name('faqs');
 
+Route::get('/gold-pieces', [GoldPieceController::class, 'index']);
+
 Route::group(["prefix" => "auth"], function () {
     Route::post('/register', [RegisterController::class, 'register']);
     Route::post('/send_mobile_token', [RegisterController::class, 'sendMobileToken']);
@@ -116,7 +118,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/gold-pieces', [GoldPieceController::class, 'index']);
+    
     Route::get('/my-gold-pieces', [GoldPieceController::class, 'myGoldPieces']);
     Route::post('/gold-pieces', [GoldPieceController::class, 'store']);
     Route::delete('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'destroy']);
