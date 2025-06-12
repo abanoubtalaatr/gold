@@ -1,5 +1,4 @@
 <template>
-
     <Head title="Sale Orders" />
 
     <AuthenticatedLayout>
@@ -22,10 +21,19 @@
                                         :placeholder="$t('Search by user or piece name...')" />
                                 </div>
 
-                                <select v-model="form.time_range"
+                                <select v-model="form.branch_id"
                                     class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="">{{ $t('All Time') }}</option>
-                                    <option v-for="(value, key) in timeRangeOptions" :value="key">{{ $t(value) }}
+                                    <option value="">{{ $t('All Branches') }}</option>
+                                    <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                                        {{ branch.name }}
+                                    </option>
+                                </select>
+
+                                <select v-model="form.status"
+                                    class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">{{ $t('All Statuses') }}</option>
+                                    <option v-for="(value, key) in statusOptions" :value="key">
+                                        {{ $t(value) }}
                                     </option>
                                 </select>
 
@@ -39,101 +47,57 @@
                                     {{ $t('Reset') }}
                                 </button>
                             </div>
-
-                            <div v-if="form.time_range === 'custom'" class="flex flex-wrap items-center gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('From Date')
-                                        }}</label>
-                                    <input v-model="form.date_from" type="date"
-                                        class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('To Date')
-                                        }}</label>
-                                    <input v-model="form.date_to" type="date"
-                                        class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                </div>
-                            </div>
-
-                            <div class="flex flex-wrap items-center gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Service Name')
-                                        }}</label>
-                                    <input v-model="form.service_name" type="text"
-                                        class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        :placeholder="$t('Filter by service name...')" />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Service Description')}}</label>
-                                    <input v-model="form.service_description" type="text"
-                                        class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        :placeholder="$t('Filter by description...')" />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Min Price')
-                                        }}</label>
-                                    <input v-model="form.price_min" type="number"
-                                        class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        :placeholder="$t('Minimum price...')" />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Max Price')
-                                        }}</label>
-                                    <input v-model="form.price_max" type="number"
-                                        class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        :placeholder="$t('Maximum price...')" />
-                                </div>
-                            </div>
                         </div>
 
                         <!-- Orders Table -->
-                        <div v-if="orders?.data?.length > 0" class="overflow-x-auto">
+                        <div v-if="saleOrders?.data?.length > 0" class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $t('Order ID') }}</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $t('User') }}</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $t('Gold Piece') }}</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $t('Order Date') }}</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $t('Price') }}</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $t('Status') }}</th>
-                                        <!-- <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $t('Actions') }}</th> -->
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $t('Order ID') }}
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $t('User') }}
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $t('Gold Piece') }}
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $t('Branch') }}
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $t('Order Date') }}
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $t('Price') }}
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $t('Status') }}
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $t('Actions') }}
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="order in orders.data" :key="order.id">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.id }}
+                                    <tr v-for="order in saleOrders.data" :key="order.id">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ order.id }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             <div class="flex items-center">
                                                 <div>
                                                     {{ order.user?.name || 'N/A' }}<br />
-                                                    {{ order.user?.mobile || 'N/A' }}
+                                                    {{ order.user?.email || 'N/A' }}
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
-                                            <button class="bg-none border-none">
-                                                {{ order.gold_piece?.name || '--' }}
-                                            </button>
+                                            {{ order.gold_piece?.name || '--' }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ order.branch?.name || '--' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ formatDate(order.created_at) }}
@@ -142,20 +106,34 @@
                                             {{ order.total_price }} {{ $t('SAR') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span
-                                                :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(order.status).class]">
+                                            <span :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(order.status).class]">
                                                 {{ $t(getStatusClass(order.status).text) }}
                                             </span>
                                         </td>
-                                        <!-- <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button @click="showDetails(order)" class="show-button py-2 px-4 rounded">
-                                                {{ $t('View') }}
-                                            </button>
-                                        </td> -->
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                            <template v-for="action in order.allowed_actions">
+                                                <button v-if="action === 'accept'" @click="acceptOrder(order)"
+                                                    class="px-3 py-1 text-sm text-white bg-green-600 rounded hover:bg-green-700">
+                                                    {{ $t('Accept') }}
+                                                </button>
+                                                <button v-if="action === 'reject'" @click="rejectOrder(order)"
+                                                    class="px-3 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700">
+                                                    {{ $t('Reject') }}
+                                                </button>
+                                                <button v-if="action === 'mark_as_sent'" @click="markAsSent(order)"
+                                                    class="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700">
+                                                    {{ $t('Mark as Sent') }}
+                                                </button>
+                                                <button v-if="action === 'mark_as_sold'" @click="markAsSold(order)"
+                                                    class="px-3 py-1 text-sm text-white bg-purple-600 rounded hover:bg-purple-700">
+                                                    {{ $t('Mark as Sold') }}
+                                                </button>
+                                            </template>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
-                            <Pagination :links="orders.links" class="mt-6" />
+                            <Pagination :links="saleOrders.links" class="mt-6" />
                         </div>
                         <div v-else class="flex flex-col items-center justify-center py-12 text-gray-500">
                             <p class="text-xl font-semibold">{{ $t('No sale orders found.') }}</p>
@@ -164,43 +142,124 @@
                 </div>
             </div>
         </div>
+
+        <!-- Accept Order Modal -->
+        <Modal :show="showAcceptModal" @close="showAcceptModal = false">
+            <div class="p-6">
+                <h2 class="text-lg font-medium text-gray-900">
+                    {{ $t('Accept Order') }} #{{ selectedOrder?.id }}
+                </h2>
+
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Select Branch') }}</label>
+                    <select v-model="acceptBranchId"
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                            {{ branch.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mt-6 flex justify-end">
+                    <button @click="showAcceptModal = false"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 mr-3">
+                        {{ $t('Cancel') }}
+                    </button>
+                    <button @click="confirmAccept" :disabled="!acceptBranchId"
+                        class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50">
+                        {{ $t('Confirm') }}
+                    </button>
+                </div>
+            </div>
+        </Modal>
     </AuthenticatedLayout>
 </template>
 
 <script setup>
-import { watch } from 'vue';
+import { ref } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
+import Modal from '@/Components/Modal.vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
 const props = defineProps({
-    orders: {
+    saleOrders: {
         type: Object,
         default: () => ({ data: [], links: [] }),
+    },
+    branches: {
+        type: Array,
+        default: () => [],
     },
     filters: {
         type: Object,
         default: () => ({}),
     },
-    timeRangeOptions: {
-        type: Object,
-        default: () => ({}),
-    },
 });
+
+const statusOptions = {
+    'pending_approval': 'Pending Approval',
+    'approved': 'Approved',
+    'piece_sent': 'Piece Sent',
+    'sold': 'Sold',
+    'rejected': 'Rejected'
+};
 
 const form = useForm({
     search: props.filters.search || '',
-    service_name: props.filters.service_name || '',
-    service_description: props.filters.service_description || '',
-    date_from: props.filters.date_from || '',
-    date_to: props.filters.date_to || '',
-    price_min: props.filters.price_min || '',
-    price_max: props.filters.price_max || '',
-    time_range: props.filters.time_range || '',
+    branch_id: props.filters.branch_id || '',
+    status: props.filters.status || '',
 });
+
+const showAcceptModal = ref(false);
+const selectedOrder = ref(null);
+const acceptBranchId = ref('');
+
+const acceptOrder = (order) => {
+    selectedOrder.value = order;
+    showAcceptModal.value = true;
+};
+
+const confirmAccept = () => {
+    if (!acceptBranchId.value) return;
+
+    router.post(route('admin.orders.sale.accept', selectedOrder.value.id), {
+        branch_id: acceptBranchId.value
+    }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showAcceptModal.value = false;
+            acceptBranchId.value = '';
+        }
+    });
+};
+
+const rejectOrder = (order) => {
+    if (confirm(t('Are you sure you want to reject this order?'))) {
+        router.post(route('admin.orders.sale.reject', order.id), {}, {
+            preserveScroll: true
+        });
+    }
+};
+
+const markAsSent = (order) => {
+    if (confirm(t('Are you sure you want to mark this order as sent?'))) {
+        router.post(route('admin.orders.sale.markAsSent', order.id), {}, {
+            preserveScroll: true
+        });
+    }
+};
+
+const markAsSold = (order) => {
+    if (confirm(t('Are you sure you want to mark this order as sold?'))) {
+        router.post(route('admin.orders.sale.markAsSold', order.id), {}, {
+            preserveScroll: true
+        });
+    }
+};
 
 const applyFilters = () => {
     form.get(route('admin.orders.sale.index'), {
@@ -219,25 +278,35 @@ const resetFilters = () => {
 
 const getStatusClass = (status) => {
     switch (status) {
-        case 'pending':
+        case 'pending_approval':
             return {
                 class: 'bg-yellow-100 text-yellow-800',
-                text: t('pending')
+                text: 'Pending Approval'
             };
-        case 'completed':
+        case 'approved':
+            return {
+                class: 'bg-blue-100 text-blue-800',
+                text: 'Approved'
+            };
+        case 'piece_sent':
+            return {
+                class: 'bg-indigo-100 text-indigo-800',
+                text: 'Piece Sent'
+            };
+        case 'sold':
             return {
                 class: 'bg-green-100 text-green-800',
-                text: t('completed')
+                text: 'Sold'
             };
-        case 'cancelled':
+        case 'rejected':
             return {
                 class: 'bg-red-100 text-red-800',
-                text: t('cancelled')
+                text: 'Rejected'
             };
         default:
             return {
                 class: 'bg-gray-100 text-gray-800',
-                text: t(status)
+                text: status
             };
     }
 };
@@ -245,34 +314,4 @@ const getStatusClass = (status) => {
 const formatDate = (date) => {
     return new Date(date).toLocaleDateString();
 };
-
-const showDetails = (order) => {
-    router.get(route('admin.orders.sale.show', order.id));
-};
-
-watch(() => form.time_range, (newValue) => {
-    if (newValue !== 'custom') {
-        form.date_from = '';
-        form.date_to = '';
-    }
-});
 </script>
-
-<style scoped>
-.order-name {
-    border: none;
-    background-color: transparent;
-    text-align: center;
-    color: darkgoldenrod;
-    text-decoration: underline;
-}
-
-.show-button {
-    background-color: #f5eb62;
-    text-align: center;
-}
-
-.show-button:hover {
-    background-color: #d8c113;
-}
-</style>

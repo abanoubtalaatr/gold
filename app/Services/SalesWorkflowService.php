@@ -225,6 +225,8 @@ class SalesWorkflowService
                 case OrderSale::STATUS_APPROVED:
                     if ($order->status === OrderSale::STATUS_PENDING_APPROVAL) {
                         $actions[] = 'approve';
+                        $actions[] = 'accept';
+
                     }
                     break;
                 case OrderSale::STATUS_REJECTED:
