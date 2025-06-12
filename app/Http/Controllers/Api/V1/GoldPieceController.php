@@ -88,7 +88,7 @@ class GoldPieceController extends Controller
                 ->where('city_id', $address->city_id)
                 ->where('is_active', true)
                 ->whereHas('vendor', function ($query) {
-                    $query->where('is_active', true);
+                    $query->where('vendor_status', 'approved');
                 })
                 ->with('vendor') // Eager load vendor for notifications
                 ->get();
@@ -114,6 +114,7 @@ class GoldPieceController extends Controller
                 'rental_price_per_day' => $request->type === 'for_rent' ? $request->rental_price_per_day : null,
                 'sale_price' => $request->type === 'for_sale' ? $request->sale_price : null,
                 'deposit_amount' => $request->type === 'for_rent' ? $request->deposit_amount : null,
+                'is_including_lobes' => $request->is_including_lobes,
             ]);
 
             // Generate QR code for the gold piece and store as media

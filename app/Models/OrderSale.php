@@ -17,6 +17,7 @@ class OrderSale extends Model
         'total_price',
         'status',
         'is_suspended',
+        'is_including_lobes',
     ];
 
     protected $casts = [

@@ -471,8 +471,8 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
         Route::post('/sale-orders/{orderId}/mark-sent', 'markAsSent')->name('orders.sales.mark-sent');
         Route::post('/sale-orders/{orderId}/mark-sold', 'markAsSold')->name('orders.sales.mark-sold');
         Route::patch('/sale-orders/{orderId}/status', 'updateStatus')->name('orders.sales.updateStatus');
-
     });
+    
     Route::get('/rental-requests', [RentalRequestController::class, 'index'])->name('rental-requests.index');
     Route::post('/rental-requests/{order}/accept', [RentalRequestController::class, 'accept'])->name('rental-requests.accept');
     Route::post('/rental-requests/{order}/reject', [RentalRequestController::class, 'reject'])->name('rental-requests.reject');

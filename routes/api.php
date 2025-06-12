@@ -37,7 +37,9 @@ Route::get('settings', [SettingsApiController::class, 'index'])->name('settings'
 Route::get('faqs', [FaqController::class, 'index'])->name('faqs');
 
 Route::get('/gold-pieces', [GoldPieceController::class, 'index']);
+Route::post('/price', [PriceController::class, 'index']);
 
+Route::get('/mobile-formatted-prices', [PriceController::class, 'mobileFormattedPrices']);
 Route::group(["prefix" => "auth"], function () {
     Route::post('/register', [RegisterController::class, 'register']);
     Route::post('/send_mobile_token', [RegisterController::class, 'sendMobileToken']);
@@ -195,7 +197,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     |--------------------------------------------------------------------------
     */
 
-    Route::post('/price', [PriceController::class, 'index']);
+    
     Route::post('/price/breakdown', [PriceController::class, 'priceBreakdown']);
     Route::post('/price/breakdown-by-type', [PriceController::class, 'priceBreakdownByType']);
     
@@ -203,7 +205,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::get('/raw-real-time-price', [PriceController::class, 'rawRealTimePrice']);
     Route::get('/adjusted-prices', [PriceController::class, 'adjustedPrices']);
     Route::get('/structured-prices', [PriceController::class, 'structuredPrices']);
-    Route::get('/mobile-formatted-prices', [PriceController::class, 'mobileFormattedPrices']);
+    
     Route::get('/price/carat', [PriceController::class, 'priceForCarat']);
 
     /*

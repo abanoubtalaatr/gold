@@ -1654,5 +1654,8 @@
     "You are about to reject this liquidation request. Please provide a reason.": "أنت على وشك رفض طلب التصفية هذا. يرجى تقديم سبب.",
     "Are you sure you want to approve this liquidation request?": "هل أنت متأكد من أنك تريد الموافقة على طلب التصفية هذا؟",
     "Settlement Requests for users": "طلبات التصفية للمستخدمين",
-    "Gold pieces": " القطع الذهبية"
+    "Gold pieces": " القطع الذهبية",
+    "Is Including Lobe": "يشمل الفصوص",
+    "Yes": "نعم",
+    "No": "لا"
 }

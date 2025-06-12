@@ -29,6 +29,7 @@ class GoldPieceFilter
         }
 
         return $this
+        
             ->caratFilter()
             ->weightFilter()
             ->priceFilter()
