@@ -89,7 +89,7 @@
                     collapsed: !$page.url.startsWith('/admin/orders/sale'),
                 }">
                 <i class="bi bi-shop"></i>
-                <span>{{ $t("Order sales") }}</span>
+                <span>{{ $t("Sales Orders") }}</span>
                 </Link>
             </li>
 

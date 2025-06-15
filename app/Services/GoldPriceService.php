@@ -245,6 +245,7 @@ class GoldPriceService
         }
 
         $basePrice = $realTimePrices[$priceKey];
+        // for sell price
         $adjustment = config("gold.price_adjustments.{$carat}", 0);
         
         return round($basePrice + $adjustment, 2);
