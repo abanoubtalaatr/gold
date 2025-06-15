@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
+use App\Models\SystemSetting;
 use App\Traits\ApiResponseTrait;
-use App\Http\Controllers\Controller;
 use App\Services\GoldPriceService;
-use App\Http\Requests\Api\V1\PriceRequest;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\PriceRequest;
 
 class PriceController extends Controller
 {
@@ -29,12 +30,14 @@ class PriceController extends Controller
                 $request->number_rental_day
             );
 
+            $systemSetting = SystemSetting::first();
+            $deposit = $systemSetting->booking_insurance_amount??10;
             return $this->successResponse([
                 'total_price' => round($totalPrice, 2),
                 'carat' => $request->carat,
                 'weight' => $request->weight,
                 'rental_days' => $request->number_rental_day,
-                'deposit' => 100,
+                'deposit' => $deposit,
             ]);
         } catch (\Exception $e) {
             // Log the error for debugging

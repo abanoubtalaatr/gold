@@ -119,4 +119,77 @@ class NotificationController extends Controller
 
         return response()->json(['count' => min($count, 99)]); // Cap at 99 like in frontend
     }
+
+    /**
+     * Poll for new notifications (for web interface real-time updates)
+     */
+    public function poll(Request $request): JsonResponse
+    {
+        // Ensure this is treated as an AJAX request
+        if (!$request->ajax() && !$request->wantsJson()) {
+            return response()->json(['error' => 'This endpoint only accepts AJAX requests'], 400);
+        }
+
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $lastCheck = $request->get('last_check');
+
+        // If no last_check provided, use 5 minutes ago to catch recent notifications
+        if (!$lastCheck) {
+            $since = now()->subMinutes(5);
+        } else {
+            try {
+                $since = \Carbon\Carbon::parse($lastCheck);
+                // Ensure we don't go too far back to avoid performance issues
+                $maxLookback = now()->subHours(1);
+                if ($since->lt($maxLookback)) {
+                    $since = $maxLookback;
+                }
+            } catch (\Exception $e) {
+                // If invalid date, use 5 minutes ago as fallback
+                $since = now()->subMinutes(5);
+            }
+        }
+
+        // Get only unread notifications created AFTER the last check time
+        $newNotifications = $user->notifications()
+            ->where('created_at', '>', $since)
+            ->whereNull('read_at')
+            ->orderBy('created_at', 'desc')
+            ->limit(50) // Limit to prevent overwhelming the frontend
+            ->get()
+            ->map(function ($notification) {
+                return [
+                    'id' => $notification->id,
+                    'type' => $notification->type,
+                    'data' => $notification->data,
+                    'created_at' => $notification->created_at->toISOString(),
+                    'time_ago' => $notification->created_at->diffForHumans(),
+                ];
+            });
+
+        // Get total unread count
+        $totalUnread = $user->unreadNotifications()->count();
+
+        return response()->json([
+            'notifications' => $newNotifications,
+            'count' => $newNotifications->count(),
+            'total_unread' => $totalUnread,
+            'timestamp' => now()->toISOString(),
+            'since' => $since->toISOString(),
+            'next_check_from' => $newNotifications->count() > 0 ?
+                $newNotifications->first()['created_at'] :
+                now()->toISOString(),
+            'debug' => [
+                'user_id' => $user->id,
+                'last_check_provided' => $lastCheck,
+                'since_parsed' => $since->toISOString(),
+                'notifications_found' => $newNotifications->count(),
+                'server_time' => now()->toISOString(),
+            ]
+        ])->header('Content-Type', 'application/json');
+    }
 }

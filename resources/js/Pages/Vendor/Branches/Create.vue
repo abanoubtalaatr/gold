@@ -41,6 +41,55 @@
                                     class="mt-1 text-xs text-red-500 font-medium" />
                             </div>
 
+                            <!-- User Selection -->
+                            <div class="col-span-1 md:col-span-6">
+                                <InputLabel for="user_id" :value="$t('Assign User')"
+                                    class="text-sm font-semibold text-gray-800" />
+                                <select id="user_id" v-model="form.user_id"
+                                    class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 ease-in-out"
+                                    :class="{ 'border-red-500 focus:border-red-500': form.errors.user_id }">
+                                    <option value="" disabled selected>{{ $t('Select a user') }}</option>
+                                    <option v-for="user in users" :key="user.id" :value="user.id">
+                                        {{ user.name }}
+                                    </option>
+                                </select>
+                                <InputError :message="form.errors.user_id"
+                                    class="mt-1 text-xs text-red-500 font-medium" />
+                            </div>
+
+                            <!-- Contact Number -->
+                            <div class="col-span-1 md:col-span-6">
+                                <InputLabel for="contact_number" :value="$t('Contact Number')"
+                                    class="text-sm font-semibold text-gray-800" />
+                                <TextInput id="contact_number" v-model="form.contact_number" type="tel"
+                                    class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 ease-in-out"
+                                    :class="{ 'border-red-500 focus:border-red-500': form.errors.contact_number }"
+                                    :placeholder="$t('Contact Number')" />
+                                <InputError :message="form.errors.contact_number" class="mt-1 text-xs text-red-500 font-medium" />
+                            </div>
+
+                            <!-- Contact Email -->
+                            <div class="col-span-1 md:col-span-6">
+                                <InputLabel for="contact_email" :value="$t('Contact Email')"
+                                    class="text-sm font-semibold text-gray-800" />
+                                <TextInput id="contact_email" v-model="form.contact_email" type="email"
+                                    class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 ease-in-out"
+                                    :class="{ 'border-red-500 focus:border-red-500': form.errors.contact_email }"
+                                    :placeholder="$t('Contact Email')" />
+                                <InputError :message="form.errors.contact_email" class="mt-1 text-xs text-red-500 font-medium" />
+                            </div>
+
+                            <!-- Number of Available Items -->
+                            <div class="col-span-1 md:col-span-6">
+                                <InputLabel for="number_of_available_items" :value="$t('Number of Available Items')"
+                                    class="text-sm font-semibold text-gray-800" />
+                                <TextInput id="number_of_available_items" v-model="form.number_of_available_items" type="number"
+                                    class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 ease-in-out"
+                                    :class="{ 'border-red-500 focus:border-red-500': form.errors.number_of_available_items }"
+                                    :placeholder="$t('Number of Available Items')" min="0" />
+                                <InputError :message="form.errors.number_of_available_items" class="mt-1 text-xs text-red-500 font-medium" />
+                            </div>
+
                             <!-- Branch Logo -->
                             <div class="col-span-1 md:col-span-6">
                                 <InputLabel for="logo" :value="$t('Branch Logo')"
@@ -195,6 +244,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    users: {
+        type: Array,
+        default: () => [],
+    },
     branch: {
         type: Object,
         default: null,
@@ -228,6 +281,10 @@ const initializeWorkingHours = (workingDays = [], existingHours = {}) => {
 const form = useForm({
     name: props.branch?.name || '',
     city_id: props.branch?.city_id || '',
+    user_id: props.branch?.user_id || '',
+    contact_number: props.branch?.contact_number || '',
+    contact_email: props.branch?.contact_email || '',
+    number_of_available_items: props.branch?.number_of_available_items || 0,
     working_days: props.branch?.working_days || [], // Ensure this is always an array
     working_hours: initializeWorkingHours(
         props.branch?.working_days,
@@ -305,7 +362,7 @@ const submit = () => {
     form.working_hours = filteredWorkingHours;
 
     if (editMode.value) {
-        form.put(route('vendor.branches.update', props.branch.id), {
+        form.post(route('vendor.branches.update', props.branch.id), {
             preserveScroll: true,
             onError: (errors) => {
                 console.log('Update errors:', errors);

@@ -32,7 +32,7 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
-            'csrf_token' => $request->session()->token(),
+            'csrf_token' => csrf_token(),
             'auth' => $request->user() ? [
                 'id' => $request->user()->id,
                 'name' => $request->user()->name,
@@ -46,12 +46,11 @@ class HandleInertiaRequests extends Middleware
                 'store_name_en' => $request->user()->store_name_en,
             ] : null,
             'flash' => [
-                'success' => $request->session()->get('success'),
-                'error' => $request->session()->get('error')
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error')
             ],
             'locale' => app()->getLocale(),
-            'auth_permissions'=>$request->user() ?  $request->user()->getPermissionsViaRoles()->pluck('name')->toArray() : []
-
+            'auth_permissions' => $request->user() ? $request->user()->getPermissionsViaRoles()->pluck('name')->toArray() : []
         ];
     }
 }

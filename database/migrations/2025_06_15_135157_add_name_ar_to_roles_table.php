@@ -9,10 +9,10 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::table('cities', function (Blueprint $table) {
-            $table->unsignedBigInteger('country_id')->nullable()->change();
+        Schema::table('roles', function (Blueprint $table) {
+            $table->string('name_ar')->nullable();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cities', function (Blueprint $table) {
-            //
+        Schema::table('roles', function (Blueprint $table) {
+            $table->dropColumn('name_ar');
         });
     }
 };

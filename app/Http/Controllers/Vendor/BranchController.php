@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Models\City;
+use App\Models\User;
 use Inertia\Inertia;
 use App\Models\State;
 use App\Models\Branch;
@@ -16,15 +17,13 @@ use App\Http\Requests\Vendor\BranchRequest;
 
 class BranchController extends Controller
 {
-    public function __construct(protected BranchService $branchService)
-    {
-    }
+    public function __construct(protected BranchService $branchService) {}
 
     public function index(Request $request)
     {
         $filters = $request->only(['search']);
-        
-        $branches = $this->branchService->list($request->user()->vendor_id??$request->user()->id, $filters);
+
+        $branches = $this->branchService->list($request->user()->vendor_id ?? $request->user()->id, $filters);
 
         return Inertia::render('Vendor/Branches/Index', [
             'branches' => $branches,
@@ -32,83 +31,86 @@ class BranchController extends Controller
         ]);
     }
 
-    public function create()
-    {        
-        
-        $country = Country::find(194);
-
-        // i want to get all cities for this all states for this country  
-        $states = State::where('country_id', $country->id)->pluck('id')->toArray();
-        
-        $cities = City::whereIn('state_id',$states)->where('status',1)->select(['id as value', 'name as label'])->get()->toArray();
+    public function create(Request $request)
+    {
+        $cities = City::query()
+            ->where('status', '=', 1)
+            ->get()
+            ->map(function ($city) {
+                return [
+                    'value' => $city->id,
+                    'label' => app()->getLocale() === 'ar' ? $city->name_ar : $city->name
+                ];
+            });
+        $users = User::where('vendor_id', $request->user()->vendor_id ?? $request->user()->id)->get();
 
         return Inertia::render('Vendor/Branches/Create', [
             'cities' => $cities,
+            'users' => $users,
         ]);
     }
 
     public function store(BranchRequest $request)
     {
-        // try {
-            $validated = $request->validated();
+        
+        $validated = $request->validated();
 
-            // Ensure working_days is an array of integers
-            $validated['working_days'] = array_map('intval', $validated['working_days']);
+        // Ensure working_days is an array of integers
+        $validated['working_days'] = array_map('intval', $validated['working_days']);
 
-            // Handle logo upload
-            $logoPath = null;
-            if ($request->hasFile('logo')) {
-                $logoPath = $request->file('logo')->store('branches/logos', 'public');
-            }
+        
+        // Handle logo upload
+        $logoPath = null;
+        if ($request->hasFile('logo')) {
+            $logoPath = $request->file('logo')->store('branches/logos', 'public');
+        }
 
-            // Create branch
-            $branch = Branch::create([
-                'vendor_id' => $request->user()->id,
-                'name' => $validated['name'],
-                'city_id' => $validated['city_id'],
-                'working_days' => $validated['working_days'],
-                'working_hours' => $validated['working_hours'],
-                'logo' => $logoPath,
-                'address' => 'address',
-                'is_active' => true,
-            ]);
+        // Create branch
+        $branch = Branch::create([
+            'vendor_id' => $request->user()->vendor_id ?? $request->user()->id,
+            'name' => $validated['name'],
+            'city_id' => $validated['city_id'],
+            'working_days' => $validated['working_days'],
+            'working_hours' => $validated['working_hours'],
+            'logo' => $logoPath,
+            'address' => 'address',
+            'is_active' => true,
+            'user_id' => $validated['user_id'],
+            'contact_number' => $validated['contact_number'],
+            'contact_email' => $validated['contact_email'],
+            'number_of_available_items' => $validated['number_of_available_items'] ?? 0,
+        ]);
 
-            // Log branch creation
-
-            // Handle image uploads
-            
-
-            return redirect()->route('vendor.branches.index')
-                ->with('success', __('dashboard.Branch created successfully'));
-
-        // } catch (\Exception $e) {
-        //     Log::error('Failed to create branch', ['error' => $e->getMessage()]);
-        //     return back()->withInput()
-        //         ->with('error', __('Failed to create branch: ') . $e->getMessage());
-        // }
+        return redirect()->route('vendor.branches.index')
+            ->with('success', __('dashboard.Branch created successfully'));
     }
 
-    public function edit(Branch $branch)
+    public function edit(Branch $branch, Request $request)
     {
         // Load the branch with city relationship
         $branch->load('city');
-        $country = Country::find(194);
 
-        // i want to get all cities for this all states for this country  
-        $states = State::where('country_id', $country->id)->pluck('id')->toArray();
+        $cities = City::query()
+        ->where('status', '=', 1)
+        ->get()
+        ->map(function ($city) {
+            return [
+                'value' => $city->id,
+                'label' => app()->getLocale() === 'ar' ? $city->name_ar : $city->name
+            ];
+        });
         
-        $cities = City::whereIn('state_id',$states)->where('status',1)->select(['id as value', 'name as label'])->get()->toArray();
+        $users = User::where('vendor_id', $request->user()->vendor_id ?? $request->user()->id)->get();
 
         return Inertia::render('Vendor/Branches/Edit', [
             'branch' => $branch,
-            'cities' =>$cities,
+            'cities' => $cities,
+            'users' => $users,
         ]);
     }
 
     public function update(BranchRequest $request, Branch $branch)
     {
-
-        try {
             $validated = $request->validated();
             $validated['working_days'] = array_map('intval', $validated['working_days']);
 
@@ -118,6 +120,10 @@ class BranchController extends Controller
                 'city_id' => $validated['city_id'],
                 'working_days' => $validated['working_days'],
                 'working_hours' => $validated['working_hours'],
+                'user_id' => $validated['user_id'],
+                'contact_number' => $validated['contact_number'],
+                'contact_email' => $validated['contact_email'],
+                'number_of_available_items' => $validated['number_of_available_items'] ?? 0,
             ];
 
             // Check if a new logo is uploaded
@@ -126,17 +132,9 @@ class BranchController extends Controller
                 if ($branch->logo && Storage::disk('public')->exists($branch->logo)) {
                     Storage::disk('public')->delete($branch->logo);
                 }
-                
+
                 // Store new logo
                 $updateData['logo'] = $request->file('logo')->store('branches/logos', 'public');
-            }
-            // Check if logo should be removed
-            elseif ($request->input('removeLogo') === true || $request->input('removeLogo') === 'true') {
-                // Delete existing logo
-                if ($branch->logo && Storage::disk('public')->exists($branch->logo)) {
-                    Storage::disk('public')->delete($branch->logo);
-                }
-                $updateData['logo'] = null;
             }
 
             $branch->update($updateData);
@@ -160,11 +158,6 @@ class BranchController extends Controller
 
             return redirect()->route('vendor.branches.index')
                 ->with('success', __('dashboard.Branch updated successfully'));
-
-        } catch (\Exception $e) {
-            return back()->withInput()
-                ->with('error', __('dashboard.Failed to update branch: ') . $e->getMessage());
-        }
     }
 
     public function destroy(Branch $branch)
@@ -182,6 +175,11 @@ class BranchController extends Controller
                 }
                 $image->delete();
             }
+        }
+
+        // check if related to order sale or order rental
+        if ($branch->orderRentals->count() > 0 || $branch->orderSales->count() > 0) {
+            return back()->with('error', __('dashboard.Branch cannot be deleted because it has related orders'));
         }
 
         $branch->delete();

@@ -9,7 +9,7 @@ class AddStatusToCitiesTable extends Migration
     public function up()
     {
         Schema::table('cities', function (Blueprint $table) {
-            $table->boolean('status')->default(true)->nullable()-> after('wikiDataId');
+            $table->boolean('status')->default(true)->nullable()->after('wikiDataId');
         });
     }
 

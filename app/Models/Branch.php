@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Branch extends Model
 {
@@ -23,6 +24,10 @@ class Branch extends Model
         'is_active',
         'address',
         'logo',
+        'contact_number',
+        'contact_email',
+        'number_of_available_items',
+        'user_id',
     ];
 
     protected $casts = [
@@ -55,5 +60,15 @@ class Branch extends Model
     public function scopeForVendor($query, $vendorId)
     {
         return $query->where('vendor_id', $vendorId);
+    }
+
+    public function orderRentals(): HasMany
+    {
+        return $this->hasMany(OrderRental::class);
+    }
+
+    public function orderSales(): HasMany
+    {
+        return $this->hasMany(OrderSale::class);
     }
 }

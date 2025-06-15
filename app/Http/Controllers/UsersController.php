@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
@@ -36,7 +38,8 @@ class UsersController extends Controller
             'is_active' => $request->is_active,
         ];
 
-        $UsersQuery = User::with('roles')->where('vendor_id', auth()->user()->vendor_id ?? auth()->user()->id)->latest();
+        $vendorId = Auth::user()->vendor_id ?? Auth::user()->id;
+        $UsersQuery = User::with('roles')->where('vendor_id', $vendorId)->latest();
 
 
         $UsersQuery->when($filters['name'], function ($query, $name) {
@@ -65,11 +68,21 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $roles = Role::whereNull('vendor_id')
-            ->where('name', '!=', 'user')
-            ->where('name', '!=', 'superadmin')
-
-            ->pluck('name')->toArray();
+        $vendorId = Auth::user()->vendor_id ?? Auth::user()->id;
+        
+        // Get roles with name and name_ar
+        $roles = Role::where('vendor_id', $vendorId)
+            ->select('id', 'name', 'name_ar')
+            ->get()
+            ->map(function ($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'name_ar' => $role->name_ar,
+                    'display_name' => app()->isLocale('ar') ? $role->name_ar : $role->name
+                ];
+            });
+        
         return Inertia('Users/Create', ['roles' => $roles]);
     }
 
@@ -82,8 +95,8 @@ class UsersController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'avatar' => 'avatars/default_avatar.png', // القيمة الافتراضية
-            'vendor_id' => auth()->user()->id
+            'avatar' => 'avatars/default_avatar.png', // Default value
+            'vendor_id' => Auth::user()->id
         ];
 
         if ($request->hasFile('avatar')) {
@@ -92,9 +105,8 @@ class UsersController extends Controller
 
         $user = User::create($userData);
 
-        $user->save();
-
-        if ($request->has('selectedRoles')) {
+        // Sync roles if provided
+        if ($request->has('selectedRoles') && is_array($request->selectedRoles)) {
             $user->syncRoles($request->selectedRoles);
         }
 
@@ -116,11 +128,29 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
-        $roles = Role::whereNull('vendor_id')
-            ->where('name', '!=', 'user')
-            ->where('name', '!=', 'superadmin')
-            ->pluck('name')->toArray();
+        $vendorId = Auth::user()->vendor_id ?? Auth::user()->id;
+        
+        // Get roles with name and name_ar
+        $roles = Role::where('vendor_id', $vendorId)
+            ->select('id', 'name', 'name_ar')
+            ->get()
+            ->filter(function ($role) {
+                // Filter out superadmin roles
+                return $role->name !== 'superadmin' && !empty($role->name);
+            })
+            ->map(function ($role) {
+                return [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'name_ar' => $role->name_ar,
+                    'display_name' => app()->isLocale('ar') ? $role->name_ar : $role->name
+                ];
+            })
+            ->values()
+            ->toArray();
+
         $userRoles = $user->roles->pluck('name')->all();
+
         return Inertia('Users/Edit', [
             'user' => $user,
             'roles' => $roles,
@@ -135,7 +165,6 @@ class UsersController extends Controller
     {
         try {
             DB::beginTransaction();
-
 
             $userData = [
                 'name' => $request->name,
@@ -154,18 +183,16 @@ class UsersController extends Controller
                 $path = $request->file('avatar')->store('avatars', 'public');
                 $userData['avatar'] = $path;
 
-                \Log::info('Image uploaded:', ['path' => $path]);
+                Log::info('Image uploaded:', ['path' => $path]);
             }
 
-            \Log::info('Updating user with data:', $userData);
+            Log::info('Updating user with data:', $userData);
 
-            // تحديث بيانات المستخدم
+            // Update user data
             $user->update($userData);
 
-            $user->save();
-
-            // تحديث الأدوار
-            if ($request->has('selectedRoles')) {
+            // Update roles if provided
+            if ($request->has('selectedRoles') && is_array($request->selectedRoles)) {
                 $user->syncRoles($request->selectedRoles);
             }
 
@@ -176,8 +203,8 @@ class UsersController extends Controller
                 ->with('success', __('messages.data_updated_successfully'));
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('User Update Error: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            Log::error('User Update Error: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return back()->with('error', $e->getMessage());
         }
     }

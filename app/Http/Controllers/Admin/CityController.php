@@ -37,10 +37,7 @@ class CityController extends Controller
     public function create()
     {
         // $states = State::where('country_id', 194)->get();
-        $states = State::all();
-        return Inertia::render('Admin/Cities/Create', [
-            'states' => $states,
-        ]);
+        return Inertia::render('Admin/Cities/Create');
     }
 
     public function store(Request $request)
@@ -48,15 +45,14 @@ class CityController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'name_ar' => 'nullable|string|max:255',
-            'state_id' => 'required|exists:states,id',
             'status' => 'required|in:active,inactive',
         ]);
 
         City::create([
             'name' => $request->name,
             'name_ar' => $request->name_ar,
-            'state_id' => $request->state_id,
             'status' => $request->status === 'active',
+            'state_id' => State::first()->id,
         ]);
 
         return redirect()->route('admin.cities.index')->with('success', 'City created successfully.');
@@ -71,11 +67,7 @@ class CityController extends Controller
 
     public function edit(City $city)
     {
-        $states = State::all();
-        return Inertia::render('Admin/Cities/Edit', [
-            'city' => $city,
-            'states' => $states,
-        ]);
+        return Inertia::render('Admin/Cities/Edit');
     }
 
     public function update(Request $request, City $city)
@@ -83,7 +75,6 @@ class CityController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'name_ar' => 'nullable|string|max:255',
-            'state_id' => 'required|exists:states,id',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -91,7 +82,6 @@ class CityController extends Controller
             'name' => $request->name,
             'name_ar' => $request->name_ar,
             'status' => $request->status,
-            'state_id' => $request->state_id
         ]);
 
         return redirect()->route('admin.cities.index')->with('success', 'City updated successfully.');

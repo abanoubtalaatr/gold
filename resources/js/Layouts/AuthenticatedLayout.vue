@@ -350,7 +350,13 @@ const setupPollingNotifications = () => {
     
     const pollForNotifications = async () => {
         try {
-            const response = await fetch(`/notifications/poll?last_check=${encodeURIComponent(lastProcessedTimestamp)}`);
+            const response = await fetch(`/notifications/poll?last_check=${encodeURIComponent(lastProcessedTimestamp)}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json',
+                }
+            });
             const data = await response.json();
             
             console.log('🔍 Polling response:', {

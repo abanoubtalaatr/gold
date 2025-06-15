@@ -75,7 +75,7 @@
                             </div>
 
                             <div class="col-span-1 md:col-span-4">
-                                <InputLabel for="gold_purchase_price" :value="$t('Gold Purchase Price')"
+                                <InputLabel for="gold_purchase_price" :value="$t('Gold Sell Price')"
                                     class="text-sm font-semibold text-gray-800" />
                                 <TextInput id="gold_purchase_price" v-model="settingsForm.gold_purchase_price"
                                     type="number" step="0.01" min="0"

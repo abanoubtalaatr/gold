@@ -138,9 +138,9 @@
                             >
                                 <el-option
                                     v-for="role in validRoles"
-                                    :key="role"
-                                    :label="role"
-                                    :value="role"
+                                    :key="role.id || role.name || role"
+                                    :label="role.display_name || role"
+                                    :value="role.name || role"
                                 />
                             </el-select>
                             <div
@@ -253,10 +253,20 @@ const validRoles = computed(() => {
     console.log("Roles:", props.roles);
     if (!props.roles) return [];
 
+    // Handle array format (new structure)
     if (Array.isArray(props.roles)) {
-        return props.roles.filter((role) => role != null && role !== "");
+        return props.roles.filter(role => {
+            // Handle both old format (strings) and new format (objects)
+            if (typeof role === 'string') {
+                return role != null && role.trim() !== '';
+            } else if (typeof role === 'object' && role !== null) {
+                return role.name != null && role.display_name != null;
+            }
+            return false;
+        });
     }
 
+    // Handle object format (legacy)
     return Object.values(props.roles).filter(
         (role) => role != null && role !== ""
     );

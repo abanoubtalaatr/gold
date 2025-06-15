@@ -127,6 +127,7 @@ const updateStatus = (id, newStatus) => {
         updatedStatus.is_active = newStatus ? 1 : 0;
     }
 };
+
 const handleFilterUpdate = (updatedFilters) => {
     Object.assign(filterForm, updatedFilters);
     router.get(route("vendor.roles.index"), filterForm, {

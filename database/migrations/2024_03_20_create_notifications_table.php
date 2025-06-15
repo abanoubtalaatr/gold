@@ -11,18 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //i want if not exist the table notifications create it
-        if (!Schema::hasTable('notifications')) {
+        // i want if not exist the table notifications create it
+        if (! Schema::hasTable('notifications')) {
             Schema::create('notifications', function (Blueprint $table) {
                 $table->uuid('id')->primary();
                 $table->string('type');
                 $table->morphs('notifiable');
                 $table->text('data');
                 $table->timestamp('read_at')->nullable();
-            $table->timestamps();
-        });
+                $table->timestamps();
+            });
+        }
     }
-}
 
     /**
      * Reverse the migrations.
@@ -31,4 +31,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('notifications');
     }
-}; 
+};

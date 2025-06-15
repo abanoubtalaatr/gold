@@ -31,14 +31,14 @@ class BannerSeeder extends Seeder
         foreach ($banners as $banner) {
             $translations = $banner['translations'];
             unset($banner['translations']);
-            
+
             $bannerModel = Banner::create($banner);
-            
+
             foreach ($translations as $locale => $translation) {
                 $bannerModel->translateOrNew($locale)->fill($translation);
             }
-            
+
             $bannerModel->save();
         }
     }
-} 
+}

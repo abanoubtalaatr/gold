@@ -1,10 +1,9 @@
 <?php
 
-use App\Models\OrderRental;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -20,7 +19,7 @@ return new class extends Migration
             'piece_sent',
             'rented',
             'available',
-            'sold'
+            'sold',
         ])->update(['status' => 'pending_approval']);
 
         // Step 2: Change the ENUM definition
@@ -31,7 +30,7 @@ return new class extends Migration
                 'piece_sent',
                 'rented',
                 'available',
-                'sold'
+                'sold',
             ])->nullable()->default('pending_approval')->change();
         });
     }
@@ -44,10 +43,10 @@ return new class extends Migration
         Schema::table('order_rentals', function (Blueprint $table) {
             $table->enum('status', [
                 'pending',
-                'accepted', 
+                'accepted',
                 'active',
                 'completed',
-                'cancelled'
+                'cancelled',
             ])->nullable()->default('pending')->change();
         });
     }

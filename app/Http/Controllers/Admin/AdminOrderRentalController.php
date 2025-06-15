@@ -42,7 +42,7 @@ class AdminOrderRentalController extends Controller
             ->when($filters['status'] ?? null, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->with(['user', 'goldPiece', 'goldPiece.user', 'branch'])
+            ->with(['user', 'goldPiece', 'goldPiece.user', 'branch','branch.vendor'])
             ->orderBy('created_at', 'desc');
 
         $rentalOrders = $rentalOrdersQuery->paginate(10)->appends($filters);

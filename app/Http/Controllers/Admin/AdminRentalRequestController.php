@@ -128,7 +128,8 @@ class AdminRentalRequestController extends Controller
             ->with([
                 'user',
                 'goldPiece',
-                'branch'
+                'branch',
+                'branch.vendor'
             ])
             ->select([
                 'id',
@@ -155,7 +156,7 @@ class AdminRentalRequestController extends Controller
             return $order;
         });
 
-        return Inertia::render('Admin/RentalRequests/Index', [
+        return Inertia::render('Admin/Orders/RentalRequest', [
             'orders' => $orders,
             'branches' => $branches,
             'filters' => $filters,

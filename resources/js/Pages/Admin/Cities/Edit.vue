@@ -34,22 +34,6 @@
                                         {{ form.errors.name_ar }}
                                     </p>
                                 </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('State')
-                                        }}</label>
-                                    <select v-model="form.state_id"
-                                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        required>
-                                        <option v-for="state in states" :key="state.id" :value="state.id">
-                                            {{ state.name }}
-                                        </option>
-                                    </select>
-                                    <p v-if="form.errors.state_id" class="mt-1 text-sm text-red-600">
-                                        {{ form.errors.state_id }}
-                                    </p>
-                                </div>
-
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Status')
                                         }}</label>

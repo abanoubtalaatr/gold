@@ -7,7 +7,7 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
                         <Link class="nav-link" :href="route('dashboard')">
-                            {{ $t("Home") }}
+                        {{ $t("Home") }}
                         </Link>
                     </li>
                     <li class="breadcrumb-item active">{{ $t("roles") }}</li>
@@ -27,38 +27,33 @@
                             <!-- General Form Elements -->
                             <form @submit.prevent="update" class="row g-3">
                                 <div class="row mb-3">
-
-
                                     <div class="col-sm-10">
-                            <div v-for="(language, index) in supportedLanguages" :key="index">
-                            <el-form-item :label="$t('name') + ' (' + $t(language) + ')'" :error="form.errors[`translations.${language}.name`]">
-                                <el-input
-                                v-model="form.translations[language].name "
-                                :placeholder="$t('name') + ' (' + $t(language) + ')'"
-                                />
-                            </el-form-item>
-                            </div>
+                                        <el-form-item :label="$t('name') + ' (English)'" :error="form.errors.name">
+                                            <el-input
+                                                v-model="form.name"
+                                                :placeholder="$t('name') + ' (English)'"
+                                            />
+                                        </el-form-item>
+                                    </div>
+                                </div>
 
+                                <div class="row mb-3">
+                                    <div class="col-sm-10">
+                                        <el-form-item :label="$t('name') + ' (العربية)'" :error="form.errors.name_ar">
+                                            <el-input
+                                                v-model="form.name_ar"
+                                                :placeholder="$t('name') + ' (العربية)'"
+                                            />
+                                        </el-form-item>
                                     </div>
                                 </div>
 
                                 <div class="text-center">
-                                    <button
-                                        type="submit"
-                                        class="btn btn-primary"
-                                        v-bind:disabled="show_loader"
-                                    >
+                                    <button type="submit" class="btn btn-primary" v-bind:disabled="show_loader">
                                         {{ $t("update") }} &nbsp;
-                                        <i
-                                            class="bi bi-save"
-                                            v-if="!show_loader"
-                                        ></i>
-                                        <span
-                                            class="spinner-border spinner-border-sm"
-                                            role="status"
-                                            aria-hidden="true"
-                                            v-if="show_loader"
-                                        ></span>
+                                        <i class="bi bi-save" v-if="!show_loader"></i>
+                                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+                                            v-if="show_loader"></span>
                                     </button>
                                 </div>
                             </form>
@@ -78,36 +73,18 @@ import InputError from "@/Components/InputError.vue";
 import { ref } from "vue";
 import { Link } from '@inertiajs/vue3';
 
-import settings from '@/src/config/settings';
-
-const supportedLanguages = settings.supportedLanguages;
-
 const props = defineProps({
     role: Object,
 });
 
 const show_loader = ref(false);
 
-
-
 const form = useForm({
     name: props.role.name,
-    translations: {},
+    name_ar: props.role.name_ar,
 });
 
-
-const translationsMap = (props.role.translations || []).reduce((acc, translation) => {
-  acc[translation.locale] = { name: translation.name };
-  return acc;
-}, {});
-
-
-
-console.log( props.role);
-    supportedLanguages.forEach((lang) => {
-    form.translations[lang] = translationsMap[lang] || { name: props.role.name };
-    });
-
+console.log(props.role);
 
 const update = () => {
     show_loader.value = true;

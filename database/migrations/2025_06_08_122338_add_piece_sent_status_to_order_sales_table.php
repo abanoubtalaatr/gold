@@ -17,7 +17,7 @@ return new class extends Migration
                 'approved',
                 'piece_sent',
                 'sold',
-                'rejected'
+                'rejected',
             ])->nullable()->default('pending_approval')->change();
         });
     }
@@ -32,7 +32,7 @@ return new class extends Migration
                 'pending_approval',
                 'approved',
                 'sold',
-                'rejected'
+                'rejected',
             ])->nullable()->default('pending_approval')->change();
         });
     }

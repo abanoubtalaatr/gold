@@ -104,9 +104,9 @@
               >
                 <el-option
                   v-for="role in validRoles"
-                  :key="role"
-                  :label="role"
-                  :value="role"
+                  :key="role.id || role.name"
+                  :label="role.display_name || role"
+                  :value="role.name || role"
                 />
               </el-select>
               <div v-if="form.errors.selectedRoles" class="error-message">
@@ -213,7 +213,17 @@ const form = useForm({
 });
 
 const validRoles = computed(() => {
-  return props.roles?.filter(role => role != null) || [];
+  if (!props.roles) return [];
+  
+  return props.roles.filter(role => {
+    // Handle both old format (strings) and new format (objects)
+    if (typeof role === 'string') {
+      return role != null && role.trim() !== '';
+    } else if (typeof role === 'object' && role !== null) {
+      return role.name != null && role.display_name != null;
+    }
+    return false;
+  });
 });
 
 const handleAvatarChange = (file) => {

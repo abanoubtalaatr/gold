@@ -45,7 +45,13 @@ class AdminOrderSalesController extends Controller
             ->when($filters['status'] ?? null, function ($query, $status) {
                 $query->where('status', $status);
             })
-            ->with(['user', 'goldPiece.user', 'goldPiece.media', 'branch'])
+            ->with([
+                'user', 
+                'goldPiece.user', 
+                'goldPiece.media', 
+                'branch',
+                'branch.vendor' // Added branch vendor relationship
+            ])
             ->orderBy('created_at', 'desc');
 
         $saleOrders = $saleOrdersQuery->paginate(10)->appends($filters);

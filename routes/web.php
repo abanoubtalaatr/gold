@@ -63,6 +63,15 @@ Route::get('/', [LandingController::class, 'index'])->name('landing');
 Route::post('/contact', [LandingController::class, 'contact'])->name('landing.contact');
 Route::get('privacy', [LandingController::class, 'show'])->name('privacy')->defaults('slug', 'privacy');
 Route::get('terms', [LandingController::class, 'show'])->name('terms')->defaults('slug', 'terms');
+
+// CSRF token refresh route
+Route::get('/refresh-csrf', function () {
+    return response()->json([
+        'csrf_token' => csrf_token(),
+        'timestamp' => now()->toISOString()
+    ]);
+})->name('refresh-csrf');
+
 // Dashboard route for authenticated users
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -79,71 +88,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
         Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
         Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
-
-        // Add polling endpoint for real-time notifications
-        Route::get('/poll', function () {
-            $user = request()->user();
-            if (!$user) {
-                return response()->json(['error' => 'Unauthorized'], 401);
-            }
-
-            $lastCheck = request()->get('last_check');
-
-            // If no last_check provided, use 5 minutes ago to catch recent notifications
-            if (!$lastCheck) {
-                $since = now()->subMinutes(5);
-            } else {
-                try {
-                    $since = \Carbon\Carbon::parse($lastCheck);
-                    // Ensure we don't go too far back to avoid performance issues
-                    $maxLookback = now()->subHours(1);
-                    if ($since->lt($maxLookback)) {
-                        $since = $maxLookback;
-                    }
-                } catch (\Exception $e) {
-                    // If invalid date, use 5 minutes ago as fallback
-                    $since = now()->subMinutes(5);
-                }
-            }
-
-            // Get only unread notifications created AFTER the last check time
-            $newNotifications = $user->notifications()
-                ->where('created_at', '>', $since)
-                ->whereNull('read_at')
-                ->orderBy('created_at', 'desc')
-                ->limit(50) // Limit to prevent overwhelming the frontend
-                ->get()
-                ->map(function ($notification) {
-                    return [
-                        'id' => $notification->id,
-                        'type' => $notification->type,
-                        'data' => $notification->data,
-                        'created_at' => $notification->created_at->toISOString(),
-                        'time_ago' => $notification->created_at->diffForHumans(),
-                    ];
-                });
-
-            // Get total unread count
-            $totalUnread = $user->unreadNotifications()->count();
-
-            return response()->json([
-                'notifications' => $newNotifications,
-                'count' => $newNotifications->count(),
-                'total_unread' => $totalUnread,
-                'timestamp' => now()->toISOString(),
-                'since' => $since->toISOString(),
-                'next_check_from' => $newNotifications->count() > 0 ?
-                    $newNotifications->first()['created_at'] :
-                    now()->toISOString(),
-                'debug' => [
-                    'user_id' => $user->id,
-                    'last_check_provided' => $lastCheck,
-                    'since_parsed' => $since->toISOString(),
-                    'notifications_found' => $newNotifications->count(),
-                    'server_time' => now()->toISOString(),
-                ]
-            ]);
-        })->name('notifications.poll');
+        Route::get('/poll', [NotificationController::class, 'poll'])->name('notifications.poll');
     });
 
     // Add vendor notifications count route
@@ -527,3 +472,10 @@ Route::get('invoice/{order}', [InvoiceController::class, 'index'])->name('invoic
 
 // Gold piece details route for QR code scanning
 Route::get('gold-piece/{goldPiece}', [GoldPieceDetailsController::class, 'show'])->name('gold-piece.show');
+
+// Add CSRF token refresh route for AJAX requests
+Route::get('/refresh-csrf', function () {
+    return response()->json([
+        'csrf_token' => csrf_token()
+    ]);
+})->name('refresh-csrf');

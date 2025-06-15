@@ -75,12 +75,21 @@
                 </Link>
             </li>
 
+            
+            <li class="nav-item" v-if="hasPermission('read orders')">
+                <Link class="nav-link" :href="route('admin.rental-requests.index')" :class="{
+                    collapsed: !$page.url.startsWith('/admin/rental-requests'),
+                }">
+                <i class="bi bi-shop"></i>
+                <span>{{ $t("Rental Requests") }}</span>
+                </Link>
+            </li>
             <li class="nav-item" v-if="hasPermission('read orders')">
                 <Link class="nav-link" :href="route('admin.orders.rental.index')" :class="{
                     collapsed: !$page.url.startsWith('/admin/orders/rental'),
                 }">
                 <i class="bi bi-shop"></i>
-                <span>{{ $t("Order Rentals") }}</span>
+                <span>{{ $t("Rental Orders") }}</span>
                 </Link>
             </li>
 

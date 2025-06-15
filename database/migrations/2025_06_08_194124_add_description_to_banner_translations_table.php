@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('banner_translations', function (Blueprint $table) {
-            // check if exist not migrate it 
-            if (!Schema::hasColumn('banner_translations', 'description')) {
+            // check if exist not migrate it
+            if (! Schema::hasColumn('banner_translations', 'description')) {
                 $table->text('description')->nullable()->after('title');
             }
         });

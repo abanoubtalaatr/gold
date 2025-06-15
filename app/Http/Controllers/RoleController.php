@@ -6,6 +6,7 @@ use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use App\Models\User;
@@ -17,7 +18,7 @@ class RoleController extends Controller
 
     public function index(Request $request)
     {
-        $roles = Role::where('vendor_id', auth()->user()->id)->latest()->with('translations');
+        $roles = Role::where('vendor_id', Auth::user()->id)->latest();
 
         $filters = [
             'name' => $request->name,
@@ -25,22 +26,20 @@ class RoleController extends Controller
         ];
 
         $roles->when($filters['name'], function ($roles, $name) {
-            return $roles->whereTranslationLike('name', "%{$name}%");
+            return $roles->where('name', "%{$name}%")->orWhere('name_ar', "%{$name}%");
         });
 
         if (isset($filters['is_active'])) {
             $roles->where('is_active', $filters['is_active']);
         }
 
-
-
-
         $roles = $roles->paginate(10);
         $roles->getCollection()->transform(function ($role) {
+
             return [
                 'id' => $role->id,
                 'is_active' => $role->is_active,
-                'name' => $role->translate(app()->getLocale())?->name ?? $role->name,
+                'name' => app()->getLocale() == 'ar' ? $role->name_ar : $role->name,
                 'guard_name' => $role->guard_name,
             ];
         });
@@ -59,28 +58,28 @@ class RoleController extends Controller
 
     public function store(StoreRoleRequest $request)
     {
+        $vendorId = Auth::user()->vendor_id ?? Auth::user()->id;
+        
+        // Check if role already exists for this vendor
+        $existingRole = Role::where('name', $request->input('translations.en.name'))
+                           ->where('guard_name', 'web')
+                           ->where('vendor_id', $vendorId)
+                           ->first();
+        
+        if ($existingRole) {
+            return redirect()->back()
+                ->withErrors(['translations.en.name' => 'A role with this name already exists for your account.'])
+                ->withInput();
+        }
+
         $role = Role::create([
             'key' => $request->input('translations.en.name'),
             'name' => $request->input('translations.en.name'),
+            'name_ar' => $request->input('translations.ar.name'),
             'guard_name' => 'web',
-            'vendor_id' => auth()->user()->id
+            'vendor_id' => $vendorId
         ]);
-
-        $translations = [];
-        foreach ($request->input('translations') as $locale => $translation) {
-            $translations[] = [
-                'role_id' => $role->id,
-                'locale' => $locale,
-                'name' => $translation['name']
-            ];
-        }
-
-        DB::table('role_translations')->upsert(
-            $translations,
-            ['role_id', 'locale'], // Unique key for checking duplicates
-            ['name'] // Fields to update if duplicate is found
-        );
-
+        
         return redirect()->route('roles.index')
             ->with('success', __('messages.data_created_successfully'));
     }
@@ -96,15 +95,12 @@ class RoleController extends Controller
 
     public function edit(Role $role)
     {
-        $role->load('translations');
-
-
         return Inertia('roles-permissions/Roles/Edit', [
             'role' => [
                 'id' => $role->id,
                 'name' =>  $role->name,
+                'name_ar' =>  $role->name_ar,
                 'guard_name' => $role->guard_name,
-                'translations' => $role->translations,
             ],
         ]);
     }
@@ -112,39 +108,13 @@ class RoleController extends Controller
 
     public function update(UpdateRoleRequest $request, Role $role)
     {
-        DB::beginTransaction();
-        try {
+        $role->update([
+            'name' => $request->input('name'),
+            'name_ar' => $request->input('name_ar'),
+        ]);
 
-            DB::table('roles')
-                ->where('id', $role->id)
-                ->update(['name' => $request->input('translations.en.name')]);
-
-            foreach ($request->input('translations') as $locale => $translation) {
-                DB::table('role_translations')
-                    ->updateOrInsert(
-                        [
-                            'role_id' => $role->id,
-                            'locale' => $locale
-                        ],
-                        [
-                            'name' => $translation['name']
-                        ]
-                    );
-            }
-
-            DB::commit();
-
-            
-            return redirect()->route('roles.index')
-                ->with('success', __('messages.data_updated_successfully'));
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Update failed:', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return back()->with('error', 'Error updating role: ' . $e->getMessage());
-        }
+        return redirect()->route('roles.index')
+            ->with('success', __('messages.data_updated_successfully'));
     }
 
     public function destroy($roleId)
@@ -176,16 +146,16 @@ class RoleController extends Controller
 
     public function givePermissionToRole(Request $request, $roleId)
     {
-        
+
         $request->validate([
             'selectedPermissions' => 'required'
         ]);
 
         $role = Role::findOrFail($roleId);
         $role->syncPermissions($request->selectedPermissions);
-        $parentRole = User::find(auth()->user()->vendor_id??auth()->user()->id);
+        $parentRole = User::find(Auth::user()->vendor_id ?? Auth::user()->id);
 
-        if (auth()->user()->hasRole('vendor') || $parentRole->hasRole('vendor')) {
+        if (Auth::user()->hasRole('vendor') || $parentRole->hasRole('vendor')) {
             return redirect()->route('vendor.roles.index')
                 ->with('success',  __('messages.role_permissions_updated_successfully'));
         }

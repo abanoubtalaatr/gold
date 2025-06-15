@@ -14,11 +14,6 @@ use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
-    public function __construct()
-    {
-        
-    }
-
     public function index(Request $request)
     {
         // Get the current authenticated user (assuming it's a vendor)
@@ -26,7 +21,7 @@ class RoleController extends Controller
 
         $roles = Role::where('name', '!=', 'superadmin')->where('vendor_id', $user->vendor_id??$user->id)
             ->latest()
-            ->with('translations');
+            ;
 
         // If the user is a vendor, only show roles associated with this vendor
         if ($user && $user->hasRole('vendor')) {
@@ -53,7 +48,7 @@ class RoleController extends Controller
             return [
                 'id' => $role->id,
                 'is_active' => $role->is_active,
-                'name' => $role->translate(app()->getLocale())?->name ?? $role->name,
+                'name' => app()->getLocale() == 'ar' ? $role->name_ar : $role->name,
                 'guard_name' => $role->guard_name,
             ];
         });

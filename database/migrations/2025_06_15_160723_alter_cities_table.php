@@ -9,10 +9,15 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
+        // Check if the column already exists, if so, skip this migration
+        if (Schema::hasColumn('cities', 'state_id')) {
+            return;
+        }
+
         Schema::table('cities', function (Blueprint $table) {
-            $table->unsignedBigInteger('country_id')->nullable()->change();
+            $table->foreignId('state_id')->nullable()->constrained('states')->cascadeOnDelete();
         });
     }
 

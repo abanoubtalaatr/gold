@@ -18,6 +18,10 @@ class BranchRequest extends FormRequest
             'removeLogo' => ['nullable', 'boolean'],
             'images' => ['nullable', 'array', 'max:5'],
             'images.*' => ['image', 'mimes:jpg,png', 'max:5120'],
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'contact_number' => ['nullable', 'string', 'max:255'],
+            'contact_email' => ['nullable', 'email', 'max:255'],
+            'number_of_available_items' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }

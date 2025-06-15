@@ -69,6 +69,10 @@
                                         </th>
                                         <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            {{ $t('Vendor') }}
+                                        </th>
+                                        <th
+                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Branch') }}
                                         </th>
                                         <th
@@ -83,10 +87,7 @@
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Status') }}
                                         </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $t('Actions') }}
-                                        </th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -98,7 +99,7 @@
                                             <div class="flex items-center">
                                                 <div>
                                                     {{ order.user?.name || 'N/A' }}<br />
-                                                    {{ order.user?.email || 'N/A' }}
+                                                    {{ order.user?.mobile || 'N/A' }}
                                                 </div>
                                             </div>
                                         </td>
@@ -106,8 +107,13 @@
                                             {{ order.gold_piece?.name || '--' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ order.branch?.vendor?.name || '--' }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ order.branch?.name || '--' }}
                                         </td>
+                                        
+                                        
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ formatDate(order.created_at) }}
                                         </td>
@@ -122,22 +128,7 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                             <template v-for="action in order.allowed_actions">
-                                                <button v-if="action === 'accept'" @click="acceptOrder(order)"
-                                                    class="px-3 py-1 text-sm text-white bg-green-600 rounded hover:bg-green-700">
-                                                    {{ $t('Accept') }}
-                                                </button>
-                                                <button v-if="action === 'reject'" @click="rejectOrder(order)"
-                                                    class="px-3 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700">
-                                                    {{ $t('Reject') }}
-                                                </button>
-                                                <button v-if="action === 'mark_as_sent'" @click="markAsSent(order)"
-                                                    class="px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700">
-                                                    {{ $t('Mark as Sent') }}
-                                                </button>
-                                                <button v-if="action === 'mark_as_sold'" @click="markAsSold(order)"
-                                                    class="px-3 py-1 text-sm text-white bg-purple-600 rounded hover:bg-purple-700">
-                                                    {{ $t('Mark as Sold') }}
-                                                </button>
+                                                
                                             </template>
                                         </td>
                                     </tr>

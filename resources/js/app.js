@@ -3,7 +3,7 @@ import '../css/app.css'
 import '../../public/dashboard-assets/js/main.js'
 
 import { createApp, h } from 'vue'
-import { createInertiaApp } from '@inertiajs/vue3'
+import { createInertiaApp, router } from '@inertiajs/vue3'
 import { createI18n } from 'vue-i18n'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { ZiggyVue } from '../../vendor/tightenco/ziggy'
@@ -36,6 +36,30 @@ document.documentElement.style.setProperty(
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel'
 
+// CSRF Token Management
+const updateCsrfToken = (token) => {
+  if (token) {
+    // Update meta tag
+    const metaTag = document.head.querySelector('meta[name="csrf-token"]');
+    if (metaTag) {
+      metaTag.setAttribute('content', token);
+    }
+    
+    // Update axios headers
+    if (window.axios) {
+      window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
+    }
+    
+    console.log('CSRF token updated:', token.substring(0, 10) + '...');
+  }
+}
+
+// Set initial CSRF token
+const initialToken = document.head.querySelector('meta[name="csrf-token"]')?.content;
+if (initialToken) {
+  axios.defaults.headers.common['X-CSRF-TOKEN'] = initialToken;
+}
+
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,
   resolve: (name) =>
@@ -44,15 +68,7 @@ createInertiaApp({
       import.meta.glob('./Pages/**/*.vue')
     ),
   setup({ el, App, props, plugin }) {
-    // Set up CSRF token from page props or meta tag
-    const csrfToken = props.initialPage.props.csrf_token || 
-                      document.head.querySelector('meta[name="csrf-token"]')?.content
-    
-    if (csrfToken) {
-      window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken
-    }
-
-    return createApp({ render: () => h(App, props) })
+    const app = createApp({ render: () => h(App, props) })
       .use(plugin)
       .use(ZiggyVue)
       .use(i18n)
@@ -60,24 +76,83 @@ createInertiaApp({
       .component('QuillEditor', QuillEditor)
       .component('Editor', Editor)
       .component('apexchart', VueApexCharts)
-      .mount(el)
+
+    return app.mount(el)
   },
   progress: {
     color: '#4B5563',
   },
 })
 
-// Axios and Echo setup
+// Update CSRF token on every Inertia page load/navigation
+router.on('navigate', (event) => {
+  const page = event.detail.page;
+  if (page.props && page.props.csrf_token) {
+    updateCsrfToken(page.props.csrf_token);
+  }
+});
+
+// Handle CSRF token mismatch errors
+router.on('error', (event) => {
+  const response = event.detail.response;
+  
+  if (response.status === 419) {
+    console.warn('CSRF token mismatch detected');
+    
+    // Try to refresh the token
+    fetch('/refresh-csrf', {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch fresh token');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.csrf_token) {
+        updateCsrfToken(data.csrf_token);
+        // Show user-friendly message
+        alert('Your session has been refreshed. Please try your action again.');
+      } else {
+        throw new Error('No CSRF token in response');
+      }
+    })
+    .catch(error => {
+      console.error('Failed to refresh CSRF token:', error);
+      alert('Your session has expired. The page will be refreshed.');
+      window.location.reload();
+    });
+  }
+});
+
+// Axios setup for non-Inertia requests
 window.axios = axios
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 
-// Set up CSRF token for axios (fallback)
+// Set up CSRF token for axios
 const token = document.head.querySelector('meta[name="csrf-token"]')
 if (token) {
   window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content
 } else {
-  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token')
+  console.error('CSRF token not found')
 }
+
+// Ensure fresh CSRF token on each axios request
+window.axios.interceptors.request.use(function (config) {
+  const freshToken = document.head.querySelector('meta[name="csrf-token"]')?.content;
+  if (freshToken) {
+    config.headers['X-CSRF-TOKEN'] = freshToken;
+  }
+  return config;
+}, function (error) {
+  return Promise.reject(error);
+});
 
 // window.Pusher = Pusher
 

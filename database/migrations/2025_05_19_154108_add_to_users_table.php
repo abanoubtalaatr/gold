@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('commercial_registration_number')->nullable();
             $table->string('commercial_registration_image')->nullable();
 
-            
         });
     }
 

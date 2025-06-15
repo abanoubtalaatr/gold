@@ -42,6 +42,9 @@
                       {{ $t('City') }}
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {{ $t('Contact Info') }}
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {{ $t('Status') }}
                     </th>
                     <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -77,6 +80,21 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {{ branch.city?.name || 'N/A' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">
+                        <div v-if="branch.contact_number" class="flex items-center">
+                          <span class="text-xs text-gray-500 mr-1">{{ $t('Phone') }}:</span>
+                          {{ branch.contact_number }}
+                        </div>
+                        <div v-if="branch.contact_email" class="flex items-center">
+                          <span class="text-xs text-gray-500 mr-1">{{ $t('Email') }}:</span>
+                          {{ branch.contact_email }}
+                        </div>
+                        <div v-if="!branch.contact_number && !branch.contact_email" class="text-gray-400">
+                          {{ $t('No contact info') }}
+                        </div>
+                      </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span

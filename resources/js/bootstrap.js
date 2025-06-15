@@ -5,10 +5,15 @@ import Pusher from 'pusher-js';
 window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-// Get CSRF token for requests
-const token = document.head.querySelector('meta[name="csrf-token"]');
+// Simple CSRF token getter
+const getCsrfToken = () => {
+    return document.head.querySelector('meta[name="csrf-token"]')?.content;
+};
+
+// Set initial CSRF token for axios
+const token = getCsrfToken();
 if (token) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
 }
 
 // Enable Pusher for real-time notifications
@@ -24,7 +29,7 @@ window.Echo = new Echo({
     disabledTransports: ['xhr_polling', 'xhr_streaming'],
     auth: {
         headers: {
-            'X-CSRF-TOKEN': token ? token.content : '',
+            'X-CSRF-TOKEN': getCsrfToken() || '',
             'Authorization': 'Bearer ' + (window.authToken || ''),
         },
     },
@@ -36,7 +41,7 @@ window.Echo = new Echo({
                     channel_name: channel.name
                 }, {
                     headers: {
-                        'X-CSRF-TOKEN': token ? token.content : '',
+                        'X-CSRF-TOKEN': getCsrfToken() || '',
                     }
                 })
                 .then(response => {
@@ -62,7 +67,7 @@ window.Echo.connector.pusher.connection.bind('disconnected', () => {
 });
 
 window.Echo.connector.pusher.connection.bind('error', (error) => {
-    console.error('Echo: Connection error:', error);
+    console.error('Echo: Connection error', error);
 });
 
 // Log when Echo is ready

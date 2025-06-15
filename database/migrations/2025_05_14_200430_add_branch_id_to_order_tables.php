@@ -8,14 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        //i want if exist branch id not make it again
-        if (!Schema::hasColumn('order_rentals', 'branch_id')) {                             
+        // i want if exist branch id not make it again
+        if (! Schema::hasColumn('order_rentals', 'branch_id')) {
             Schema::table('order_rentals', function (Blueprint $table) {
                 $table->foreignId('branch_id')->after('gold_piece_id')->constrained('branches')->onDelete('cascade');
             });
         }
 
-        if (!Schema::hasColumn('order_sales', 'branch_id')) {
+        if (! Schema::hasColumn('order_sales', 'branch_id')) {
             Schema::table('order_sales', function (Blueprint $table) {
                 $table->foreignId('branch_id')->after('gold_piece_id')->constrained('branches')->onDelete('cascade');
             });

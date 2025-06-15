@@ -162,6 +162,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::post('/notifications/read-all', [App\Http\Controllers\Api\V1\NotificationController::class, 'markAllAsRead']);
     Route::delete('/notifications/{id}', [App\Http\Controllers\Api\V1\NotificationController::class, 'destroy']);
     Route::delete('/notifications', [App\Http\Controllers\Api\V1\NotificationController::class, 'deleteAllNotifications']);
+    Route::get('/notifications/poll', [App\Http\Controllers\Api\V1\NotificationController::class, 'poll']);
     Route::post('toggle-enable-notifications', NotificationSettingController::class);
 
     /*

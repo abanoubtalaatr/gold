@@ -971,6 +971,10 @@
     "Reject Liquidation Request": "Reject Liquidation Request",
     "You are about to reject this liquidation request. Please provide a reason.": "You are about to reject this liquidation request. Please provide a reason.",
     "Are you sure you want to approve this liquidation request?": "Are you sure you want to approve this liquidation request?",
-    "piece_sent": "Piece Sent"
+    "piece_sent": "Piece Sent",
+    "Session refreshed. Please try again.": "Session refreshed. Please try again.",
+    "Session expired. Please refresh the page.": "Session expired. Please refresh the page.",
+    "CSRF token mismatch. Refreshing session...": "CSRF token mismatch. Refreshing session...",
+    "Request failed. Please try again.": "Request failed. Please try again."
 }
     

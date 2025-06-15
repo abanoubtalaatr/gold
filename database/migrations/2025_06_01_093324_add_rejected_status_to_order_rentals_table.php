@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -20,7 +19,7 @@ return new class extends Migration
                 'rented',
                 'available',
                 'sold',
-                'rejected'
+                'rejected',
             ])->nullable()->default('pending_approval')->change();
         });
     }
@@ -37,7 +36,7 @@ return new class extends Migration
                 'piece_sent',
                 'rented',
                 'available',
-                'sold'
+                'sold',
             ])->nullable()->default('pending_approval')->change();
         });
     }

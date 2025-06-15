@@ -67,8 +67,10 @@
                                     <tr v-for="(city, index) in cities.data" :key="city.id">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ index + 1 }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ city.name }}
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{ city[$i18n.locale === 'ar' ? 'name_ar' : 'name'] }}
                                         </td>
+                                        
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span v-if="city.status"
                                                 class="px-3 py-1 inline-flex items-center text-sm font-medium rounded-full bg-green-100 text-green-800">

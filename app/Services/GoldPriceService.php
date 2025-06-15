@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\SystemSetting;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class GoldPriceService
 {
@@ -53,9 +54,11 @@ class GoldPriceService
     public function getStructuredGoldPrices(): array
     {
         $realTimePrices = $this->getRealTimePrices();
-        $buyAdjustments = config('gold.adjustments.buy', []);
-        $sellAdjustments = config('gold.adjustments.sell', []);
-        $rentalSettings = config('gold.rental', []);
+        $systemSetting = SystemSetting::first();
+        
+        // Calculate buy and sell rates as percentages
+        $buyRate = ($systemSetting->gold_rental_price_percentage ?? 10) / 100;
+        $sellRate = ($systemSetting->gold_purchase_price ?? 10) / 100;
         
         $carats = ['24', '22', '21', '20', '18', '16', '14', '10'];
         $structuredPrices = [];
@@ -68,14 +71,13 @@ class GoldPriceService
             }
             
             $originalPrice = round($realTimePrices[$priceKey], 2);
-            $buyAdjustment = $buyAdjustments[$carat] ?? 0;
-            $sellAdjustment = $sellAdjustments[$carat] ?? 0;
             
-            $buyPrice = round($originalPrice + $buyAdjustment, 2);
-            $sellPrice = round($originalPrice + $sellAdjustment, 2);
+            // Calculate prices using rates instead of fixed adjustments
+            $buyPrice = round($originalPrice * (1 + $buyRate), 2);
+            $sellPrice = round($originalPrice * (1 - $sellRate), 2);
             
             // Calculate rental price (daily rate)
-            $dailyRentalRate = $rentalSettings['daily_rate_percentage'] ?? 0.01;
+            $dailyRentalRate = ($systemSetting->gold_rental_price_percentage ?? 10) / 100;
             $rentalPricePerDay = round($originalPrice * $dailyRentalRate, 2);
             
             $structuredPrices[$carat] = [
@@ -84,8 +86,8 @@ class GoldPriceService
                 'buy_price' => $buyPrice,
                 'sell_price' => $sellPrice,
                 'rental_price_per_day' => $rentalPricePerDay,
-                'buy_adjustment' => $buyAdjustment,
-                'sell_adjustment' => $sellAdjustment,
+                'buy_rate' => $buyRate * 100, // Store as percentage
+                'sell_rate' => $sellRate * 100, // Store as percentage
                 'price_change_indicator' => $this->getPriceChangeIndicator($carat, $originalPrice),
             ];
         }
@@ -277,12 +279,20 @@ class GoldPriceService
     {
         $pricePerGram = $this->getAdjustedPricePerGram($carat);
         $totalPrice = $pricePerGram * $weight;
-
+        $systemSetting = SystemSetting::first();
         // Add rental cost if applicable
         if ($rentalDays) {
-            $dailyRate = config('gold.rental.daily_rate_percentage', 0.01);
+            $dailyRate = $systemSetting->gold_rental_price_percentage??10;
+            $dailyRate = $dailyRate/100;
+
             $rentalCostPerDay = $pricePerGram * $dailyRate;
             $totalPrice += $rentalCostPerDay * $weight * $rentalDays;
+        }else{
+
+            $dailyRate = $systemSetting->gold_purchase_price??10;
+            $dailyRate = $dailyRate/100;
+
+            $totalPrice += $pricePerGram * $weight;
         }
 
         return round($totalPrice, 2);

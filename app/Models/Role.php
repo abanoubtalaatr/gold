@@ -8,11 +8,10 @@ use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Role extends SpatieRole implements TranslatableContract
+class Role extends SpatieRole
 {
-    use Translatable;
 
-    public $translatedAttributes = ['name'];
+    // public $translatedAttributes = ['name'];
     protected $fillable = [
         'name',
         'display_name',
@@ -20,6 +19,7 @@ class Role extends SpatieRole implements TranslatableContract
         'guard_name',
         'is_active',
         'vendor_id',
+        'name_ar',
     ];
 
     public function roles(){

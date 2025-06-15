@@ -1,11 +1,11 @@
 <template>
 
-    <Head title="Rental Orders" />
+    <Head title="Rental Requests" />
 
     <AuthenticatedLayout>
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                {{ $t('Rental Orders') }}
+                {{ $t('Rental Requests') }}
             </h2>
         </template>
 

@@ -16,7 +16,7 @@ class SimpleCityResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name'=> $this->name,
+            'name'=> app()->getLocale() == 'ar' ? $this->name_ar : $this->name,
         ];
     }
 }

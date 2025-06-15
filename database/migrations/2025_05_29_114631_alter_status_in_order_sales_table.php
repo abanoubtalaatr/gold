@@ -1,10 +1,9 @@
 <?php
 
-use App\Models\OrderSale;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -17,15 +16,15 @@ return new class extends Migration
         DB::table('order_sales')->whereNotIn('status', [
             'pending-approval',
             'approved',
-            'sold'
+            'sold',
         ])->update(['status' => 'pending_approval']);
 
         // Step 2: Change the ENUM definition
         Schema::table('order_sales', function (Blueprint $table) {
             $table->enum('status', [
                 'pending_approval',
-                'approved', 
-                'sold'
+                'approved',
+                'sold',
             ])->nullable()->default('pending_approval')->change();
         });
     }
@@ -38,10 +37,10 @@ return new class extends Migration
         Schema::table('order_sales', function (Blueprint $table) {
             $table->enum('status', [
                 'pending',
-                'accepted', 
+                'accepted',
                 'active',
                 'completed',
-                'cancelled'
+                'cancelled',
             ])->nullable()->default('pending')->change();
         });
     }

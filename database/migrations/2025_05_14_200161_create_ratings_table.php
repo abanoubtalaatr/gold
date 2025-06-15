@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        //drop the table if it exists
+        // drop the table if it exists
         Schema::dropIfExists('ratings');
 
         Schema::create('ratings', function (Blueprint $table) {
@@ -32,4 +32,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('ratings');
     }
-}; 
+};

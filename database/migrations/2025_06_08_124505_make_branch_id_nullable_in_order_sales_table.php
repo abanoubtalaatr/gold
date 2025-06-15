@@ -15,7 +15,7 @@ return new class extends Migration
             $table->dropForeign(['branch_id']);
             $table->dropColumn('branch_id');
         });
-        
+
         Schema::table('order_sales', function (Blueprint $table) {
             $table->foreignId('branch_id')->nullable()->constrained()->onDelete('set null');
         });
@@ -30,7 +30,7 @@ return new class extends Migration
             $table->dropForeign(['branch_id']);
             $table->dropColumn('branch_id');
         });
-        
+
         Schema::table('order_sales', function (Blueprint $table) {
             $table->foreignId('branch_id')->constrained()->onDelete('cascade');
         });

@@ -13,17 +13,10 @@ class UpdateRoleRequest extends FormRequest
 
     public function rules(): array
     {
-
-
-            $rules = [];
-
-            foreach (config('app.supported_languages') as $language) {
-            $rules ["translations.{$language}.name"] = ['required',
-                'string',
-                'max:255',
-                'unique:roles,name,' . $this->role->id] ;
-        }
-        return $rules;
+        return [
+            'name' => ['required', 'string', 'max:255', 'unique:roles,name,' . $this->role->id],
+            'name_ar' => ['required', 'string', 'max:255', 'unique:roles,name_ar,' . $this->role->id],
+        ];
     }
 
     public function messages()
