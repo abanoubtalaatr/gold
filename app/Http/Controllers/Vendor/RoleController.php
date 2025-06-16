@@ -19,9 +19,8 @@ class RoleController extends Controller
         // Get the current authenticated user (assuming it's a vendor)
         $user = Auth::user();
 
-        $roles = Role::where('name', '!=', 'superadmin')->where('vendor_id', $user->vendor_id??$user->id)
-            ->latest()
-            ;
+        $roles = Role::where('name', '!=', 'superadmin')->where('vendor_id', $user->vendor_id ?? $user->id)
+            ->latest();
 
         // If the user is a vendor, only show roles associated with this vendor
         if ($user && $user->hasRole('vendor')) {
@@ -58,8 +57,6 @@ class RoleController extends Controller
         ]);
     }
 
-
-
     public function create()
     {
         return Inertia('Vendor/roles-permissions/Roles/Create');
@@ -68,47 +65,39 @@ class RoleController extends Controller
 
     public function store(StoreRoleRequest $request)
     {
-        DB::beginTransaction();
-        try {
-            // First create the role
-            $roleId = DB::table('roles')->insertGetId([
-                'name' => $request->input('translations.en.name'),
-                'guard_name' => 'web',
-                'vendor_id' => Auth::user()->id,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-
-            // Then add translations
-            foreach ($request->input('translations') as $locale => $translation) {
-                DB::table('role_translations')->insert([
-                    'role_id' => $roleId,
-                    'locale' => $locale,
-                    'name' => $translation['name']
-                ]);
-            }
-
-            DB::commit();
-
-            return redirect()->route('vendor.roles.index')
-                ->with('success', __('messages.data_created_successfully'));
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Role creation failed: ' . $e->getMessage());
-            return back()->with('error', 'Error creating role');
+        $vendorId = Auth::user()->vendor_id ?? Auth::user()->id;
+        
+        $existingRole = Role::where('name', $request->input('translations.en.name'))
+                           ->where('guard_name', 'web')
+                           ->where('vendor_id', $vendorId)
+                           ->first();
+        
+        if ($existingRole) {
+            return redirect()->back()
+                ->withErrors(['translations.en.name' => 'A role with this name already exists for your account.'])
+                ->withInput();
         }
+
+        $role = Role::create([
+            'key' => $request->input('translations.en.name'),
+            'name' => $request->input('translations.en.name'),
+            'name_ar' => $request->input('translations.ar.name'),
+            'guard_name' => 'web',
+            'vendor_id' => $vendorId
+        ]);
+        
+
+        return redirect()->route('vendor.roles.index')
+            ->with('success', __('messages.data_created_successfully'));
     }
     public function edit(Role $role)
     {
-        $role->load('translations');
-
-
-        return Inertia('Vendor/roles-permissions/Roles/Edit', [
+        return Inertia('roles-permissions/Roles/Edit', [
             'role' => [
                 'id' => $role->id,
-                'name' => $role->name,
+                'name' =>  $role->name,
+                'name_ar' =>  $role->name_ar,
                 'guard_name' => $role->guard_name,
-                'translations' => $role->translations,
             ],
         ]);
     }
@@ -116,57 +105,30 @@ class RoleController extends Controller
 
     public function update(UpdateRoleRequest $request, Role $role)
     {
-        DB::beginTransaction();
-        try {
+        $role->update([
+            'name' => $request->input('name'),
+            'name_ar' => $request->input('name_ar'),
+        ]);
 
-            DB::table('roles')
-                ->where('id', $role->id)
-                ->update(['name' => $request->input('translations.en.name')]);
-
-            foreach ($request->input('translations') as $locale => $translation) {
-                DB::table('role_translations')
-                    ->updateOrInsert(
-                        [
-                            'role_id' => $role->id,
-                            'locale' => $locale
-                        ],
-                        [
-                            'name' => $translation['name']
-                        ]
-                    );
-            }
-
-            DB::commit();
-
-
-            return redirect()->route('vendor.roles.index')
-                ->with('success', __('messages.data_updated_successfully'));
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Update failed:', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return back()->with('error', 'Error updating role: ' . $e->getMessage());
-        }
+        return redirect()->route('vendor.roles.index')
+            ->with('success', __('messages.data_updated_successfully'));
     }
 
     public function destroy($role)
     {
-
         $role->delete();
+        
         return redirect()->route('vendor.roles.index')
-        ->with('success', __('messages.data_deleted_successfully'));
+            ->with('success', __('messages.data_deleted_successfully'));
     }
 
     public function addPermissionToRole($roleId)
     {
         // Get the role we want to add permissions to
         $role = Role::findOrFail($roleId);
-        
+
         // Get all vendor-prefixed permissions
-        $permissions = Permission::where('name', 'like', 'vendor %')->get();
-        ;
+        $permissions = Permission::where('name', 'like', 'vendor %')->get();;
         // Get permissions already assigned to this role
         $rolePermissions = DB::table('role_has_permissions')
             ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
@@ -174,7 +136,7 @@ class RoleController extends Controller
             ->pluck('permissions.name')
             ->all();
 
-        
+
         return Inertia('Vendor/roles-permissions/Roles/Add-permissions', [
             'role' => $role,
             'permissions' => $permissions,

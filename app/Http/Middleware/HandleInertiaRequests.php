@@ -30,6 +30,10 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        // Set locale from session if available
+        $locale = $request->session()->get('locale', config('app.locale', 'en'));
+        app()->setLocale($locale);
+
         return [
             ...parent::share($request),
             'csrf_token' => csrf_token(),
@@ -49,7 +53,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error')
             ],
-            'locale' => app()->getLocale(),
+            'locale' => $locale,
             'auth_permissions' => $request->user() ? $request->user()->getPermissionsViaRoles()->pluck('name')->toArray() : []
         ];
     }

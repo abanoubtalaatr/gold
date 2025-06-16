@@ -26,13 +26,13 @@ class LangController extends Controller
             $language = 'en'; // fallback to English
         }
         
-        // Set application locale
+        // Set application locale immediately
         App::setLocale($language);
         
-        // Store in session
+        // Store in session for persistence
         Session::put('locale', $language);
         
-        return redirect()->back()->with('success', __('Language changed successfully'));
+        return back()->with('success', __('Language changed successfully'));
     }
 
     /**

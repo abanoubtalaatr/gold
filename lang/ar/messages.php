@@ -297,4 +297,5 @@ return [
     "home"=>'الرئيسية',
     "active"=>'مفعل',
     "inactive"=>'غير مفعل',
+    "Data created successfully"=>'تم إنشاء البيانات بنجاح'
 ];

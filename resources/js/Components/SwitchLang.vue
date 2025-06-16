@@ -60,9 +60,8 @@
 </template>
 
 <script setup>
-import { usePage } from '@inertiajs/vue3';
+import { usePage, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
-import axios from 'axios';
 
 const page = usePage();
 const currentLanguage = computed(() => page.props.locale || 'en');
@@ -74,15 +73,11 @@ const currentLanguageLabel = computed(() => {
   return currentLanguage.value === 'ar' ? 'العربية' : 'English';
 });
 
-const changeLanguage = async (selectedLanguage) => {
+const changeLanguage = (selectedLanguage) => {
   if (selectedLanguage === currentLanguage.value) return;
   
-  try {
-    await axios.get(`/lang/change?lang=${selectedLanguage}`);
-    location.reload(); 
-  } catch (error) {
-    console.error('Error changing language:', error);
-  }
+  // Use direct navigation to ensure full page refresh for RTL/LTR styles
+  window.location.href = `/lang/change?lang=${selectedLanguage}`;
 };
 </script>
 
