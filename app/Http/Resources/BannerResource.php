@@ -18,8 +18,8 @@ class BannerResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image' => $this->image,
-            'title' => $this->title,
+            'image' => $this->image_url,
+            'title' => $this->description,
             'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s'),
             'updated_at' => Carbon::parse($this->updated_at)->format('Y-m-d H:i:s'),
         ];

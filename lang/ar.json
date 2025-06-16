@@ -1735,5 +1735,6 @@
     "Vendor deleted successfully": "تم حذف المحل بنجاح",
     "Submit Rejection": "إرسال الرفض",
     "Scan this QR code to view this gold piece":"اعمل scan علشان تقدر تشوف تفاصيل القطعة",
-    "Language changed successfully":"تم تغيير اللغة بنجاح"
+    "Language changed successfully":"تم تغيير اللغة بنجاح",
+    "is active":"مفعل"
 }

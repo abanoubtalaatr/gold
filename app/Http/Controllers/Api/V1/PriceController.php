@@ -89,12 +89,6 @@ class PriceController extends Controller
             $data = $this->goldPriceService->getMobileFormattedPrices();
             return $this->successResponse($data);
         } catch (\Exception $e) {
-            // Log the error for debugging
-            Log::warning('Gold API unavailable, using fallback data', [
-                'error' => $e->getMessage(),
-                'endpoint' => 'mobileFormattedPrices'
-            ]);
-            
             // Return fallback data with same structure when API fails
             $fallbackData = $this->getFallbackMobileFormattedPrices();
             return $this->successResponse($fallbackData);

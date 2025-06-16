@@ -26,32 +26,6 @@
                                     v-for="lang in supportedLanguages"
                                     :key="lang"
                                 >
-                                    <el-form-item
-                                        :label="
-                                            $t('title') + ' (' + $t(lang) + ')'
-                                        "
-                                    >
-                                        <el-input
-                                            v-model="
-                                                form.translations[lang].title
-                                            "
-                                            :placeholder="$t('title')"
-                                        />
-                                        <div
-                                            v-if="
-                                                form.errors[
-                                                    `translations.${lang}.title`
-                                                ]
-                                            "
-                                            class="error-message"
-                                        >
-                                            {{
-                                                form.errors[
-                                                    `translations.${lang}.title`
-                                                ]
-                                            }}
-                                        </div>
-                                    </el-form-item>
 
                                     <el-form-item
                                         :label="
@@ -83,23 +57,6 @@
                                                     `translations.${lang}.description`
                                                 ]
                                             }}
-                                        </div>
-                                    </el-form-item>
-                                </div>
-
-                                <!-- Sort Order -->
-                                <div class="mb-3 col-md-6">
-                                    <el-form-item :label="$t('sort_order')">
-                                        <el-input
-                                            v-model="form.sort_order"
-                                            type="number"
-                                            :placeholder="$t('sort_order')"
-                                        />
-                                        <div
-                                            v-if="form.errors.sort_order"
-                                            class="error-message"
-                                        >
-                                            {{ form.errors.sort_order }}
                                         </div>
                                     </el-form-item>
                                 </div>

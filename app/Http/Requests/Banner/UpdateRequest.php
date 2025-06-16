@@ -15,22 +15,15 @@ class UpdateRequest extends FormRequest
     {
         $rules = [
             'image' => 'nullable|image|mimes:webp,jpeg,png,jpg,gif|max:2048',
-            'sort_order' => 'required|numeric|unique:banners,sort_order,' . $this->route('banner')->id,
             'is_active' => 'boolean'
         ];
 
         foreach (config('app.supported_languages') as $language) {
-            $rules["translations.{$language}.title"] = [
+        
+            $rules["translations.{$language}.description"] = [
                 'required',
                 'string',
-                'min:2',
-                'max:255',
-            ];
-            
-            $rules["translations.{$language}.description"] = [
-                'nullable',
-                'string',
-                'min:10',
+                'min:3',
                 'max:500',
             ];
         }

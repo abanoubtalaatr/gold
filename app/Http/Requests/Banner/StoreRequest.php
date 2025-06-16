@@ -21,22 +21,15 @@ class StoreRequest extends FormRequest
     {
         $rules = [
             'image' => 'nullable|image|mimes:webp,jpeg,png,jpg,gif|max:2048',
-            'sort_order' => 'required|numeric|unique:banners,sort_order',
             'is_active' => 'boolean'
         ];
 
         foreach (config('app.supported_languages') as $language) {
-            $rules["translations.{$language}.title"] = [
-                'required',
-                'string',
-                'min:2',
-                'max:255',
-            ];
             
             $rules["translations.{$language}.description"] = [
-                'nullable',
+                'required',
                 'string',
-                'min:10',
+                'min:3',
                 'max:500',
             ];
         }

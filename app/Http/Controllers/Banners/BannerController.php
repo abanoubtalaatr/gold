@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Banners;
+
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Banner\StoreRequest;
 use App\Http\Requests\Banner\UpdateRequest;
 use App\Models\Banner;
-use App\Repositories\BannerRepository ;
+use App\Repositories\BannerRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -24,7 +25,7 @@ class BannerController extends Controller
         $filters = [
             'title' => $request->title,
             'is_active' => $request->is_active,
-            'sort_order'=>$request->sort_order
+            'sort_order' => $request->sort_order
         ];
 
         $items = $this->repository->getFilteredBanners($filters);
@@ -43,17 +44,18 @@ class BannerController extends Controller
 
     public function store(StoreRequest $request)
     {
-            $banner = $this->repository->create($request);
-            return redirect()
-                ->route('banners.index')
-                ->with('success', __('messages.data_created_successfully'));
-      
+        $this->repository->create($request);
+        
+        return redirect()
+            ->route('banners.index')
+            ->with('success', __('messages.data_created_successfully'));
     }
 
     public function show(Banner $banner)
     {
         return Inertia('Banner/Show', [
-            'banner' => $banner]);
+            'banner' => $banner
+        ]);
     }
 
 

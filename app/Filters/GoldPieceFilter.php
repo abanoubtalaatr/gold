@@ -39,7 +39,15 @@ class GoldPieceFilter
             ->availableToRentFilter()
             ->sortByPrice()
             ->cityFilter()
+            ->orderBy('created_at', 'desc')
             ->getQuery();
+    }
+
+    public function orderBy(): self
+    {
+        $this->query->orderBy('created_at', 'desc');
+
+        return $this;
     }
 
     protected function availableToRentFilter(): self

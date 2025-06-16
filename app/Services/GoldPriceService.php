@@ -73,8 +73,8 @@ class GoldPriceService
             $originalPrice = round($realTimePrices[$priceKey], 2);
             
             // Calculate prices using rates instead of fixed adjustments
-            $buyPrice = round($originalPrice * (1 + $buyRate), 2);
-            $sellPrice = round($originalPrice * (1 - $sellRate), 2);
+            $buyPrice = round($originalPrice);
+            $sellPrice = round($originalPrice);
             
             // Calculate rental price (daily rate)
             $dailyRentalRate = ($systemSetting->gold_rental_price_percentage ?? 10) / 100;
@@ -285,14 +285,14 @@ class GoldPriceService
             $dailyRate = $systemSetting->gold_rental_price_percentage??10;
             $dailyRate = $dailyRate/100;
 
-            $rentalCostPerDay = $pricePerGram * $dailyRate;
-            $totalPrice += $rentalCostPerDay * $weight * $rentalDays;
+            $rentalCostPerDay = ($totalPrice * $dailyRate) * $rentalDays??1;
+            $totalPrice = $rentalCostPerDay;
         }else{
 
             $dailyRate = $systemSetting->gold_purchase_price??10;
             $dailyRate = $dailyRate/100;
 
-            $totalPrice += $pricePerGram * $weight;
+            $totalPrice += $pricePerGram * $weight + $pricePerGram * $weight * $dailyRate;
         }
 
         return round($totalPrice, 2);
