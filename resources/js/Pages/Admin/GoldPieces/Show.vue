@@ -32,7 +32,7 @@
                             <div class="w-full">
                                 <div v-if="goldPiece.images.length > 0">
                                     <!-- Main Image -->
-                                    <div class="relative overflow-hidden rounded-lg aspect-square mb-4">
+                                    <div class="relative overflow-hidden rounded-lg aspect-square mb-4" style="width:200px">
                                         <img :src="currentImageSrc" class="object-cover w-full h-full"
                                             :alt="goldPiece.name" />
                                     </div>
@@ -135,7 +135,7 @@
                                     <h3 class="mb-3 text-lg font-medium text-gray-900">{{ $t('Additional Information')
                                         }}</h3>
                                     <dl class="space-y-3">
-                                        <div>
+                                        <div v-if="goldPiece.branch">
                                             <dt class="text-sm font-medium text-gray-500">{{ $t('Branch') }}</dt>
                                             <dd class="mt-1 text-sm text-gray-900">{{ goldPiece.branch?.name ||
                                                 $t('N/A') }}

@@ -2,7 +2,7 @@
     <AuthenticatedLayout>
         <!-- breadcrumb-->
         <div class="pagetitle">
-            <h1>Roles</h1>
+            <h1>{{ $t("Roles") }}</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
@@ -12,7 +12,7 @@
                     </li>
                     <li class="breadcrumb-item active">
                         <Link class="nav-link" :href="route('roles.index')">
-                            {{ $t("roles") }}
+                            {{ $t("Roles") }}
                         </Link>
                     </li>
                     <li class="breadcrumb-item active">{{ $t("create") }}</li>

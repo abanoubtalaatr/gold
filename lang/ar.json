@@ -1719,5 +1719,21 @@
     "Assign User": "تعيين مدير",
     "Contact Number": "رقم الاتصال",
     "Contact Email": "البريد الإلكتروني",
-    "Number of Available Items": "عدد القطع المتاحة"
+    "Number of Available Items": "عدد القطع المتاحة",
+    "Working Days": "أيام العمل",
+    "Vendor updated successfully": "تم تحديث المحل بنجاح",
+    "Vendor rejected successfully": "تم رفض المحل بنجاح",
+    "Vendor approved successfully": "تم الموافقة على المحل بنجاح",
+    "Vendor created successfully": "تم إنشاء المحل بنجاح",
+    "Roles": "الادوار",
+    "Branches": "الفروع",
+    "Do you want to change this vendor's status?": "هل تريد تغيير حالة هذا المحل؟",
+    "store name": "اسم المحل",
+    "Yes, proceed": "نعم، استمرار",
+    "Vendor deactivated successfully": "تم إلغاء تفعيل المحل بنجاح",
+    "Vendor activated successfully": "تم تفعيل المحل بنجاح",
+    "Vendor deleted successfully": "تم حذف المحل بنجاح",
+    "Submit Rejection": "إرسال الرفض",
+    "Scan this QR code to view this gold piece":"اعمل scan علشان تقدر تشوف تفاصيل القطعة"
+    
 }

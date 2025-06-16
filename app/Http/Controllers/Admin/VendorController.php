@@ -91,7 +91,7 @@ class VendorController extends Controller
         $user->assignRole('vendor');
 
         return redirect()->route('vendors.index')
-            ->with('success', 'Vendor created successfully');
+            ->with('success', __('Vendor created successfully'));
     }
 
     // Show vendor details
@@ -131,7 +131,7 @@ class VendorController extends Controller
         // Send approval notification
         $vendor->notify(new VendorApprovedNotification());
 
-        return back()->with('success', 'Vendor approved successfully');
+        return back()->with('success', __('Vendor approved successfully'));
     }
 
     // Reject vendor
@@ -150,7 +150,7 @@ class VendorController extends Controller
         // Send rejection notification
         $vendor->notify(new VendorRejectedNotification($validated['rejection_reason']));
 
-        return back()->with('success', 'Vendor rejected successfully');
+        return back()->with('success', __('Vendor rejected successfully'));
     }
 
     // Toggle vendor active status
@@ -163,7 +163,7 @@ class VendorController extends Controller
 
         $status = $vendor->is_active ? 'activated' : 'deactivated';
 
-        return back()->with('success', "Vendor {$status} successfully");
+        return back()->with('success', __("Vendor {$status} successfully"));
     }
 
     // Show edit form
@@ -228,6 +228,6 @@ class VendorController extends Controller
         $vendor->update($updateData);
 
         return redirect()->route('vendors.show', $vendor)
-            ->with('success', 'Vendor updated successfully');
+            ->with('success', __('Vendor updated successfully'));
     }
 }

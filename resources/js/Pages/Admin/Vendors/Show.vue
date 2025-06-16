@@ -41,12 +41,7 @@
                                         <label class="block text-sm font-medium text-gray-700">{{ $t('Email') }}</label>
                                         <p class="mt-1 text-sm text-gray-900">{{ vendor.email }}</p>
                                     </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">{{ $t('Phone') }}</label>
-                                        <p class="mt-1 text-sm text-gray-900">
-                                            {{ vendor.dialling_code }} {{ vendor.mobile }}
-                                        </p>
-                                    </div>
+                                    
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">{{ $t('Status')
                                         }}</label>
@@ -126,12 +121,31 @@
                                             <p class="text-sm text-gray-900">{{ branch.city.name }}</p>
                                         </div>
                                         
-                                        <div v-if="branch.address">
-                                            <label class="block text-xs font-medium text-gray-600">{{ $t('Address') }}</label>
-                                            <p class="text-sm text-gray-900">{{ branch.address }}</p>
+                                        <div v-if="branch.contact_number">
+                                            <label class="block text-xs font-medium text-gray-600">{{ $t('Contact Number') }}</label>
+                                            <p class="text-sm text-gray-900">{{ branch.contact_number }}</p>
                                         </div>
                                         
-                                        <div v-if="branch.working_days && branch.working_days.length > 0">
+                                        <div v-if="branch.contact_email">
+                                            <label class="block text-xs font-medium text-gray-600">{{ $t('Contact Email') }}</label>
+                                            <p class="text-sm text-gray-900">{{ branch.contact_email }}</p>
+                                        </div>
+                                        
+                                        <div v-if="branch.number_of_available_items !== null && branch.number_of_available_items !== undefined">
+                                            <label class="block text-xs font-medium text-gray-600">{{ $t('Available Items') }}</label>
+                                            <p class="text-sm text-gray-900">{{ branch.number_of_available_items }}</p>
+                                        </div>
+                                        
+                                        <!-- Debug info (uncomment to see raw data) -->
+                                        <!-- <div class="text-xs text-gray-500 bg-gray-100 p-2 rounded">
+                                            <strong>Debug:</strong><br>
+                                            Working Days: {{ branch.working_days }}<br>
+                                            Working Hours: {{ branch.working_hours }}<br>
+                                            Parsed Days: {{ getWorkingDaysText(branch.working_days) }}<br>
+                                            Parsed Hours: {{ JSON.stringify(getWorkingHours(branch.working_days, branch.working_hours)) }}
+                                        </div> -->
+                                        
+                                        <div v-if="getWorkingDaysText(branch.working_days).length > 0">
                                             <label class="block text-xs font-medium text-gray-600">{{ $t('Working Days') }}</label>
                                             <div class="flex flex-wrap gap-1 mt-1">
                                                 <span v-for="day in getWorkingDaysText(branch.working_days)" :key="day"
@@ -141,14 +155,19 @@
                                             </div>
                                         </div>
                                         
-                                        <div v-if="branch.working_hours">
+                                        <div v-if="Object.keys(getWorkingHours(branch.working_days, branch.working_hours)).length > 0">
                                             <label class="block text-xs font-medium text-gray-600">{{ $t('Working Hours') }}</label>
                                             <div class="text-sm text-gray-900">
-                                                <div v-for="(hours, day) in branch.working_hours" :key="day" class="text-xs">
-                                                    <span class="font-medium">{{ $t(day) }}:</span> 
+                                                <div v-for="(hours, day) in getWorkingHours(branch.working_days, branch.working_hours)" :key="day" class="text-xs">
+                                                    <span class="font-medium">{{ getDayName(day) }}:</span> 
                                                     {{ hours.from }} - {{ hours.to }}
                                                 </div>
                                             </div>
+                                        </div>
+                                        
+                                        <!-- Show message if no working days/hours are available -->
+                                        <div v-if="!branch.working_days || getWorkingDaysText(branch.working_days).length === 0" class="text-xs text-gray-500 italic">
+                                            {{ $t('No working days specified') }}
                                         </div>
                                         
                                         <div v-if="branch.logo" class="mt-2">
@@ -223,19 +242,126 @@ const props = defineProps({
 const showRejectForm = ref(false);
 const rejectionReason = ref('');
 
+// Define weekDays array similar to Edit.vue
+const weekDays = [
+    { value: 0, label: t('Sunday') },
+    { value: 1, label: t('Monday') },
+    { value: 2, label: t('Tuesday') },
+    { value: 3, label: t('Wednesday') },
+    { value: 4, label: t('Thursday') },
+    { value: 5, label: t('Friday') },
+    { value: 6, label: t('Saturday') },
+];
+
 // Helper function to convert working days numbers to text
 const getWorkingDaysText = (workingDays) => {
-    const dayNames = {
-        0: t('Sunday'),
-        1: t('Monday'),
-        2: t('Tuesday'),
-        3: t('Wednesday'),
-        4: t('Thursday'),
-        5: t('Friday'),
-        6: t('Saturday')
-    };
+    if (!workingDays) return [];
     
-    return workingDays.map(day => dayNames[day] || day);
+    // Handle different data formats
+    let parsedDays;
+    try {
+        if (typeof workingDays === 'string') {
+            // Handle empty strings or "null" strings
+            if (workingDays.trim() === '' || workingDays === 'null') return [];
+            parsedDays = JSON.parse(workingDays);
+        } else if (Array.isArray(workingDays)) {
+            parsedDays = workingDays;
+        } else {
+            console.log('Unexpected working_days format:', workingDays);
+            return [];
+        }
+    } catch (e) {
+        console.error('Error parsing working days:', workingDays, e);
+        return [];
+    }
+    
+    if (!Array.isArray(parsedDays)) {
+        console.log('Working days is not an array after parsing:', parsedDays);
+        return [];
+    }
+    
+    return parsedDays
+        .map(day => {
+            const dayNum = parseInt(day);
+            const weekDay = weekDays.find(wd => wd.value === dayNum);
+            return weekDay ? weekDay.label : `Day ${day}`;
+        })
+        .filter(Boolean); // Remove any undefined values
+};
+
+const getDayName = (day) => {
+    const dayNum = parseInt(day);
+    const weekDay = weekDays.find(wd => wd.value === dayNum);
+    return weekDay ? weekDay.label : `Day ${day}`;
+};
+
+// Helper function to parse and format working hours
+const getWorkingHours = (workingDays, workingHours) => {
+    if (!workingDays || !workingHours) return {};
+    
+    // Parse JSON strings if they're strings
+    let parsedDays, parsedHours;
+    try {
+        // Parse working days
+        if (typeof workingDays === 'string') {
+            if (workingDays.trim() === '' || workingDays === 'null') return {};
+            parsedDays = JSON.parse(workingDays);
+        } else if (Array.isArray(workingDays)) {
+            parsedDays = workingDays;
+        } else {
+            console.log('Unexpected working_days format in hours:', workingDays);
+            return {};
+        }
+        
+        // Parse working hours
+        if (typeof workingHours === 'string') {
+            if (workingHours.trim() === '' || workingHours === 'null') return {};
+            parsedHours = JSON.parse(workingHours);
+        } else if (Array.isArray(workingHours)) {
+            parsedHours = workingHours;
+        } else if (typeof workingHours === 'object') {
+            // Handle case where it's already an object
+            parsedHours = workingHours;
+        } else {
+            console.log('Unexpected working_hours format:', workingHours);
+            return {};
+        }
+    } catch (e) {
+        console.error('Error parsing working hours:', { workingDays, workingHours }, e);
+        return {};
+    }
+    
+    if (!Array.isArray(parsedDays)) {
+        console.log('Working days is not an array in hours function:', parsedDays);
+        return {};
+    }
+    
+    // Handle different working hours formats
+    const hoursMap = {};
+    
+    if (Array.isArray(parsedHours)) {
+        // Format: [{"open": "09:00", "close": "17:00"}, ...]
+        parsedDays.forEach((day, index) => {
+            if (parsedHours[index]) {
+                hoursMap[day] = {
+                    from: parsedHours[index].open || parsedHours[index].from,
+                    to: parsedHours[index].close || parsedHours[index].to
+                };
+            }
+        });
+    } else if (typeof parsedHours === 'object') {
+        // Format: {"0": {"from": "09:00", "to": "17:00"}, ...}
+        parsedDays.forEach(day => {
+            if (parsedHours[day]) {
+                hoursMap[day] = {
+                    from: parsedHours[day].from || parsedHours[day].open,
+                    to: parsedHours[day].to || parsedHours[day].close
+                };
+            }
+        });
+    }
+    
+    return hoursMap;
 };
 
 const toggleStatus = async () => {

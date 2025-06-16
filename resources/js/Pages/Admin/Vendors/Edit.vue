@@ -40,23 +40,6 @@
                                         </p>
                                     </div>
 
-                                    <div>
-                                        <label for="mobile" class="block text-sm font-medium text-gray-700">
-                                            {{ $t('Mobile Number') }}
-                                        </label>
-                                        <div class="flex mt-1 rounded-md shadow-sm">
-                                            <select v-model="form.dialling_code" disabled
-                                                class="flex-shrink-0 w-24 px-3 py-2 text-gray-500 bg-gray-100 border-gray-300 rounded-l-md focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                                <option value="+966">+966 (SA)</option>
-                                            </select>
-                                            <input id="mobile" v-model="form.mobile" type="tel"
-                                                class="block w-full min-w-0 border-gray-300 rounded-none rounded-r-md focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                                required />
-                                        </div>
-                                        <p v-if="form.errors.mobile" class="mt-1 text-sm text-red-600">
-                                            {{ form.errors.mobile }}
-                                        </p>
-                                    </div>
                                 </div>
 
                                 <!-- Store Information -->
@@ -106,12 +89,7 @@
                                         <label class="block text-sm font-medium text-gray-700">
                                             {{ $t('Commercial Registration Image') }}
                                         </label>
-                                        <div class="flex items-center mt-1">
-                                            <input type="file"
-                                                @change="handleFileUpload('commercial_registration_image', $event)"
-                                                accept="image/*"
-                                                class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-                                        </div>
+                                        
                                         <p v-if="form.errors.commercial_registration_image"
                                             class="mt-1 text-sm text-red-600">
                                             {{ form.errors.commercial_registration_image }}
@@ -126,10 +104,7 @@
                                                 </a>
                                                 <img :src="'/storage/' + vendor.commercial_registration_image"
                                                     class="h-16 object-cover rounded-md" />
-                                                <button type="button" @click="deleteFile('commercial_registration_image')"
-                                                    class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-600">
-                                                    &times;
-                                                </button>
+                                                
                                             </div>
                                             <!-- Show preview of new image if selected -->
                                             <div v-if="commercialRegistrationPreview" class="relative">
@@ -147,11 +122,7 @@
                                         <label class="block text-sm font-medium text-gray-700">
                                             {{ $t('Store Logo') }}
                                         </label>
-                                        <div class="flex items-center mt-1">
-                                            <input type="file" @change="handleFileUpload('logo', $event)"
-                                                accept="image/*"
-                                                class="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-                                        </div>
+                                        
                                         <p v-if="form.errors.logo" class="mt-1 text-sm text-red-600">
                                             {{ form.errors.logo }}
                                         </p>
@@ -160,19 +131,13 @@
                                             <div v-if="vendor.logo && !deletedLogo && !logoPreview" class="relative">
                                                 <img :src="'/storage/' + vendor.logo"
                                                     class="h-16 w-16 rounded-full object-cover" />
-                                                <button type="button" @click="deleteFile('logo')"
-                                                    class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-600">
-                                                    &times;
-                                                </button>
+                                                
                                             </div>
                                             <!-- Show preview of new logo if selected -->
                                             <div v-if="logoPreview" class="relative">
                                                 <img :src="logoPreview"
                                                     class="h-16 w-16 rounded-full object-cover" />
-                                                <button type="button" @click="deleteFile('logo')"
-                                                    class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-600">
-                                                    &times;
-                                                </button>
+                                                
                                             </div>
                                         </div>
                                     </div>
