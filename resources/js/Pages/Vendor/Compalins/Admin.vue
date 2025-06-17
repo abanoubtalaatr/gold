@@ -42,23 +42,22 @@
                                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500">
                                     {{ $t('Reset') }}
                                 </button>
+                                <Link :href="route('vendor.contacts.create')"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                {{ $t('Contact Admin') }}
+                                </Link>
                             </div>
                         </div>
-
-                        <!-- Main Contacts Table -->
-                        <div class="mb-12">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Incoming Messages') }}</h3>
-                            <div v-if="contacts?.data?.length > 0" class="overflow-x-auto">
+                        <!-- Vendor Messages Table -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Your Messages to Admin') }}</h3>
+                            <div v-if="vendorMessages?.data?.length > 0" class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
                                         <tr>
                                             <th
                                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                 {{ $t('Date') }}
-                                            </th>
-                                            <th
-                                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                {{ $t('User') }}
                                             </th>
                                             <th
                                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -79,114 +78,40 @@
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
-                                        <tr v-for="contact in contacts.data" :key="contact.id">
+                                        <tr v-for="message in vendorMessages.data" :key="message.id">
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ contact.created_at }}
+                                                {{ message.created_at }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ contact.user?.name || 'N/A' }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ contact.subject }}
+                                                {{ message.subject }}
                                             </td>
                                             <td class="px-6 py-4 text-sm text-gray-500">
-                                                {{ contact.message.length > 100 ? contact.message.substring(0, 100) +
+                                                {{ message.message.length > 100 ? message.message.substring(0, 100) +
                                                     '...' :
-                                                    contact.message }}
+                                                    message.message }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <span
-                                                    :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(contact)]">
-                                                    {{ formatStatus(contact) }}
+                                                    :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getVendorMessageStatusClass(message)]">
+                                                    {{ formatVendorMessageStatus(message) }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div class="relative inline-block text-left">
-                                                    <button type="button" @click="toggleContactDropdown(contact.id)"
-                                                        class="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                                        :aria-expanded="activeDropdown === contact.id"
-                                                        aria-haspopup="true">
-                                                        {{ $t('Actions') }}
-                                                        <svg class="w-5 h-5 ml-2 -mr-1"
-                                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                                            fill="currentColor">
-                                                            <path fill-rule="evenodd"
-                                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                                clip-rule="evenodd" />
-                                                        </svg>
-                                                    </button>
+                                                <button @click="showVendorMessageDetails(message)"
+                                                    class="px-3 py-1 text-sm text-white bg-yellow-500 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                    {{ $t('View') }}
+                                                </button>
 
-                                                    <transition enter-active-class="transition ease-out duration-100"
-                                                        enter-from-class="transform opacity-0 scale-95"
-                                                        enter-to-class="transform opacity-100 scale-100"
-                                                        leave-active-class="transition ease-in duration-75"
-                                                        leave-from-class="transform opacity-100 scale-100"
-                                                        leave-to-class="transform opacity-0 scale-95">
-                                                        <div v-if="activeDropdown === contact.id"
-                                                            class="absolute right-0 z-10 mt-2 w-56 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                                            role="menu" aria-orientation="vertical"
-                                                            :aria-labelledby="'menu-button-' + contact.id">
-                                                            <div class="py-1" role="none">
-                                                                <button
-                                                                    @click="showContactDetails(contact); activeDropdown = null"
-                                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 menuitem"
-                                                                    role="menuitem">
-                                                                    <svg class="w-5 h-5 mr-3 text-blue-500"
-                                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                        viewBox="0 0 24 24" stroke="currentColor">
-                                                                        <path stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2"
-                                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                                        <path stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2"
-                                                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                                    </svg>
-                                                                    {{ $t('View') }}
-                                                                </button>
-
-                                                                <button v-if="!contact.reply"
-                                                                    @click="openReplyModal(contact); activeDropdown = null"
-                                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 menuitem"
-                                                                    role="menuitem">
-                                                                    <svg class="w-5 h-5 mr-3 text-green-500"
-                                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                        viewBox="0 0 24 24" stroke="currentColor">
-                                                                        <path stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2"
-                                                                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                                    </svg>
-                                                                    {{ $t('Reply') }}
-                                                                </button>
-
-                                                                <button v-if="!contact.read"
-                                                                    @click="markAsRead(contact.id); activeDropdown = null"
-                                                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 menuitem"
-                                                                    role="menuitem">
-                                                                    <svg class="w-5 h-5 mr-3 text-indigo-500"
-                                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                        viewBox="0 0 24 24" stroke="currentColor">
-                                                                        <path stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2"
-                                                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                    </svg>
-                                                                    {{ $t('Mark as Read') }}
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </transition>
-                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
-                                <Pagination :links="contacts.links" class="mt-6" />
+                                <Pagination :links="vendorMessages.links" class="mt-6" />
                             </div>
                             <div v-else class="flex flex-col items-center justify-center py-12 text-gray-500">
-                                <p class="text-xl font-semibold">{{ $t('No incoming messages found.') }}</p>
+                                <p class="text-xl font-semibold">{{ $t('No messages sent to admin yet.') }}</p>
                             </div>
                         </div>
-
-                        
                     </div>
                 </div>
             </div>

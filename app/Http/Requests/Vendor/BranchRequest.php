@@ -11,6 +11,9 @@ class BranchRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'city_id' => ['required', 'integer', 'exists:cities,id'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+            'address' => ['required', 'string', 'max:1000'],
             'working_days' => ['required', 'array'],
             'working_days.*' => ['required', 'integer', 'between:0,6'],
             'working_hours' => ['required', 'array'],

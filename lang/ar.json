@@ -1748,5 +1748,14 @@
     "The order has been marked as taken by vendor.": "تم تحديد الطلب استلام من قبل التاجر.",
     "Something went wrong while marking the order as taken.": "حدث خطأ أثناء تحديد الطلب كمأخوذ.",
     "Complaint Details": "تفاصيل الشكاوي",
-    "Reply to Complaint": "الرد على الشكاوي"
+    "Reply to Complaint": "الرد على الشكاوي",
+    "Branch Location": "موقع الفرع",
+    "Search location or enter address": "ابحث عن موقع أو أدخل العنوان",
+    "Click on map to set location": "انقر على الخريطة لتحديد الموقع",
+    "Drag marker to adjust location": "اسحب العلامة لضبط الموقع",
+    "Or enter coordinates manually": "أو أدخل الإحداثيات يدوياً",
+    "Latitude": "خط العرض",
+    "Longitude": "خط الطول",
+    "Admin Complaints":"الشكاوي المديرية",
+    "Application resubmitted for approval. The admin has been notified.": "تم إعادة إرسال الطلب للموافقة. تم إشعار الإدارة."
 }

@@ -985,6 +985,14 @@
     "Session refreshed. Please try again.": "Session refreshed. Please try again.",
     "Session expired. Please refresh the page.": "Session expired. Please refresh the page.",
     "CSRF token mismatch. Refreshing session...": "CSRF token mismatch. Refreshing session...",
-    "Request failed. Please try again.": "Request failed. Please try again."
+    "Request failed. Please try again.": "Request failed. Please try again.",
+    "Branch Location": "Branch Location",
+    "Search location or enter address": "Search location or enter address",
+    "Click on map to set location": "Click on map to set location",
+    "Drag marker to adjust location": "Drag marker to adjust location",
+    "Or enter coordinates manually": "Or enter coordinates manually",
+    "Latitude": "Latitude",
+    "Longitude": "Longitude",
+    "Application resubmitted for approval. The admin has been notified.": "Application resubmitted for approval. The admin has been notified."
 }
     

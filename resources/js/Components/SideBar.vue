@@ -191,7 +191,7 @@
 
 
             <!-- Complaints -->
-            <li class="nav-item" v-if="hasPermission('vendor read users')">
+            <li class="nav-item" v-if="hasPermission('vendor read complaints')">
                 <Link class="nav-link" :href="route('vendor.contacts.index')"
                     :class="{ collapsed: !$page.url.startsWith('/vendor/contacts') }">
                 <i class="bi bi-person-lines-fill"></i>
@@ -199,6 +199,15 @@
                 </Link>
             </li>
 
+
+                        <!-- Complaints -->
+            <li class="nav-item" v-if="hasPermission('vendor read complaints')">
+                <Link class="nav-link" :href="route('vendor.admin.complaints.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/admin/complaints') }">
+                <i class="bi bi-person-lines-fill"></i>
+                <span>{{ $t("Admin Complaints") }}</span>
+                </Link>
+            </li>
 
             <!-- Vendor wallet -->
             <li class="nav-item" v-if="hasPermission('vendor read wallet')">

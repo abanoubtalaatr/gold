@@ -350,12 +350,17 @@ const setupPollingNotifications = () => {
     
     const pollForNotifications = async () => {
         try {
+            // Get CSRF token from meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
             const response = await fetch(`/notifications/poll?last_check=${encodeURIComponent(lastProcessedTimestamp)}`, {
                 headers: {
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                     'Content-Type': 'application/json',
-                }
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                credentials: 'include' // Include cookies for session-based auth
             });
             const data = await response.json();
             

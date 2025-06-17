@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Vendor\UpdateStoreRequest;
 use App\Models\Address;
 use App\Models\City;
+use App\Models\User;
+use App\Notifications\Admin\VendorResubmissionNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -156,7 +158,7 @@ class StoreController extends Controller
         $request->has('commercial_number') &&
         $request->commercial_number !== $vendor->commercial_registration_number
     ) {
-        $data['venodr_status'] = 'pending';
+        $data['vendor_status'] = 'pending';
     }
 
     // Update only the fields that are present in the data array
@@ -174,12 +176,25 @@ class StoreController extends Controller
             return redirect()->back()->with('error', 'User not found');
         }
 
+        // Update vendor status to pending and clear rejection reason
         $vendor->update([
-            'venodr_status' => 'pending',
+            'vendor_status' => 'pending',
             'rejection_reason' => null
         ]);
 
+        // Get all admin users to notify them
+        $admins = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin')
+                ->orWhere('name', 'superadmin')
+                ->whereNull('vendor_id');
+        })->get();
+
+        // Send notification to all admins
+        foreach ($admins as $admin) {
+            $admin->notify(new VendorResubmissionNotification($vendor));
+        }
+
         return redirect()->route('vendor.store.show')
-            ->with('success', 'Application resubmitted for approval');
+            ->with('success', __('Application resubmitted for approval. The admin has been notified.'));
     }
 }

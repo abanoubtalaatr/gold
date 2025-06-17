@@ -121,6 +121,22 @@
                                 </div>
                             </div>
 
+                            <!-- Branch Location -->
+                            <div class="col-span-1 md:col-span-12">
+                                <InputLabel :value="$t('Branch Location')"
+                                    class="text-sm font-semibold text-gray-800" />
+                                <MapPicker
+                                    v-model:latitude="form.latitude"
+                                    v-model:longitude="form.longitude"
+                                    v-model:address="form.address"
+                                    :error="form.errors.latitude || form.errors.longitude || form.errors.address"
+                                    class="mt-1"
+                                />
+                                <InputError :message="form.errors.latitude" class="mt-1 text-xs text-red-500 font-medium" />
+                                <InputError :message="form.errors.longitude" class="mt-1 text-xs text-red-500 font-medium" />
+                                <InputError :message="form.errors.address" class="mt-1 text-xs text-red-500 font-medium" />
+                            </div>
+
                             <!-- Working Days and Hours -->
                             <div class="col-span-1 md:col-span-6">
                                 <InputLabel :value="$t('Working Days and Hours')"
@@ -212,6 +228,7 @@
                                 {{ $t('Cancel') }}
                                 </Link>
                                 <PrimaryButton
+                                    @click="() => console.log('🖱️ Submit button clicked, disabled:', form.processing || form.working_days.length === 0)"
                                     class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-semibold text-xs rounded-md hover:from-indigo-700 hover:to-indigo-800 transition-all duration-200"
                                     :disabled="form.processing || form.working_days.length === 0">
                                     {{ editMode ? $t('Update Branch') : $t('Create Branch') }}
@@ -236,6 +253,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import TimePicker from '@/Components/TimePicker.vue';
 import FileUpload from '@/Components/FileUpload.vue';
+import MapPicker from '@/Components/MapPicker.vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -293,6 +311,9 @@ const form = useForm({
     logo: null,
     images: [],
     deleted_images: [],
+    latitude: props.branch?.latitude || '',
+    longitude: props.branch?.longitude || '',
+    address: props.branch?.address || '',
 });
 
 const existingImages = ref(props.branch?.images || []);
@@ -347,10 +368,18 @@ const removeLogo = () => {
 };
 
 const submit = () => {
+    console.log('🔄 Submit function called');
+    console.log('📊 Form data:', form.data());
+    console.log('📅 Working days:', form.working_days);
+    console.log('🕐 Working hours:', form.working_hours);
+    
     if (form.working_days.length === 0) {
+        console.log('❌ No working days selected');
         form.errors.working_days = t('Please select at least one working day');
         return;
     }
+
+    console.log('✅ Validation passed, preparing to submit');
 
     // Filter working_hours to only include selected days
     const filteredWorkingHours = {};
@@ -361,18 +390,46 @@ const submit = () => {
     });
     form.working_hours = filteredWorkingHours;
 
+    console.log('📤 Final form data before submission:', form.data());
+
     if (editMode.value) {
+        console.log('🔄 Submitting as UPDATE to:', route('vendor.branches.update', props.branch.id));
         form.post(route('vendor.branches.update', props.branch.id), {
             preserveScroll: true,
+            onStart: () => {
+                console.log('🚀 Update request started');
+            },
+            onProgress: (progress) => {
+                console.log('⏳ Update progress:', progress);
+            },
+            onSuccess: (response) => {
+                console.log('✅ Update successful:', response);
+            },
             onError: (errors) => {
-                console.log('Update errors:', errors);
+                console.log('❌ Update errors:', errors);
+            },
+            onFinish: () => {
+                console.log('🏁 Update request finished');
             },
         });
     } else {
+        console.log('🆕 Submitting as CREATE to:', route('vendor.branches.store'));
         form.post(route('vendor.branches.store'), {
             preserveScroll: true,
+            onStart: () => {
+                console.log('🚀 Create request started');
+            },
+            onProgress: (progress) => {
+                console.log('⏳ Create progress:', progress);
+            },
+            onSuccess: (response) => {
+                console.log('✅ Create successful:', response);
+            },
             onError: (errors) => {
-                console.log('Creation errors:', errors);
+                console.log('❌ Create errors:', errors);
+            },
+            onFinish: () => {
+                console.log('🏁 Create request finished');
             },
         });
     }

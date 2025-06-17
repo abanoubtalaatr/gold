@@ -29,7 +29,6 @@ class UpdateOrderSaleRequest extends FormRequest
             'is_including_lobes' => 'required|boolean',
             'images' => 'nullable|array',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            "deposit_amount" => 'required',
         ];
     }
 }

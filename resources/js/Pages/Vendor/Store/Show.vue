@@ -184,7 +184,7 @@
 </template>
 
 <script setup>
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { ExclamationTriangleIcon, XCircleIcon } from '@heroicons/vue/24/outline';
 
@@ -197,7 +197,7 @@ const { props: page } = usePage();
 const user = page.auth?.user ?? { role: '' };
 
 const resubmit = () => {
-    Inertia.post(route('vendor.store.resubmit'));
+    router.post(route('vendor.store.resubmit'));
 };
 
 </script>

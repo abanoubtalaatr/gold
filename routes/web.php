@@ -404,6 +404,7 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
     });
 
     Route::resource('contacts', VendorContactController::class)->except("show");
+    Route::get('complaints', [VendorContactController::class, 'adminComplaints'])->name('admin.complaints.index');
     Route::post('contacts/{contact}/replay', [VendorContactController::class, 'reply'])->name('contacts.reply');
     Route::PATCH('contacts/{contact}/markAsRead', [VendorContactController::class, 'markAsRead'])->name('contacts.markAsRead');
 

@@ -42,7 +42,6 @@ class ContactUsController extends AppBaseController
             $input = $request->validated();
 
             $input['user_id'] = auth()->user()->id;
-            $input['is_to_admin'] = 1;
 
             $contact = Contact::create($input);
 

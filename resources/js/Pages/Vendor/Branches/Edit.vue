@@ -192,6 +192,22 @@
                 </div>
               </div>
 
+              <!-- Branch Location -->
+              <div class="col-span-1 md:col-span-12">
+                <InputLabel :value="$t('Branch Location')"
+                  class="text-sm font-semibold text-gray-800" />
+                <MapPicker
+                  v-model:latitude="form.latitude"
+                  v-model:longitude="form.longitude"
+                  v-model:address="form.address"
+                  :error="form.errors.latitude || form.errors.longitude || form.errors.address"
+                  class="mt-1"
+                />
+                <InputError :message="form.errors.latitude" class="mt-1 text-xs text-red-500 font-medium" />
+                <InputError :message="form.errors.longitude" class="mt-1 text-xs text-red-500 font-medium" />
+                <InputError :message="form.errors.address" class="mt-1 text-xs text-red-500 font-medium" />
+              </div>
+
               <!-- Working Days and Hours -->
               <div class="col-span-1 md:col-span-6">
                 <InputLabel
@@ -321,6 +337,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue'
 import Checkbox from '@/Components/Checkbox.vue'
 import TimePicker from '@/Components/TimePicker.vue'
 import FileUpload from '@/Components/FileUpload.vue'
+import MapPicker from '@/Components/MapPicker.vue'
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -381,6 +398,9 @@ const form = useForm({
   _method: 'PUT', // Inertia expects _method for PUT requests with FormData
   images: [],
   deleted_images: [],
+  latitude: props.branch.latitude || 0,
+  longitude: props.branch.longitude || 0,
+  address: props.branch.address || '',
 })
 
 const existingImages = ref(props.branch.images || [])

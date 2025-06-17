@@ -41,6 +41,36 @@ class ContactController extends Controller
     }
 
 
+    public function adminComplaints(Request $request)
+    {
+        $vendorId = auth()->user()->vendor_id??auth()->user()->id;
+        
+        $contacts = Contact::with(['user', 'rentalOrder', 'saleOrder'])
+            ->latest()
+            ->filter($request->only('search', 'type', 'status'))
+            ->where(function ($query) use ($vendorId) {
+                $query->whereHas('saleOrder.branch', function ($q) use ($vendorId) {
+                    $q->where('vendor_id', $vendorId);
+                })->orWhereHas('rentalOrder.branch', function ($q) use ($vendorId) {
+                    $q->where('vendor_id', $vendorId);
+                });
+            })
+            ->paginate(10)
+            ->withQueryString();
+
+
+        $vendorMessages = Contact::where('is_to_admin', '1')
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->paginate(10, ['*'], 'vendor_messages_page');
+
+        return inertia('Vendor/Compalins/Admin', [
+            'contacts' => $contacts,
+            'vendorMessages' => $vendorMessages,
+            'filters' => $request->all('search', 'type', 'status'),
+        ]);
+    }
+
 
     public function create()
     {

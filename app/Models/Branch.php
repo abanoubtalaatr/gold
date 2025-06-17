@@ -18,6 +18,8 @@ class Branch extends Model
         'vendor_id',
         'name',
         'city_id',
+        'latitude',
+        'longitude',
         'working_days',
         'working_hours',
         'services',

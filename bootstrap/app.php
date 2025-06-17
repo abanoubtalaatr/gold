@@ -34,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth' => App\Http\Middleware\Authenticate::class,
             'active' => App\Http\Middleware\CheckActiveAccount::class,
             'mobile_verified' => App\Http\Middleware\EnsureMobileIsVerified::class,
+            'optional.auth' => App\Http\Middleware\OptionalAuth::class,
             'role' => Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
