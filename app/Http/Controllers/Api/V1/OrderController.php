@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Events\OrderRentalEvent;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\Order\UpdateOrderRentalRequest;
-use App\Http\Requests\Api\V1\Order\UpdateOrderSaleRequest;
-use App\Http\Requests\Api\V1\StoreOrderRequest;
-use App\Http\Resources\Api\OrderRentalResource;
+use App\Models\User;
 use App\Models\Branch;
 use App\Models\GoldPiece;
-use App\Models\OrderRental;
 use App\Models\OrderSale;
-use App\Models\User;
-use App\Services\VendorNotificationService;
-use App\Traits\ApiResponseTrait;
+use App\Models\OrderRental;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Events\OrderRentalEvent;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Services\VendorNotificationService;
+use App\Http\Resources\Api\OrderSaleResource;
+use App\Http\Requests\Api\V1\StoreOrderRequest;
+use App\Http\Resources\Api\OrderRentalResource;
+use App\Http\Requests\Api\V1\Order\UpdateOrderSaleRequest;
+use App\Http\Requests\Api\V1\Order\UpdateOrderRentalRequest;
 
 class OrderController extends Controller
 {
@@ -226,14 +227,14 @@ class OrderController extends Controller
         // Return the updated order with type information for frontend validation
         $order->load('goldPiece');
         return $this->successResponse(
-            new OrderRentalResource($order),
+            new OrderSaleResource($order),
             __("mobile.order_updated_success"),
             200
         );
 
         // Load the goldPiece relationship before returning the resource
         $orderRental->load('goldPiece');
-        return $this->successResponse(new OrderRentalResource($orderRental), __("mobile.order_created_success"), 200);
+        return $this->successResponse(new OrderSaleResource($orderRental), __("mobile.order_created_success"), 200);
     }
     public function toggleSuspendRental(OrderRental $order)
     {

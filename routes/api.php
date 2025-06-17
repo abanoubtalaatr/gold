@@ -143,6 +143,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
 
     Route::post('/orders', [OrderController::class, 'store']);
     Route::post('/orders/{order}/rental', [OrderController::class, 'updateRental']);
+    Route::post('/orders/{order}/sale', [OrderController::class, 'updateSale']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders/{order}/toggle-suspend-rental', [OrderController::class, 'toggleSuspendRental']);
     Route::post('/orders/{order}/toggle-suspend-sale', [OrderController::class, 'toggleSuspendSale']);

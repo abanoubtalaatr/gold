@@ -27,10 +27,9 @@ class UpdateOrderSaleRequest extends FormRequest
             'carat' => 'required|numeric',
             'total_price' => 'required',
             'is_including_lobes' => 'required|boolean',
-            'images' => 'required|array',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             "deposit_amount" => 'required',
-            'sale_price' => 'required',
         ];
     }
 }
