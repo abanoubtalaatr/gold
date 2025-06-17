@@ -215,4 +215,6 @@ return [
     'created_date' => 'تاريخ الإنشاء',
     'print_details' => 'طباعة التفاصيل',
     'view_details' => 'عرض التفاصيل',
+    "order_not_approved" => "الطلب غير معتمد",
+    "start_and_end_date_required" => "يجب إدخال تاريخ البدء والانتهاء",
 ];

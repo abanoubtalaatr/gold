@@ -38,8 +38,8 @@ class GoldPieceResource extends JsonResource
             'type' => $this->type,
             'description' => $this->description,
             'qr_code' => $this->qr_code,
-            'created_at' => Carbon::parse($this->created_at)->format('Y-m-d'),
-            'updated_at' => Carbon::parse($this->updated_at)->format('Y-m-d'),
+            'created_at' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::parse($this->updated_at)->format('Y-m-d H:i:s'),
             'user' => [
                 'id' => $this->user?->id,
                 'name' => $this->user?->name,

@@ -30,6 +30,7 @@ class PriceController extends Controller
                 $request->number_rental_day
             );
 
+
             $systemSetting = SystemSetting::first();
             $deposit = $systemSetting->booking_insurance_amount??10;
             return $this->successResponse([
@@ -40,9 +41,6 @@ class PriceController extends Controller
                 'deposit' => $deposit,
             ]);
         } catch (\Exception $e) {
-            // Log the error for debugging
-            
-            // Calculate fallback total price
             $fallbackTotalPrice = $this->calculateFallbackTotalPrice(
                 $request->carat,
                 $request->weight,
@@ -55,6 +53,7 @@ class PriceController extends Controller
                 'weight' => $request->weight,
                 'rental_days' => $request->number_rental_day,
                 'deposit' => 100,
+                'current_price_for_24' => 2400,
             ]);
         }
     }
@@ -103,8 +102,8 @@ class PriceController extends Controller
         return [
             'banner_info' => [
                 'main_carat' => '24',
-                'buy_price' => 393.39,
-                'sell_price' => 418.39,
+                'buy_price' => 2400,
+                'sell_price' => 2410,
                 'date' => now()->format('j F'),
                 'currency' => 'SAR'
             ],
@@ -112,64 +111,64 @@ class PriceController extends Controller
                 [
                     'carat_key' => '24',
                     'carat' => 'عيار 24',
-                    'buy_price' => 393.39,
-                    'sell_price' => 418.39,
+                    'buy_price' => 2400,
+                    'sell_price' => 2410,
                     'change_indicator' => 'same',
                     'is_featured' => true
                 ],
                 [
                     'carat_key' => '22',
                     'carat' => 'عيار 22',
-                    'buy_price' => 354.78,
-                    'sell_price' => 389.78,
+                    'buy_price' => 2200,
+                    'sell_price' => 2210,
                     'change_indicator' => 'same',
                     'is_featured' => false
                 ],
                 [
                     'carat_key' => '21',
                     'carat' => 'عيار 21',
-                    'buy_price' => 332.97,
-                    'sell_price' => 377.97,
+                    'buy_price' => 2100,
+                    'sell_price' => 2110,
                     'change_indicator' => 'same',
                     'is_featured' => false
                 ],
                 [
                     'carat_key' => '20',
                     'carat' => 'عيار 20',
-                    'buy_price' => 311.16,
-                    'sell_price' => 366.16,
+                    'buy_price' => 2000,
+                    'sell_price' => 2010,
                     'change_indicator' => 'same',
                     'is_featured' => false
                 ],
                 [
                     'carat_key' => '18',
                     'carat' => 'عيار 18',
-                    'buy_price' => 272.54,
-                    'sell_price' => 337.54,
+                    'buy_price' => 1800,
+                    'sell_price' => 1810,
                     'change_indicator' => 'same',
                     'is_featured' => false
                 ],
                 [
                     'carat_key' => '16',
                     'carat' => 'عيار 16',
-                    'buy_price' => 233.93,
-                    'sell_price' => 308.93,
+                    'buy_price' => 1600,
+                    'sell_price' => 1610,
                     'change_indicator' => 'same',
                     'is_featured' => false
                 ],
                 [
                     'carat_key' => '14',
                     'carat' => 'عيار 14',
-                    'buy_price' => 195.31,
-                    'sell_price' => 280.31,
+                    'buy_price' => 1400,
+                    'sell_price' => 1410,
                     'change_indicator' => 'same',
                     'is_featured' => false
                 ],
                 [
                     'carat_key' => '10',
                     'carat' => 'عيار 10',
-                    'buy_price' => 123.08,
-                    'sell_price' => 218.08,
+                    'buy_price' => 1000,
+                    'sell_price' => 1010,
                     'change_indicator' => 'same',
                     'is_featured' => false
                 ]
@@ -583,14 +582,14 @@ class PriceController extends Controller
     private function getFallbackPriceBreakdown(string $carat, float $weight, ?int $rentalDays = null): array
     {
         $fallbackBasePrices = [
-            '24' => 403.39,
-            '22' => 369.78,
-            '21' => 352.97,
-            '20' => 336.16,
-            '18' => 302.54,
-            '16' => 268.93,
-            '14' => 235.31,
-            '10' => 168.08,
+            '24' => 2400,
+            '22' => 2200,
+            '21' => 2100,
+            '20' => 2000,
+            '18' => 1800,
+            '16' => 1600,
+            '14' => 1400,
+            '10' => 1000,
         ];
 
         $adjustments = [
@@ -638,24 +637,36 @@ class PriceController extends Controller
     private function calculateFallbackTotalPrice(string $carat, float $weight, ?int $rentalDays = null): float
     {
         $fallbackPrices = [
-            '24' => 408.39,
-            '22' => 374.78,
-            '21' => 362.97,
-            '20' => 351.16,
-            '18' => 322.54,
-            '16' => 293.93,
-            '14' => 265.31,
-            '10' => 203.08,
+            '24' => 2400,
+            '22' => 2200,
+            '21' => 2100,
+            '20' => 2000,
+            '18' => 1800,
+            '16' => 1600,
+            '14' => 1400,
+            '10' => 1000,
         ];
 
         $pricePerGram = $fallbackPrices[$carat] ?? 0;
         $totalPrice = $pricePerGram * $weight;
 
+        $systemSetting = SystemSetting::first();
         // Add rental cost if applicable
-        if ($rentalDays) {
-            $dailyRate = 0.01; // 1% per day
-            $rentalCostPerDay = $pricePerGram * $dailyRate;
-            $totalPrice += $rentalCostPerDay * $weight * $rentalDays;
+       if ($rentalDays) {
+            $dailyRate = $systemSetting->gold_rental_price_percentage??10;
+            $dailyRate = $dailyRate/100;
+
+            $rentalCostPerDay = ($totalPrice * $dailyRate) * $rentalDays??1;
+            $totalPrice = $rentalCostPerDay;
+        }else{
+            $dailyRate = $systemSetting->gold_purchase_price??10;
+            if($dailyRate < 0){
+                $dailyRate = abs($dailyRate/100); // Make the rate negative for purchase discount
+                $totalPrice = $totalPrice - ($totalPrice * $dailyRate); // Apply discount to total price
+            }else{
+                $dailyRate = abs($dailyRate/100); // Make the rate negative for purchase discount
+                $totalPrice = $totalPrice + ($totalPrice * $dailyRate); // Apply discount to total price
+            }
         }
 
         return round($totalPrice, 2);

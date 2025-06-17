@@ -113,6 +113,7 @@ class OrderController extends Controller
         $request->validate([
             'branch_id' => 'required|exists:branches,id',
         ]);
+        OrderSale::where('gold_piece_id', $order->gold_piece_id)->where('id', '!=', $orderId)->delete();
 
         $order->update([
             'branch_id' => $request->branch_id,

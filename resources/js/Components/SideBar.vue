@@ -239,8 +239,6 @@
                 </Link>
             </li>
 
-
-
             <!--Admin Complaints -->
             <li class="nav-item" v-if="hasPermission('read complaints')">
                 <Link class="nav-link" :href="route('admin.complaints.index')"
@@ -249,8 +247,6 @@
                 <span>{{ $t("Complaints") }}</span>
                 </Link>
             </li>
-
-
 
 
             <!-- banners -->

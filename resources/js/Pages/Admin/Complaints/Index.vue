@@ -77,14 +77,14 @@
                                             {{ formatDate(complaint.created_at) }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <div v-if="complaint.user">
-                                                {{ complaint.user.name }} ({{ $t('User') }})
+                                            <div v-if="complaint?.user">
+                                                {{ complaint?.user?.name }} ({{ $t('User') }})
                                             </div>
-                                            <div v-else-if="complaint.vendor">
-                                                {{ complaint.vendor.name }} ({{ $t('Vendor') }})
+                                            <div v-else-if="complaint?.vendor">
+                                                {{ complaint?.vendor?.name }} ({{ $t('Vendor') }})
                                             </div>
                                             <div v-else>
-                                                {{ complaint.user.name || 'N/A' }}
+                                                {{ complaint?.user?.name || '--' }}
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -181,22 +181,22 @@
                                 <div>
                                     <p><strong>{{ $t('Complainant') }}:</strong>
                                         <span v-if="selectedComplaint.user">
-                                            {{ selectedComplaint.user.name }}
+                                            {{ selectedComplaint?.user?.name }}
                                         </span>
                                         <span v-else-if="selectedComplaint.vendor">
-                                            {{ selectedComplaint.vendor.name }} ({{ $t('Vendor') }})
+                                            {{ selectedComplaint?.vendor?.name }} ({{ $t('Vendor') }})
                                         </span>
-                                        <span v-else>
-                                            {{ selectedComplaint.name || 'N/A' }}
-                                        </span>
+                                        <!-- <span v-else>
+                                            {{ selectedComplaint?.name || '--' }}
+                                        </span> -->
                                     </p>
-                                    <p><strong>{{ $t('Email') }}:</strong> {{ selectedComplaint.user.email || 'N/A' }}
+                                    <p><strong>{{ $t('Email') }}:</strong> {{ selectedComplaint?.user?.email || '--' }}
                                     </p>
-                                    <p><strong>{{ $t('Phone') }}:</strong> {{ selectedComplaint.user.mobile || 'N/A' }}
+                                    <p><strong>{{ $t('Phone') }}:</strong> {{ selectedComplaint?.user?.mobile || '--' }}
                                     </p>
                                 </div>
                                 <div>
-                                    <p><strong>{{ $t('Date') }}:</strong> {{ formatDate(selectedComplaint.created_at) }}
+                                    <p><strong>{{ $t('Date') }}:</strong> {{ formatDate(selectedComplaint?.created_at) }}
                                     </p>
                                     <p><strong>{{ $t('Status') }}:</strong>
                                         <span :class="getStatusClass(selectedComplaint)">
@@ -206,29 +206,29 @@
                                 </div>
                             </div>
 
-                            <div v-if="selectedComplaint.rental_order || selectedComplaint.sale_order"
+                            <div v-if="selectedComplaint?.rental_order || selectedComplaint?.sale_order"
                                 class="bg-gray-50 p-4 rounded-lg">
                                 <h3 class="font-medium mb-2">{{ $t('Related Order Information') }}</h3>
-                                <div v-if="selectedComplaint.rental_order">
+                                <div v-if="selectedComplaint?.rental_order">
                                     <p><strong>{{ $t('Order Type') }}:</strong> {{ $t('Rental') }}</p>
                                     <p><strong>{{ $t('Order ID') }}:</strong> #{{ selectedComplaint.rental_order.id }}
                                     </p>
                                     <p v-if="selectedComplaint.rental_order.branch"><strong>{{ $t('Branch') }}:</strong>
                                         {{
-                                            selectedComplaint.rental_order.branch.name }}</p>
-                                    <p v-if="selectedComplaint.rental_order.branch?.vendor"><strong>{{ $t('Vendor')
+                                            selectedComplaint?.rental_order?.branch?.name }}</p>
+                                    <p v-if="selectedComplaint?.rental_order?.branch?.vendor"><strong>{{ $t('Vendor')
                                     }}:</strong>
-                                        {{ selectedComplaint.rental_order.branch.vendor.name }}</p>
+                                        {{ selectedComplaint?.rental_order?.branch?.vendor?.name }}</p>
                                 </div>
                                 <div v-else-if="selectedComplaint.sale_order">
                                     <p><strong>{{ $t('Order Type') }}:</strong> {{ $t('Sale') }}</p>
                                     <p><strong>{{ $t('Order ID') }}:</strong> #{{ selectedComplaint.sale_order.id }}</p>
-                                    <p v-if="selectedComplaint.sale_order.branch"><strong>{{ $t('Branch') }}:</strong>
+                                    <p v-if="selectedComplaint?.sale_order?.branch"><strong>{{ $t('Branch') }}:</strong>
                                         {{
-                                            selectedComplaint.sale_order.branch.name }}</p>
-                                    <p v-if="selectedComplaint.sale_order.branch?.vendor"><strong>{{ $t('Vendor')
+                                            selectedComplaint?.sale_order?.branch?.name }}</p>
+                                    <p v-if="selectedComplaint?.sale_order?.branch?.vendor"><strong>{{ $t('Vendor')
                                     }}:</strong>
-                                        {{ selectedComplaint.sale_order.branch.vendor.name }}</p>
+                                        {{ selectedComplaint?.sale_order?.branch?.vendor?.name }}</p>
                                 </div>
                             </div>
 
@@ -237,7 +237,7 @@
                                 <p class="mt-1 font-medium">{{ selectedComplaint.subject }}</p>
                             </div>
 
-                            <div>
+                            <div v-if="selectedComplaint.message">
                                 <p><strong>{{ $t('Message') }}:</strong></p>
                                 <div class="mt-2 p-3 bg-gray-50 rounded-lg">
                                     {{ selectedComplaint.message }}
@@ -272,10 +272,10 @@
                 <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full">
                     <div class="p-6">
                         <h2 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Reply to Complaint') }}</h2>
-                        <p class="mb-2"><strong>{{ $t('From') }}:</strong> {{ replyForm.name }} &lt;{{ replyForm.email
-                        }}&gt;
+                        <p class="mb-2"><strong>{{ $t('From') }}:</strong> {{ replyForm?.name }} {{ replyForm?.email
+                        }}
                         </p>
-                        <p class="mb-4"><strong>{{ $t('Subject') }}:</strong> {{ replyForm.subject }}</p>
+                        <p class="mb-4"><strong>{{ $t('Subject') }}:</strong> {{ replyForm?.subject }}</p>
 
                         <form @submit.prevent="sendReply">
                             <div class="mb-4">
@@ -440,7 +440,7 @@ const formatStatus = (complaint) => {
     switch (complaint.status) {
         case 'new': return t('New');
         case 'in_progress': return t('In Progress');
-        case 'resolved': return t('Resolved');
+        case 'replied': return t('Resolved');
         default: return t('Unknown');
     }
 };
@@ -463,9 +463,9 @@ const closeDetailsModal = () => {
 const openReplyModal = (complaint) => {
     selectedComplaint.value = complaint;
     replyForm.id = complaint.id;
-    replyForm.name = complaint.user?.name || complaint.name || 'N/A';
-    replyForm.email = complaint.user?.email || complaint.email || 'N/A';
-    replyForm.subject = `Re: ${complaint.subject}`;
+    replyForm.name = complaint?.user?.name || complaint?.name || '';
+    replyForm.email = complaint?.user?.email || complaint?.email || '';
+    replyForm.subject = `Re: ${complaint?.subject}`;
     replyForm.message = '';
     showReplyModal.value = true;
     closeAllDropdowns();

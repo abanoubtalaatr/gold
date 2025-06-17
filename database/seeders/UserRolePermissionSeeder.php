@@ -112,6 +112,7 @@ class UserRolePermissionSeeder extends Seeder
                 'create gold-pieces', 'read gold-pieces', 'view gold-pieces', 'update gold-pieces', 'delete gold-pieces',
                 'create clients', 'read clients', 'view clients', 'update clients', 'delete clients',
                 'read orders', 'update orders',
+                'read complaints', 'update complaints',
             ],
             'admin' => [
                 'create roles', 'read roles', 'view roles', 'update roles', 'delete roles',

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Events\OrderRentalEvent;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Order\UpdateOrderRentalRequest;
+use App\Http\Requests\Api\V1\Order\UpdateOrderSaleRequest;
 use App\Http\Requests\Api\V1\StoreOrderRequest;
 use App\Http\Resources\Api\OrderRentalResource;
 use App\Models\Branch;
@@ -89,22 +91,13 @@ class OrderController extends Controller
             );
         }
 
-        // Find active branches in the same city that could handle this gold piece
-
-        $availableBranches = null;
-
         $orderRental = OrderRental::where('gold_piece_id', $goldPiece->id)->where('status', OrderRental::STATUS_APPROVED)->first();
-        
+
         $availableBranch = $orderRental->branch;
-        
+
         if (!$availableBranch) {
             return $this->errorResponse(__("mobile.no_available_branch"), [], 422);
         }
-
-        // For now, we'll use the first available branch
-        // In a more complex system, you might want to implement branch selection logic
-
-        
 
         DB::beginTransaction();
 
@@ -126,23 +119,7 @@ class OrderController extends Controller
         try {
             // Use VendorNotificationService for vendor notifications with real-time features
             $this->vendorNotificationService->notifyVendorOfNewOrder($orderRental, 'lease');
-
-            Log::info('Vendor notification sent successfully for new rental order', [
-                'order_id' => $orderRental->id,
-                'vendor_id' => $availableBranch->vendor_id,
-                'branch_id' => $availableBranch->id,
-                'order_type' => 'lease',
-            ]);
         } catch (\Exception $e) {
-            // Log notification failure but don't fail the entire request
-            Log::error('Failed to send vendor notification for new rental order', [
-                'order_id' => $orderRental->id,
-                'vendor_id' => $availableBranch->vendor_id ?? null,
-                'branch_id' => $availableBranch->id,
-                'order_type' => 'lease',
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
         }
 
         // Load the goldPiece relationship before returning the resource
@@ -150,6 +127,114 @@ class OrderController extends Controller
         return $this->successResponse(new OrderRentalResource($orderRental), __("mobile.order_created_success"), 200);
     }
 
+    public function updateRental(UpdateOrderRentalRequest $request, OrderRental $order)
+    {
+        $goldPiece = GoldPiece::with('user')->findOrFail($order->gold_piece_id);
+        // should ensure the order is approved
+        // if ($order->status !== OrderRental::STATUS_APPROVED) {
+        //     return $this->errorResponse(__("mobile.order_not_approved"), [], 422);
+        // }
+
+        if ($order->type === OrderRental::LEASE_TYPE && !$request->filled('start_date') && !$request->filled('end_date')) {
+            return $this->errorResponse(__("mobile.start_and_end_date_required"), [], 422);
+        }
+
+        if ($order->type === OrderRental::LEASE_TYPE) {
+            $order->update([
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'total_price' => $request->total_price,
+            ]);
+        } else {
+            $order->update([
+                'total_price' => $request->total_price,
+            ]);
+        }
+
+        if ($request->hasFile('images')) {
+            // Clear existing images before adding new ones
+            $goldPiece->clearMediaCollection('images');
+
+            foreach ($request->file('images') as $image) {
+                try {
+                    $goldPiece->addMedia($image)
+                        ->toMediaCollection('images', 'public');
+                } catch (\Exception $e) {
+                    continue;
+                }
+            }
+        }
+
+        $goldPiece->update([
+            'name' => $request->name,
+            'weight' => $request->weight,
+            'carat' => $request->carat,
+            'description' => $request->description,
+            'rental_price_per_day' => $request->rental_price_per_day,
+            'is_including_lobes' => $request->is_including_lobes,
+        ]);
+
+        // Return the updated order with type information for frontend validation
+        $order->load('goldPiece');
+        return $this->successResponse(
+            new OrderRentalResource($order),
+            __("mobile.order_updated_success"),
+            200
+        );
+
+        // Load the goldPiece relationship before returning the resource
+        $orderRental->load('goldPiece');
+        return $this->successResponse(new OrderRentalResource($orderRental), __("mobile.order_created_success"), 200);
+    }
+
+    public function updateSale(UpdateOrderSaleRequest $request, OrderSale $order)
+    {
+        $goldPiece = GoldPiece::with('user')->findOrFail($order->gold_piece_id);
+        // should ensure the order is approved
+        // if ($order->status !== OrderRental::STATUS_APPROVED) {
+        //     return $this->errorResponse(__("mobile.order_not_approved"), [], 422);
+        // }
+
+        $order->update([
+            'total_price' => $request->total_price,
+        ]);
+
+
+        if ($request->hasFile('images')) {
+            // Clear existing images before adding new ones
+            $goldPiece->clearMediaCollection('images');
+
+            foreach ($request->file('images') as $image) {
+                try {
+                    $goldPiece->addMedia($image)
+                        ->toMediaCollection('images', 'public');
+                } catch (\Exception $e) {
+                    continue;
+                }
+            }
+        }
+
+        $goldPiece->update([
+            'name' => $request->name,
+            'weight' => $request->weight,
+            'carat' => $request->carat,
+            'description' => $request->description,
+            'rental_price_per_day' => $request->rental_price_per_day,
+            'is_including_lobes' => $request->is_including_lobes,
+        ]);
+
+        // Return the updated order with type information for frontend validation
+        $order->load('goldPiece');
+        return $this->successResponse(
+            new OrderRentalResource($order),
+            __("mobile.order_updated_success"),
+            200
+        );
+
+        // Load the goldPiece relationship before returning the resource
+        $orderRental->load('goldPiece');
+        return $this->successResponse(new OrderRentalResource($orderRental), __("mobile.order_created_success"), 200);
+    }
     public function toggleSuspendRental(OrderRental $order)
     {
         $order->update(['is_suspended' => !$order->is_suspended]);
@@ -165,5 +250,17 @@ class OrderController extends Controller
     public function show(OrderRental $order)
     {
         return $this->successResponse(new OrderRentalResource($order), __("mobile.order_fetched_success"), 200);
+    }
+
+    public function deleteRental(OrderRental $order)
+    {
+        $order->delete();
+        return $this->successResponse(null, __("mobile.order_deleted_success"));
+    }
+
+    public function deleteSale(OrderSale $order)
+    {
+        $order->delete();
+        return $this->successResponse(null, __("mobile.order_deleted_success"));
     }
 }

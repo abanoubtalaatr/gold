@@ -39,6 +39,7 @@ class OrderSale extends Model
     const STATUS_PENDING_APPROVAL = 'pending_approval'; // في انتظار المتجر
     const STATUS_APPROVED = 'approved'; // تم القبول من المتجر
     const STATUS_PIECE_SENT = 'piece_sent'; // تم الإرسال للعميل
+    const STATUS_VENDOR_ALREADY_TAKE_THE_PIECE  = 'vendor_already_take_the_piece';
     const STATUS_SOLD = 'sold'; // تم بيعها
     const STATUS_REJECTED = 'rejected'; // تم رفضها
 

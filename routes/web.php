@@ -398,6 +398,7 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
         Route::get('/rental-orders', 'index')->name('orders.rental.index');
         Route::post('/rental-orders/{orderId}/accept', 'accept')->name('orders.rental.accept');
         Route::post('/rental-orders/{orderId}/reject', 'reject')->name('orders.rental.reject');
+        Route::post('/rental-orders/{orderId}/mark-taken', 'markAsTaken')->name('orders.rental.mark-taken');
         Route::patch('/rental-orders/{orderId}/status', 'updateStatus')->name('orders.rental.updateStatus');
 
     });
@@ -415,6 +416,7 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
         Route::post('/sale-orders/{orderId}/reject', 'reject')->name('orders.sales.reject');
         Route::post('/sale-orders/{orderId}/mark-sent', 'markAsSent')->name('orders.sales.mark-sent');
         Route::post('/sale-orders/{orderId}/mark-sold', 'markAsSold')->name('orders.sales.mark-sold');
+        Route::post('/sale-orders/{orderId}/mark-taken', 'markAsTaken')->name('orders.sales.mark-taken');
         Route::patch('/sale-orders/{orderId}/status', 'updateStatus')->name('orders.sales.updateStatus');
     });
     

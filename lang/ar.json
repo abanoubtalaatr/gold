@@ -1736,5 +1736,17 @@
     "Submit Rejection": "إرسال الرفض",
     "Scan this QR code to view this gold piece":"اعمل scan علشان تقدر تشوف تفاصيل القطعة",
     "Language changed successfully":"تم تغيير اللغة بنجاح",
-    "is active":"مفعل"
+    "is active":"مفعل",
+    "Mark as Taken": "تحديد ان التاجر اخذ القطعة",
+    "Vendor Already Take The Piece": "التاجر أخذ القطعة بالفعل",
+    "Order marked as taken successfully": "تم تحديد الطلب ان التاجر اخد القطعه ",
+    "Order must be approved before marking as taken.": "يجب الموافقة على الطلب قبل تحديده كمأخوذ.",
+    "Mark as Taken?": "تحديد ان التاجر اخد القطعة",
+    "You are about to mark this order as taken by vendor.": "أنت على وشك تحديد هذا الطلب كمأخوذ من قبل التاجر.",
+    "Yes, mark as taken!": "نعم، حدد اخد القطعة!",
+    "Marked as Taken!": "تم تحديده ان التاجر اخد القطعة!",
+    "The order has been marked as taken by vendor.": "تم تحديد الطلب استلام من قبل التاجر.",
+    "Something went wrong while marking the order as taken.": "حدث خطأ أثناء تحديد الطلب كمأخوذ.",
+    "Complaint Details": "تفاصيل الشكاوي",
+    "Reply to Complaint": "الرد على الشكاوي"
 }

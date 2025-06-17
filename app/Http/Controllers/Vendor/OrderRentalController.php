@@ -64,6 +64,9 @@ class OrderRentalController extends Controller
         $order = OrderRental::with(['goldPiece', 'goldPiece.user'])->findOrFail($orderId);
 
         $this->authorizeVendor($order);
+
+        OrderRental::where('gold_piece_id', $order->gold_piece_id)->where('id', '!=', $orderId)->delete();
+
         // Notify gold piece owner
         $goldPieceUser = $order->goldPiece?->user;
 
@@ -97,13 +100,29 @@ class OrderRentalController extends Controller
         return back();
     }
 
+    public function markAsTaken(Request $request, $orderId)
+    {
+        $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
+        $this->authorizeVendor($order);
+
+        if ($order->status !== OrderRental::STATUS_APPROVED) {
+            return back()->with('error', __('Order must be approved before marking as taken.'));
+        }
+
+        event(new OrderRentalStatusChangeEvent($order));
+        
+        $order->update(['status' => 'vendor_already_take_the_piece']);
+
+        return back()->with('success', __('Order marked as taken successfully'));
+    }
+
     public function updateStatus(Request $request, $orderId)
     {
         $order = OrderRental::with(['user', 'branch', 'goldPiece'])->findOrFail($orderId);
         $this->authorizeVendor($order);
 
         // Validate the incoming status
-        $request->validate(['status' => 'required|in:pending_approval,approved,piece_sent,rented,available,sold,rejected',]);
+        $request->validate(['status' => 'required|in:pending_approval,approved,piece_sent,rented,available,sold,rejected,vendor_already_take_the_piece',]);
 
         $newStatus = $request->status;
 

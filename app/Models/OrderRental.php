@@ -54,6 +54,7 @@ class OrderRental extends Model
     const STATUS_PENDING_APPROVAL = 'pending_approval'; // في انتظار المتجر
     const STATUS_APPROVED = 'approved'; // تم القبول من المتجر
     const STATUS_PIECE_SENT = 'piece_sent'; // تم ارسال القطعة للمتجر
+    const STATUS_VENDOR_ALREADY_TAKE_THE_PIECE  = 'vendor_already_take_the_piece'; // تم ارسال القطعة للمتجر
     const STATUS_RENTED = 'rented'; // مؤجرة حاليا
     const STATUS_AVAILABLE = 'available'; // متاحة للإيجار مرة أخرى
     const STATUS_SOLD = 'sold'; // تم بيعها (if needed for rental orders)

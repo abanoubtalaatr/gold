@@ -57,7 +57,7 @@ Route::get('countries/{country}/states', [CountryController::class, 'states']);
 Route::get('cities', [StateController::class, 'cities']);
 Route::get('pages/{slug}', [PageApiController::class, 'show']);
 
-Route::get('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'show'])->name('gold_pieces.show');
+Route::get('/gold-pieces/{goldPiece}', [GoldPieceController::class, 'show'])->name('gold_pieces.show')->middleware('optional.auth');
 Route::post('/contact-us', [ContactUsController::class, 'store'])->name('contact-us');
 
 // Debug route - remove after testing
@@ -142,9 +142,12 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     */
 
     Route::post('/orders', [OrderController::class, 'store']);
+    Route::post('/orders/{order}/rental', [OrderController::class, 'updateRental']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders/{order}/toggle-suspend-rental', [OrderController::class, 'toggleSuspendRental']);
     Route::post('/orders/{order}/toggle-suspend-sale', [OrderController::class, 'toggleSuspendSale']);
+    Route::delete('/orders/{order}/rental', [OrderController::class, 'deleteRental']);
+    Route::delete('/orders/{order}/sale', [OrderController::class, 'deleteSale']);
     Route::get('orders/{order}', [OrderController::class, 'show']);
     Route::post('orders/{order}/confirm-send-to-vendor', [ConfirmSendPieceToVendorController::class, 'index']);
     Route::post('order/{order}/confirm-sold-to-vendor', [ConfirmSoldToVendorController::class, 'index']);

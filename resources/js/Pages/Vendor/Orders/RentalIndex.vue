@@ -30,6 +30,8 @@
                                     @change="applyFilters">
                                     <option value="">{{ $t('All Statuses') }}</option>
                                     <option value="pending_approval">{{ $t('Pending Approval') }}</option>
+                                    <option value="approved">{{ $t('Approved') }}</option>
+                                    <option value="vendor_already_take_the_piece">{{ $t('Vendor Already Take The Piece') }}</option>
                                     <option value="rejected">{{ $t('Rejected') }}</option>
                                 </select>
                                 <button @click="resetFilters"
@@ -119,6 +121,15 @@
                                                     class="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors duration-200">
                                                     {{ rejecting && selectedOrderId === order.id ? $t('Processing...') :
                                                         $t('Reject') }}
+                                                </button>
+
+                                                <!-- Mark as Taken button - only show for approved orders -->
+                                                <button
+                                                    v-if="order.status === 'approved'"
+                                                    @click="markAsTaken(order.id)" :disabled="takingPiece"
+                                                    class="px-3 py-1 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50 transition-colors duration-200">
+                                                    {{ takingPiece && selectedOrderId === order.id ? $t('Processing...') :
+                                                        $t('Mark as Taken') }}
                                                 </button>
                                             </div>
                                         </td>
@@ -334,6 +345,7 @@ const getDisplayStatus = (status) => {
         'piece_sent': t('Piece Sent'),
         'rented': t('Rented'),
         'rejected': t('Rejected'),
+        'vendor_already_take_the_piece': t('Vendor Already Take The Piece'),
     };
     return statusMap[status] || status;
 };
@@ -345,6 +357,7 @@ const getStatusClass = (status) => {
         'piece_sent': 'bg-purple-100 text-purple-800',
         'rented': 'bg-green-100 text-green-800',
         'rejected': 'bg-red-100 text-red-800',
+        'vendor_already_take_the_piece': 'bg-orange-100 text-orange-800',
     };
     return statusClasses[status] || 'bg-gray-100 text-gray-800';
 };
@@ -428,6 +441,7 @@ const closeDetailsModal = () => {
 const accepting = ref(false);
 const rejecting = ref(false);
 const updating = ref(false);
+const takingPiece = ref(false);
 const selectedOrderId = ref(null);
 
 // Update the rejectOrderDirect function
@@ -468,6 +482,47 @@ const rejectOrderDirect = async (order) => {
             console.error('Error rejecting order:', errors);
         } finally {
             rejecting.value = false;
+            selectedOrderId.value = null;
+        }
+    }
+};
+
+// Add the markAsTaken function
+const markAsTaken = async (orderId) => {
+    const result = await Swal.fire({
+        title: t('Mark as Taken?'),
+        text: t('You are about to mark this order as taken by vendor.'),
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: t('Yes, mark as taken!'),
+        cancelButtonText: t('Cancel')
+    });
+
+    if (result.isConfirmed) {
+        selectedOrderId.value = orderId;
+        takingPiece.value = true;
+
+        try {
+            await router.post(route('vendor.orders.rental.mark-taken', orderId), {}, {
+                preserveScroll: true
+            });
+
+            Swal.fire(
+                t('Marked as Taken!'),
+                t('The order has been marked as taken by vendor.'),
+                'success'
+            );
+        } catch (errors) {
+            Swal.fire(
+                t('Error!'),
+                t('Something went wrong while marking the order as taken.'),
+                'error'
+            );
+            console.error('Error marking order as taken:', errors);
+        } finally {
+            takingPiece.value = false;
             selectedOrderId.value = null;
         }
     }

@@ -19,15 +19,27 @@ class ComplaintController extends Controller
             'rentalOrder' => fn($query) => $query->with(['branch.vendor']),
             'saleOrder' => fn($query) => $query->with(['branch.vendor'])
         ])
-            ->where('is_to_admin', '1')
+            ->where('is_to_admin', 1)
             ->orWhere(function ($query) {
                 $query->whereNull('sale_order_id')
                     ->whereNull('rental_order_id');
             })
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('subject', 'like', "%{$search}%")
+                      ->orWhere('message', 'like', "%{$search}%")
+                      ->orWhereHas('user', function ($userQuery) use ($search) {
+                          $userQuery->where('name', 'like', "%{$search}%");
+                      });
+                });
+            })
+            ->when($request->status, function ($query, $status) {
+                $query->where('status', $status);
+            })
             ->latest()
-            ->filter($request->only('search', 'status'))
             ->paginate(10)
             ->withQueryString();
+
         return inertia('Admin/Complaints/Index', [
             'complaints' => $complaints,
             'filters' => $request->all('search', 'status'),

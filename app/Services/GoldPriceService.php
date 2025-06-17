@@ -288,11 +288,14 @@ class GoldPriceService
             $rentalCostPerDay = ($totalPrice * $dailyRate) * $rentalDays??1;
             $totalPrice = $rentalCostPerDay;
         }else{
-
             $dailyRate = $systemSetting->gold_purchase_price??10;
-            $dailyRate = $dailyRate/100;
-
-            $totalPrice += $pricePerGram * $weight + $pricePerGram * $weight * $dailyRate;
+            if($dailyRate < 0){
+                $dailyRate = abs($dailyRate/100); // Make the rate negative for purchase discount
+                $totalPrice = $totalPrice - ($totalPrice * $dailyRate); // Apply discount to total price
+            }else{
+                $dailyRate = abs($dailyRate/100); // Make the rate negative for purchase discount
+                $totalPrice = $totalPrice + ($totalPrice * $dailyRate); // Apply discount to total price
+            }
         }
 
         return round($totalPrice, 2);

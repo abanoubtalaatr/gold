@@ -262,4 +262,6 @@ return [
     'created_date' => 'Created Date',
     'print_details' => 'Print Details',
     'view_details' => 'View Details',
+    "order_not_approved" => "Order not approved",
+    "start_and_end_date_required" => "Start and end date are required",
 ];

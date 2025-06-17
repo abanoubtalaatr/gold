@@ -303,15 +303,7 @@ class GoldPieceController extends Controller
                 return $this->errorResponse(__('mobile.Unauthorized. You can only update your own gold pieces.'), [], 403);
             }
 
-            // Check if the gold piece has active orders before allowing type change
-            if ($request->has('type') && $request->type !== $goldPiece->type) {
-                if (
-                    $goldPiece->orderRentals()->whereIn('status', ['pending', 'active'])->exists() ||
-                    $goldPiece->orderSales()->whereIn('status', ['pending', 'processing'])->exists()
-                ) {
-                    return $this->errorResponse(__('mobile.Cannot change type while there are active orders.'), [], 400);
-                }
-            }
+          
 
             DB::beginTransaction();
 

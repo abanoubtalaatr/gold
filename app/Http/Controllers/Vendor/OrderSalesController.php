@@ -219,6 +219,34 @@ class OrderSalesController extends Controller
         return back()->with('success', $successMessage);
     }
 
+    public function markAsTaken(Request $request, $orderId)
+    {
+        $orderId = $orderId; // Store the original ID
+        $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
+        $this->authorizeVendor($order);
+
+        if ($order->status !== OrderSale::STATUS_APPROVED) {
+            return back()->with('error', __('Order must be approved before marking as taken.'));
+        }
+
+        event(new OrderSaleStatusChangedEvent($order));
+        
+        $order->update(['status' => 'vendor_already_take_the_piece']);
+        
+        // Notify gold piece owner using the new unified notification
+        if ($order->goldPiece && $order->goldPiece->user) {
+            $order->goldPiece->user->notify(
+                new OrderSaleNotification(
+                    $order,
+                    'vendor_already_take_the_piece',
+                    Auth::user()->name
+                )
+            );
+        }
+
+        return back()->with('success', __('Order marked as taken successfully'));
+    }
+
     public function updateStatus(Request $request, $orderId)
     {
         $order = OrderSale::findOrFail($orderId);
@@ -226,7 +254,7 @@ class OrderSalesController extends Controller
 
         // Validate the incoming status to be one of the allowed statuses for OrderSale
         $request->validate([
-            'status' => 'required|in:pending_approval,approved,piece_sent,sold,rejected',
+            'status' => 'required|in:pending_approval,approved,piece_sent,sold,rejected,vendor_already_take_the_piece',
         ]);
 
         event(new OrderSaleStatusChangedEvent($order));

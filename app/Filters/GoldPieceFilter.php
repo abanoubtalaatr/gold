@@ -81,9 +81,9 @@ class GoldPieceFilter
     protected function approvedOrders(): self
     {
         $this->query->whereHas('orderRentals', function($query) {
-            $query->where('status', 'accepted');
+            $query->where('status', 'vendor_already_take_the_piece');
         })->orWhereHas('orderSales', function($query) {
-            $query->where('status', 'accepted');
+            $query->where('status', 'vendor_already_take_the_piece');
         });
 
         return $this;

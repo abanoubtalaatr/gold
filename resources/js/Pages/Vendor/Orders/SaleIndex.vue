@@ -31,6 +31,7 @@
                                     <option value="">{{ $t('All Statuses') }}</option>
                                     <option value="pending_approval">{{ $t('Pending Approval') }}</option>
                                     <option value="approved">{{ $t('Approved') }}</option>
+                                    <option value="vendor_already_take_the_piece">{{ $t('Vendor Already Take The Piece') }}</option>
                                     <option value="piece_sent">{{ $t('Piece Sent') }}</option>
                                     <option value="sold">{{ $t('Sold') }}</option>
                                     <option value="rejected">{{ $t('Rejected') }}</option>
@@ -117,6 +118,11 @@
                                                     {{ $t('Reject') }}
                                                 </button>
                                                 <button v-if="order.status === 'approved'"
+                                                    @click="markAsTaken(order.id)"
+                                                    class="px-3 py-1 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 transition-colors duration-200">
+                                                    {{ $t('Mark as Taken') }}
+                                                </button>
+                                                <button v-if="order.status === 'vendor_already_take_the_piece'"
                                                     @click="markAsSent(order.id)"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-200">
                                                     {{ $t('Mark as Sent') }}
@@ -384,6 +390,8 @@ const getStatusClass = (status) => {
             return 'bg-yellow-100 text-yellow-800';
         case 'approved':
             return 'bg-green-100 text-green-800';
+        case 'vendor_already_take_the_piece':
+            return 'bg-orange-100 text-orange-800';
         case 'piece_sent':
             return 'bg-blue-100 text-blue-800';
         case 'sold':
@@ -399,6 +407,7 @@ const formatStatus = (status) => {
     const statusMap = {
         'pending_approval': t('Pending Approval'),
         'approved': t('Approved'),
+        'vendor_already_take_the_piece': t('Vendor Already Take The Piece'),
         'piece_sent': t('Piece Sent'),
         'sold': t('Sold'),
         'rejected': t('Rejected'),
@@ -483,6 +492,18 @@ const markAsSold = (orderId) => {
         },
         onError: (errors) => {
             console.error('Error marking order as sold:', errors);
+        }
+    });
+};
+
+const markAsTaken = (orderId) => {
+    router.post(route('vendor.orders.sales.mark-taken', orderId), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Handle success
+        },
+        onError: (errors) => {
+            console.error('Error marking order as taken:', errors);
         }
     });
 };
