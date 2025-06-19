@@ -27,6 +27,6 @@ class SendEmail extends Command
      */
     public function handle()
     {
-        dd((new MesgatService())->send_sms('966582255234', 'mr. are you received this message?'));
+      
     }
 }
