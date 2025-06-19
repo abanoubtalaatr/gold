@@ -225,10 +225,6 @@ class OrderSalesController extends Controller
         $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
         $this->authorizeVendor($order);
 
-        if ($order->status !== OrderSale::STATUS_APPROVED) {
-            return back()->with('error', __('Order must be approved before marking as taken.'));
-        }
-
         event(new OrderSaleStatusChangedEvent($order));
         
         $order->update(['status' => 'vendor_already_take_the_piece']);

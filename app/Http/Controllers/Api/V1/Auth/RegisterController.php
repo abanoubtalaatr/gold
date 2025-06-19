@@ -12,6 +12,7 @@ use App\Models\MobileConfirm;
 use App\Events\User\UserLoggedIn;
 use App\Events\User\ApiRegistered;
 use Illuminate\Support\Facades\DB;
+use App\Http\Services\MesgatService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -72,9 +73,9 @@ class RegisterController extends AppBaseController
 
             if (MobileConfirm::create($cnfrm_data)) {
 
-                // $msg = __('رمز التحقق: :code', ['code' => $data['code']]);
+                $msg = __('رمز التحقق: :code', ['code' => $data['code']]);
 
-                // $this->smsService->send_sms($mobile,$msg);
+                // (new MesgatService())->send_sms($mobile, $msg);
 
                 return $this->sendResponse(['user' => $user, 'code' => $cnfrm_data['code']], __('mobile.You have registered successfully,please verify your mobile'));
             }
@@ -127,9 +128,9 @@ class RegisterController extends AppBaseController
 
         if (MobileConfirm::create($data)) {
 
-            // $msg = __('رمز التحقق: :code', ['code' => $data['code']]);
+            $msg = __('رمز التحقق: :code', ['code' => $data['code']]);
 
-            // $this->smsService->send_sms($mobile,$msg);
+            // (new MesgatService())->send_sms($mobile, $msg);
 
             return $this->sendResponse(['code' => $data['code']], trans('passwords.sms_sent'));
         }

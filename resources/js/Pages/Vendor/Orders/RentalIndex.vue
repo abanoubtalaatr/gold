@@ -125,7 +125,7 @@
 
                                                 <!-- Mark as Taken button - only show for approved orders -->
                                                 <button
-                                                    v-if="order.status === 'approved'"
+                                                    v-if="order.status === 'approved' || order.status === 'piece_sent'" 
                                                     @click="markAsTaken(order.id)" :disabled="takingPiece"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50 transition-colors duration-200">
                                                     {{ takingPiece && selectedOrderId === order.id ? $t('Processing...') :

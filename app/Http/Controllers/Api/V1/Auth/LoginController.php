@@ -9,15 +9,16 @@ use App\Models\User;
 use App\Services\SMS\Msegat;
 use Illuminate\Http\Request;
 use App\Models\MobileConfirm;
+use App\Traits\ApiResponseTrait;
 use App\Events\User\UserLoggedIn;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\Http\Services\MesgatService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Api\AppBaseController;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
-use App\Traits\ApiResponseTrait;
 
 /**
  * Class LoginController.
@@ -162,9 +163,9 @@ class LoginController extends AppBaseController
 
             if (MobileConfirm::create($cnfrm_data)) {
 
-                // $msg = __('رمز التحقق: :code', ['code' => $data['code']]);
+                $msg = __('رمز التحقق: :code', ['code' => $cnfrm_data['code']]);
 
-                // $this->smsService->send_sms($mobile,$msg);
+                // (new MesgatService())->send_sms($user->mobile, $msg);
 
                 return $this->errorResponse('mobile.mobile_not_verified', ['code' => $cnfrm_data['code'],'is_verified' => false], 200);
             }

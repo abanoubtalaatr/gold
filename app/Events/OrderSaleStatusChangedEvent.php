@@ -36,8 +36,10 @@ class OrderSaleStatusChangedEvent implements ShouldBroadcast
     {
         return [
             'order' => OrderSaleResource::make($this->order),
-            'message_ar' => 'تم تحديث حالة الطلب',
-            'message_en' => 'Order status has been updated',
+            'title_ar' => 'تحديث حالة الطلب',
+            'title_en' => 'Order status updated',
+            'description_ar' => 'تم تحديث حالة الطلب',
+            'description_en' => 'Order status has been updated',
         ];
     }
 }

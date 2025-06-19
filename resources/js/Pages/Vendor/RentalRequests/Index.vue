@@ -17,7 +17,7 @@
                         <!-- Filters -->
                         <div class="flex flex-wrap items-center justify-between mb-6 gap-4">
                             <!-- Search Input (Full Width) -->
-                            
+
                             <!-- Other Filters (3 Columns Each on Medium Screens) -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-full">
                                 <div class="md:w-full">
@@ -50,7 +50,7 @@
                                         <option value="future">{{ $t('Future Rentals') }}</option>
                                     </select>
                                 </div> -->
-                                
+
                                 <div class="md:w-full">
                                     <select v-model="form.date_filter"
                                         class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -120,21 +120,21 @@
                                     <tr v-for="order in orders.data" :key="order.id">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.id }}
                                         </td>
-
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             <div class="flex items-center">
                                                 <img v-if="order.user?.avatar" :src="order.user.avatar"
                                                     class="h-8 w-8 rounded-full object-cover mr-2" alt="User avatar" />
                                                 <div>
                                                     {{ order.user?.name || 'N/A' }}<br />
-                                                    {{ order.user?.mobile || 'N/A' }}
+                                                    {{ order.user?.mobile || 'N/A' }}<br />
+                                                    <!-- {{ order.user.addresses[0]?.city || 'N/A' }} -->
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
                                             <button @click="showGoldPieceDetails(order.gold_piece)"
                                                 class="text-indigo-600 p-2 rounded hover:text-indigo-800 hover:underline font-medium">
-                                               {{ order.gold_piece.name?? 'N/A' }}
+                                                {{ order.gold_piece.name ?? 'N/A' }}
                                             </button>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{
@@ -148,7 +148,7 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{
                                             order.total_price }} {{
-                                            $t('SAR') }}</td>
+                                                $t('SAR') }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span
                                                 :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(order.status)]">
@@ -249,7 +249,7 @@
                             <p><strong>{{ $t('Order Type') }}:</strong> {{ selectedOrder.order_type === 'rental' ?
                                 $t('Rental')
                                 : $t('Sale') }}</p>
-                                <p><strong>{{ $t('Piece Name') }}:</strong> {{ selectedOrder.goldPiece?.name || 'N/A' }}</p>
+                            <p><strong>{{ $t('Piece Name') }}:</strong> {{ selectedOrder.goldPiece?.name || 'N/A' }}</p>
                             <p v-if="selectedOrder.gold_piece && selectedOrder.gold_piece.is_including_lobes">
                                 <strong>{{ $t('Is Including Lobe') }}:</strong>
                                 {{ selectedOrder.gold_piece.is_including_lobes ? $t('Yes') : $t('No') }}
@@ -261,7 +261,7 @@
                             <p><strong>{{ $t('Created At') }}:</strong> {{ formatDate(selectedOrder.created_at) }}</p>
                             <p><strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || 'N/A' }}</p>
                             <p><strong>{{ $t('User Email') }}:</strong> {{ selectedOrder.user?.email || 'N/A' }}</p>
-                            
+
                             <p><strong>{{ $t('Description') }}:</strong> {{ selectedOrder.goldPiece?.description ||
                                 'N/A' }}</p>
                             <p><strong>{{ $t('Weight') }}:</strong> {{ selectedOrder.goldPiece?.weight || 'N/A' }} {{
@@ -308,7 +308,7 @@
                         </svg>
                     </button>
                 </div>
-                
+
                 <div v-if="selectedGoldPiece" class="space-y-6">
                     <!-- Basic Information -->
                     <div class="bg-gray-50 rounded-lg p-4">
@@ -320,16 +320,19 @@
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-700">{{ $t('Weight') }}</p>
-                                <p class="text-sm text-gray-900">{{ selectedGoldPiece.weight || 'N/A' }} {{ $t('grams') }}</p>
+                                <p class="text-sm text-gray-900">{{ selectedGoldPiece.weight || 'N/A' }} {{ $t('grams')
+                                }}</p>
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-700">{{ $t('Carat') }}</p>
                                 <p class="text-sm text-gray-900">{{ selectedGoldPiece.carat || 'N/A' }}</p>
                             </div>
-                            
+
                             <div v-if="selectedGoldPiece.price_per_day" class="md:col-span-2">
                                 <p class="text-sm font-medium text-gray-700">{{ $t('Daily Rental Price') }}</p>
-                                <p class="text-sm text-gray-900">{{ selectedGoldPiece.price_per_day }} {{ $t('SAR') }}/{{ $t('day') }}</p>
+                                <p class="text-sm text-gray-900">{{ selectedGoldPiece.price_per_day }} {{ $t('SAR')
+                                }}/{{
+                                        $t('day') }}</p>
                             </div>
                             <div v-if="selectedGoldPiece.sale_price" class="md:col-span-2">
                                 <p class="text-sm font-medium text-gray-700">{{ $t('Sale Price') }}</p>
@@ -348,23 +351,24 @@
                     <div v-if="selectedGoldPiece.images?.length" class="bg-gray-50 rounded-lg p-4">
                         <h3 class="text-lg font-medium text-gray-900 mb-3">{{ $t('Images Gallery') }}</h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            <div v-for="image in selectedGoldPiece.images" :key="image.id" 
-                                 class="relative group cursor-pointer"
-                                 @click="openImageModal(image)">
-                                <img :src="'/storage/' + image.path" 
-                                     class="w-full h-32 object-cover rounded-lg border hover:border-indigo-500 transition-colors duration-200"
-                                     :alt="`${selectedGoldPiece.name} image`" />
-                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-opacity duration-200 flex items-center justify-center">
-                                    <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" 
-                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                            <div v-for="image in selectedGoldPiece.images" :key="image.id"
+                                class="relative group cursor-pointer" @click="openImageModal(image)">
+                                <img :src="'/storage/' + image.path"
+                                    class="w-full h-32 object-cover rounded-lg border hover:border-indigo-500 transition-colors duration-200"
+                                    :alt="`${selectedGoldPiece.name} image`" />
+                                <div
+                                    class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-opacity duration-200 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7">
+                                        </path>
                                     </svg>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Additional Details -->
                     <div class="bg-gray-50 rounded-lg p-4">
                         <h3 class="text-lg font-medium text-gray-900 mb-3">{{ $t('Additional Details') }}</h3>
@@ -388,7 +392,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="mt-6 flex justify-end">
                     <button @click="closeGoldPieceModal"
                         class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-200">
@@ -412,9 +416,9 @@
                     </button>
                 </div>
                 <div v-if="selectedImage" class="text-center">
-                    <img :src="'/storage/' + selectedImage.path" 
-                         class="max-w-full max-h-96 mx-auto rounded-lg shadow-lg"
-                         :alt="selectedGoldPiece?.name + ' image'" />
+                    <img :src="'/storage/' + selectedImage.path"
+                        class="max-w-full max-h-96 mx-auto rounded-lg shadow-lg"
+                        :alt="selectedGoldPiece?.name + ' image'" />
                 </div>
             </div>
         </Modal>
@@ -491,8 +495,8 @@
         </Modal>
 
 
-        
-        
+
+
     </AuthenticatedLayout>
 </template>
 
@@ -629,7 +633,7 @@ const formatStatus = (status) => {
         'sold': t('Sold'),
         'payment_confirmed': t('Payment Confirmed')
     };
-    
+
     return statusTranslations[status] || status
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -638,13 +642,13 @@ const formatStatus = (status) => {
 
 const formatDate = (date, dateOnly = false) => {
     if (!date) return 'N/A';
-    
+
     const dateObj = new Date(date);
-    
+
     if (dateOnly) {
         return dateObj.toLocaleDateString();
     }
-    
+
     return dateObj.toLocaleString();
 };
 
@@ -681,7 +685,7 @@ const closeRejectModal = () => {
 const acceptOrderDirect = (order) => {
     console.log('Direct accept order function called');
     console.log('Selected order:', order);
-    
+
     if (!order) {
         console.error('No order provided');
         return;
@@ -689,7 +693,7 @@ const acceptOrderDirect = (order) => {
 
     console.log('Submitting direct accept...');
     console.log('Route URL:', route('vendor.rental-requests.accept', { order: order.id }));
-    
+
     router.post(route('vendor.rental-requests.accept', { order: order.id }), {}, {
         preserveScroll: true,
         onStart: () => {
@@ -715,7 +719,7 @@ const rejectOrder = () => {
     console.log('Reject order function called');
     console.log('Selected order:', selectedOrder.value);
     console.log('Route URL:', route('vendor.rental-requests.reject', { order: selectedOrder.value.id }));
-    
+
     router.post(route('vendor.rental-requests.reject', { order: selectedOrder.value.id }), {}, {
         preserveScroll: true,
         onStart: () => {
@@ -863,7 +867,7 @@ const showNotification = (message, type = 'success') => {
     showNotificationToast.value = true;
     notificationMessage.value = message;
     notificationToastClass.value = type === 'success' ? 'border-green-500' : 'border-red-500';
-    
+
     // Auto hide after 5 seconds
     setTimeout(() => {
         hideNotificationToast();

@@ -74,7 +74,7 @@ class AddressController extends Controller
             /** @var User $user */
             $user = Auth::user();
             $address = $user->addresses()
-                ->with(['state', 'city'])
+                ->with(['city'])
                 ->findOrFail($id);
             
             return $this->successResponse(
@@ -108,7 +108,7 @@ class AddressController extends Controller
             $address->update($request->validated());
 
             return $this->successResponse(
-                new AddressResource($address->load([ 'state', 'city'])),
+                new AddressResource($address->load(['city'])),
                 __('mobile.Address updated successfully')
             );
         } catch (\Exception $e) {
@@ -167,7 +167,7 @@ class AddressController extends Controller
             $address->update(['is_default' => true]);
 
             return $this->successResponse(
-                new AddressResource($address->load(['state', 'city'])),
+                new AddressResource($address->load([ 'city'])),
                 __('mobile.Default address set successfully')
             );
         } catch (\Exception $e) {

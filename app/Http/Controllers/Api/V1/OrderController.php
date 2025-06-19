@@ -92,7 +92,7 @@ class OrderController extends Controller
             );
         }
 
-        $orderRental = OrderRental::where('gold_piece_id', $goldPiece->id)->where('status', OrderRental::STATUS_APPROVED)->first();
+        $orderRental = OrderRental::where('gold_piece_id', $goldPiece->id)->where('status', OrderRental::STATUS_VENDOR_ALREADY_TAKE_THE_PIECE)->first();
 
         $availableBranch = $orderRental->branch;
 

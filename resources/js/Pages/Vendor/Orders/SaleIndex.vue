@@ -117,7 +117,7 @@
                                                     class="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors duration-200">
                                                     {{ $t('Reject') }}
                                                 </button>
-                                                <button v-if="order.status === 'approved'"
+                                                <button v-if="order.status === 'approved' || order.status === 'piece_sent'"
                                                     @click="markAsTaken(order.id)"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 transition-colors duration-200">
                                                     {{ $t('Mark as Taken') }}

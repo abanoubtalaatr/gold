@@ -36,11 +36,19 @@ class GoldPieceFilter
             ->typeFilter()
             ->statusFilter()
             ->searchFilter()
+            
             ->availableToRentFilter()
             ->sortByPrice()
             ->cityFilter()
             ->orderBy('created_at', 'desc')
             ->getQuery();
+    }
+
+    public function hasRentalOrder(): self
+    {
+        $this->query->whereHas('orderRentals');
+
+        return $this;
     }
 
     public function orderBy(): self

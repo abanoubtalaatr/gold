@@ -39,24 +39,15 @@ class RentalRequestController extends Controller
             OrderRental::STATUS_RENTED,
             OrderRental::STATUS_REJECTED
         ];
-        // Filters
+    
+        // Filters (unchanged)
         $filters = $request->only([
-            'search',
-            'branch_id',
-            'service_type',
-            'piece_name',
-            'description',
-            'price_min',
-            'price_max',
-            'date_filter',
-            'date_from',
-            'date_to',
-            'status',
-            'rental_status',
+            'search', 'branch_id', 'service_type', 'piece_name', 'description',
+            'price_min', 'price_max', 'date_filter', 'date_from', 'date_to',
+            'status', 'rental_status',
         ]);
-
-
-        // Query for rental orders with lease type only
+    
+        // Query for rental orders
         $ordersQuery = OrderRental::query()
             ->where('type', OrderRental::LEASE_TYPE)
             ->whereIn('branch_id', $branchIds)
@@ -109,7 +100,6 @@ class RentalRequestController extends Controller
             })
             ->when(isset($filters['status']) && in_array($filters['status'], OrderRental::statuses()), function ($query) use ($filters) {
                 $query->where('status', $filters['status']);
-                // Date-based conditions for specific statuses
                 if ($filters['status'] === OrderRental::STATUS_RENTED) {
                     $query->where('start_date', '<=', Carbon::now())
                         ->where('end_date', '>=', Carbon::now());
@@ -122,16 +112,13 @@ class RentalRequestController extends Controller
             ->when($filters['rental_status'] ?? null, function ($query, $rentalStatus) {
                 switch ($rentalStatus) {
                     case 'current':
-                        // Current rentals: start_date <= now and end_date >= now
                         $query->where('start_date', '<=', Carbon::now())
                             ->where('end_date', '>=', Carbon::now());
                         break;
                     case 'finished':
-                        // Finished rentals: end_date < now
                         $query->where('end_date', '<', Carbon::now());
                         break;
                     case 'future':
-                        // Future rentals: start_date > now
                         $query->where('start_date', '>', Carbon::now());
                         break;
                 }
@@ -139,44 +126,35 @@ class RentalRequestController extends Controller
             ->with([
                 'user',
                 'goldPiece',
-                'branch'
+                'branch',
+                
             ])
             ->select([
-                'id',
-                'user_id',
-                'gold_piece_id',
-                'branch_id',
-                'total_price',
-                'status',
-                'created_at',
-                'updated_at',
-                'start_date',
-                'end_date',
+                'id', 'user_id', 'gold_piece_id', 'branch_id', 'total_price',
+                'status', 'created_at', 'updated_at', 'start_date', 'end_date',
             ]);
-
+    
         // Paginate results
         $orders = $ordersQuery->orderBy('start_date', 'desc')->paginate(10)->appends($filters);
-
-        // Transform orders to include rental_days, invoice, and allowed_actions
+    
+        // Transform orders
         $orders->getCollection()->transform(function ($order) {
             $order->rental_days = $order->start_date && $order->end_date
                 ? Carbon::parse($order->end_date)->diffInDays(Carbon::parse($order->start_date))
                 : null;
             $order->invoice = $order->status === 'payment_confirmed' ? $this->generateInvoice($order) : null;
             $order->allowed_actions = $this->getAllowedActions($order);
-
+    
             return $order;
         });
-
-
+    
         return Inertia::render('Vendor/RentalRequests/Index', [
             'orders' => $orders,
             'branches' => $branches,
             'filters' => $filters,
-            'statuses' => $statuses, // Only rental statuses
+            'statuses' => $statuses,
         ]);
     }
-
     protected function generateInvoice($order)
     {
         return [
@@ -245,7 +223,7 @@ class RentalRequestController extends Controller
 
         $order->status = OrderRental::STATUS_APPROVED;
         $order->save();
-               
+
         event(new OrderRentalStatusChangeEvent($order, $request->user()));
 
         $order->user->notify(new ChangeOrderStatusNotification($order, OrderRental::STATUS_APPROVED));
@@ -254,15 +232,15 @@ class RentalRequestController extends Controller
     }
 
     public function reject(Request $request, $order)
-    { 
+    {
         $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
-      
+
         $this->authorizeVendor($order);
 
         event(new OrderRentalStatusChangeEvent($order, $request->user()));
 
         $order->user->notify(new ChangeOrderStatusNotification($order, OrderRental::STATUS_REJECTED));
-      
+
         $order->update(['status' => OrderRental::STATUS_REJECTED]);
 
         return back()->with('success', __('Order rejected successfully'));
@@ -271,13 +249,13 @@ class RentalRequestController extends Controller
     public function markAsSent(Request $request, $order)
     {
         $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($order);
-     
+
         $this->authorizeVendor($order);
 
         if ($order->status !== OrderRental::STATUS_APPROVED) {
             return back()->with('error', __('Order must be approved before marking as sent.'));
         }
-       
+
         $order->status = OrderRental::STATUS_PIECE_SENT;
         $order->save();
 
@@ -323,7 +301,7 @@ class RentalRequestController extends Controller
         // Use the workflow service for proper status management
         $order->status = OrderRental::STATUS_RENTED;
         $order->save();
-      
+
         event(new OrderRentalStatusChangeEvent($order, $request->user()));
 
         $order->user->notify(new ChangeOrderStatusNotification($order, OrderRental::STATUS_RENTED));

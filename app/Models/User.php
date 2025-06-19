@@ -103,7 +103,6 @@ class User extends Authenticatable implements JWTSubject
         'created_at' => 'date:Y-m-d',
     ];
 
-
     public function getFormattedCreatedAtAttribute(): string
     {
         return $this->created_at->format('d M Y');
@@ -177,6 +176,11 @@ class User extends Authenticatable implements JWTSubject
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
+    }
+
+    public function defaultAddress()
+    {
+        return $this->hasOne(Address::class)->where('is_default', true);
     }
 
     public function contacts(): HasMany
@@ -272,7 +276,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     // Make sure city is always included in serialization
-    protected $with = ['city'];
+    protected $with = ['city', 'defaultAddress'];
 
     // public function registerMediaCollections(): void
     // {

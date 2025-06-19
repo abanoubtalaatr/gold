@@ -36,8 +36,12 @@ class GoldPieceController extends Controller
     {
         $query = GoldPiece::query();
         $filter = new GoldPieceFilter($request);
-        $filteredQuery = $filter->apply($query)->with('user');
-
+    
+        $filteredQuery = $filter->apply($query)->with('user')->whereHas('orderRentals', function($query){
+            $query->where('status', 'vendor_already_take_the_piece');
+        });
+        
+        
         $perPage = $request->per_page ?? 15;
         $goldPieces = $filteredQuery->paginate($perPage);
 
@@ -52,6 +56,11 @@ class GoldPieceController extends Controller
 
         $filteredQuery = $filter->apply($query)->with('user');
 
+        if($request->has('type') && $request->type === 'for_rent'){
+            $filteredQuery->whereHas('orderRentals');
+        }else{
+            $filteredQuery->whereHas('orderSales');
+        }
         $perPage = $request->per_page ?? 15;
 
         $goldPieces = $filteredQuery->paginate($perPage);
@@ -388,11 +397,12 @@ class GoldPieceController extends Controller
 
     public function goldPiecesWillFinishRentalSoon()
     {
-        $orderRentals = OrderRental::where('end_date', '<', now())
+        $orderRentals = OrderRental::whereBetween('end_date', [now(), now()->addDays(3)])
             ->with('goldPiece')
+            ->where('status', OrderRental::STATUS_VENDOR_ALREADY_TAKE_THE_PIECE)
             ->limit(3)
             ->get();
-
+    
         return $this->successResponse(
             OrderRentalResource::collection($orderRentals), 
             __('mobile.Gold pieces will finish rental soon')

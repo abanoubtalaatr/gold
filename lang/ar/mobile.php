@@ -217,4 +217,5 @@ return [
     'view_details' => 'عرض التفاصيل',
     "order_not_approved" => "الطلب غير معتمد",
     "start_and_end_date_required" => "يجب إدخال تاريخ البدء والانتهاء",
+    "User must have at least one address to create a rental order" => "يجب أن يكون لدى المستخدم عنوان واحد على الأقل لإنشاء طلب إيجار",
 ];

@@ -74,7 +74,7 @@ class OrderRentalController extends Controller
             $goldPieceUser->notify(new GoldPieceAcceptedNotification($order, Auth::user()->name));
         }
 
-        $order->update(['status' => OrderRental::STATUS_APPROVED]);
+        $order->update(['status' => OrderRental::STATUS_APPROVED,'branch_id' => $request->branch_id]);
 
         event(new OrderRentalStatusChangeEvent($order));
 
@@ -105,9 +105,6 @@ class OrderRentalController extends Controller
         $order = OrderRental::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
         $this->authorizeVendor($order);
 
-        if ($order->status !== OrderRental::STATUS_APPROVED) {
-            return back()->with('error', __('Order must be approved before marking as taken.'));
-        }
 
         event(new OrderRentalStatusChangeEvent($order));
         

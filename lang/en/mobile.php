@@ -264,4 +264,5 @@ return [
     'view_details' => 'View Details',
     "order_not_approved" => "Order not approved",
     "start_and_end_date_required" => "Start and end date are required",
+    "User must have at least one address to create a rental order" => "User must have at least one address to create a rental order",
 ];
