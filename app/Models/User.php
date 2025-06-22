@@ -299,5 +299,9 @@ class User extends Authenticatable implements JWTSubject
     //     return $this->belongsToMany(Role::class);
     // }
 
+    public function canceledOrders()    
+    {
+        return $this->hasMany(CanceledOrder::class, 'user_id');
+    }
 
 }

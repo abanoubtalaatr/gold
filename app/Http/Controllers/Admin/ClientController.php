@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
+use App\Models\SystemSetting;
+use Illuminate\Validation\Rule;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class ClientController extends Controller
 {
@@ -35,6 +36,10 @@ class ClientController extends Controller
                 $query->where('is_active', true);
             } elseif ($request->status === 'inactive') {
                 $query->where('is_active', false);
+            }elseif ($request->status === 'max_canceled_orders') {
+                $query->whereHas('canceledOrders', function ($query) {
+                    $query->where('count', '>=', SystemSetting::first()->max_canceled_orders);
+                });
             }
             // If status is 'all', don't add any filter
         }
@@ -144,7 +149,7 @@ class ClientController extends Controller
     {
         $client->canceledOrders()->delete();
 
-        return redirect()->route('clients.show', $client)
-            ->with('success', 'Canceled orders deleted successfully');
+        return redirect()->route('clients.index')
+            ->with('success', __('Canceled orders deleted successfully'));
     }
 }

@@ -279,6 +279,7 @@ class OrderController extends Controller
         }else{
             $canceledOrder->increment('count');
         }
+
         $maxCanceledOrders = SystemSetting::first()->max_canceled_orders;
 
    
@@ -287,6 +288,8 @@ class OrderController extends Controller
           return $this->errorResponse(__("mobile.account_suspended_because_you_exceeded_the_maximum_number_of_canceled_orders"), [], 422);
         }
     
+        $order->update(['status' => OrderSale::STATUS_CANCELED]);
+
         return $this->successResponse(null, __("mobile.order_canceled_success"));
     }
 }

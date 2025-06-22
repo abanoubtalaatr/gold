@@ -11,13 +11,13 @@
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-medium text-gray-900">جميع العملاء</h3>
+                            <h3 class="text-lg font-medium text-gray-900">{{ $t('all clients') }}</h3>
                             <Link :href="route('clients.create')"
                                 class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                 </svg>
-                                إضافة عميل جديد
+                                {{ $t('add new client') }}
                             </Link>
                         </div>
 
@@ -27,7 +27,7 @@
                                 <!-- Search Input -->
                                 <div class="md:col-span-2">
                                     <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
-                                        البحث
+                                        {{ $t('search') }}
                                     </label>
                                     <div class="relative">
                                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -39,7 +39,7 @@
                                             id="search"
                                             v-model="searchForm.search"
                                             type="text"
-                                            placeholder="البحث بالاسم، البريد الإلكتروني، رقم الجوال، أو IBAN..."
+                                            :placeholder="$t('search_by_name_email_mobile_or_iban')"
                                             class="block w-full pr-10 pl-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                                             @input="debouncedSearch"
                                         />
@@ -58,7 +58,7 @@
                                 <!-- Status Filter -->
                                 <div>
                                     <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
-                                        تصفية حسب الحالة
+                                        {{ $t('filter by status') }}    
                                     </label>
                                     <select
                                         id="status"
@@ -66,18 +66,19 @@
                                         @change="applyFilters"
                                         class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                                     >
-                                        <option value="">جميع العملاء</option>
-                                        <option value="active">العملاء المفعلون</option>
-                                        <option value="inactive">العملاء غير المفعلين</option>
+                                        <option value="">{{ $t('all clients') }}</option>
+                                        <option value="active">{{ $t('active clients') }}</option>
+                                        <option value="inactive">{{ $t('inactive clients') }}</option>
+                                        <option value="max_canceled_orders">{{ $t('max canceled orders') }}</option>
                                     </select>
                                 </div>
                             </div>
 
                             <!-- Active Filters Display -->
                             <div v-if="hasActiveFilters" class="mt-4 flex flex-wrap gap-2">
-                                <span class="text-sm text-gray-600">الفلاتر النشطة:</span>
+                                <span class="text-sm text-gray-600">{{ $t('active filters') }}:</span>
                                 <span v-if="searchForm.search" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                    البحث: "{{ searchForm.search }}"
+                                    {{ $t('search') }}: "{{ searchForm.search }}"
                                     <button @click="clearSearch" class="mr-1.5 inline-flex items-center justify-center w-4 h-4 text-indigo-400 hover:text-indigo-600">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -153,12 +154,12 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-gray-900">
-                                                {{ client.city?.name || $t('not_defined') }}
+                                                {{ client.city?.name || $t('not defined') }}
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded text-center">
-                                                {{ client.iban || $t('not_defined') }}
+                                                {{ client.iban || $t('not defined') }}
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
@@ -196,7 +197,7 @@
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                                             </svg>
-                                                            {{ $t('view_details') }}
+                                                            {{ $t('view details') }}
                                                         </Link>
                                                         <Link :href="route('clients.edit', client.id)"
                                                             class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150">
@@ -205,13 +206,13 @@
                                                             </svg>
                                                             {{ $t('edit') }}
                                                         </Link>
-                                                        <Link :href="route('admin.wallet.show', client.id)"
+                                                        <!-- <Link :href="route('admin.wallet.show', client.id)"
                                                             class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150">
                                                             <svg class="w-4 h-4 ml-3 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                                                             </svg>
-                                                            {{ $t('wallet_management') }}
-                                                        </Link>
+                                                            {{ $t('wallet management') }}
+                                                        </Link> -->
                                                         <div class="border-t border-gray-100"></div>
                                                         <button @click="toggleStatus(client)"
                                                             class="group flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150">
@@ -223,10 +224,9 @@
                                                             </svg>
                                                             {{ client.is_active ? $t('deactivate') : $t('activate') }}
                                                         </button>
-
-                                                        <button @click="deleteCanceledOrders(client)"
+                                                        <button @click="activeClientAfterMaxCanceledOrders(client)"
                                                             class="group flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150">
-                                                            {{ $t('delete_canceled_orders') }}
+                                                            {{ $t('max canceled orders active') }}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -243,22 +243,22 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
                             <h3 class="mt-2 text-sm font-medium text-gray-900">
-                                {{ hasActiveFilters ? $t('no_results') : $t('no_clients') }}
+                                {{ hasActiveFilters ? $t('no results') : $t('no clients') }}
                             </h3>
                             <p class="mt-1 text-sm text-gray-500">
-                                {{ hasActiveFilters ? $t('try_changing_search_criteria_or_filters') : $t('start_by_adding_a_new_client') }}
+                                {{ hasActiveFilters ? $t('try changing search criteria or filters.') : $t('start by adding a new client.') }}
                             </p>
                             <div class="mt-6">
                                 <button v-if="hasActiveFilters" @click="clearAllFilters"
                                     class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ml-3">
-                                    {{ $t('clear_filters') }}
+                                    {{ $t('clear filters') }}
                                 </button>
                                 <Link :href="route('clients.create')"
                                     class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                     <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                     </svg>
-                                    {{ $t('add_new_client') }}
+                                    {{ $t('add new client') }}
                                 </Link>
                             </div>
                         </div>
@@ -277,11 +277,13 @@ import { Link, router } from '@inertiajs/vue3';
 import Pagination from '@/Components/Pagination.vue';
 import { ref, onMounted, onUnmounted, reactive, computed, watch } from 'vue';
 import Swal from 'sweetalert2';
-
+import { useI18n } from 'vue-i18n';
 const props = defineProps({
     clients: Object,
     filters: Object,
 });
+
+const { t } = useI18n();
 
 const activeDropdown = ref(null);
 
@@ -374,48 +376,14 @@ onUnmounted(() => {
     }
 });
 
-const deleteCanceledOrders = async (client) => {
-    const result = await Swal.fire({
-        title: $t('are_you_sure'),
-        text: $t('do_you_want_to_delete_canceled_orders'),
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: $t('yes_confirm'),
-        cancelButtonText: $t('cancel'),
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-    });
-
-    if (result.isConfirmed) {
-        router.delete(route('clients.delete-canceled-orders', client.id), {}, {
-            onSuccess: () => {
-                Swal.fire({
-                    title: $t('success'),
-                    text: $t('the_canceled_orders_have_been_deleted_successfully'),
-                    icon: 'success',
-                    confirmButtonText: $t('ok')
-                });
-            },
-            onError: () => {
-                Swal.fire({ 
-                    title: $t('error'),
-                    text: $t('failed_to_delete_canceled_orders'),
-                    icon: 'error',
-                    confirmButtonText: $t('ok')
-                });
-            }
-        });
-    }
-};
-
 const toggleStatus = async (client) => {
     const result = await Swal.fire({
-        title: $t('are_you_sure'),
-        text: $t('do_you_want_to_change_the_status_of_this_client'),
+        title: t('are you sure'),
+        text: t('do you want to change the status of this client'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: $t('yes_confirm'),
-        cancelButtonText: $t('cancel'),
+        confirmButtonText: t('yes, confirm'),
+        cancelButtonText: t('cancel'),
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
     });
@@ -425,19 +393,32 @@ const toggleStatus = async (client) => {
             onSuccess: () => {
                 activeDropdown.value = null;
                 Swal.fire({
-                    title: $t('success'),
-                    text: $t('the_client_status_has_been_updated_successfully'),
+                    title: 'تم!',
+                    text: 'تم تحديث حالة العميل بنجاح',
                     icon: 'success',
-                    confirmButtonText: $t('ok')
+                    confirmButtonText: 'موافق'
                 });
             },
             onError: () => {
                 Swal.fire({
-                    title: $t('error'),
-                    text: $t('failed_to_update_the_client_status'),
+                    title: 'خطأ!',
+                    text: 'فشل في تحديث حالة العميل',
                     icon: 'error',
-                    confirmButtonText: $t('ok')
+                    confirmButtonText: 'موافق'
                 });
+            }
+        });
+    }
+};
+const activeClientAfterMaxCanceledOrders = async (client) => {
+    const result = await Swal.fire({
+        title: t('are you sure'),
+        text: t('do you want to activate this client after max canceled orders'),
+    });
+    if (result.isConfirmed) {
+        router.post(route('clients.delete-canceled-orders', client.id), {}, {
+            onSuccess: () => {
+                Swal.fire(t('client activated successfully'));
             }
         });
     }
