@@ -33,7 +33,7 @@ class NewOrderNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable): array
     {
-        $channels = ['database', 'broadcast'];
+        $channels = ['database'];
         
         // Add email for new orders if vendor has email notifications enabled
         if ($notifiable->email && ($notifiable->email_notifications ?? true)) {

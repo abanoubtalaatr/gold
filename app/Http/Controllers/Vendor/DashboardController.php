@@ -18,8 +18,7 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     public function index(Request $request)
-    {
-        
+    {   
         // Get filter parameters from request
         $period = $request->input('period', 'all');
         $fromDate = $request->input('from_date');

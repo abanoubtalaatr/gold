@@ -42,6 +42,7 @@ class OrderSale extends Model
     const STATUS_VENDOR_ALREADY_TAKE_THE_PIECE  = 'vendor_already_take_the_piece';
     const STATUS_SOLD = 'sold'; // تم بيعها
     const STATUS_REJECTED = 'rejected'; // تم رفضها
+    const STATUS_CANCELED = 'canceled'; // تم الإلغاء
 
     /**
      * Get all possible order statuses.

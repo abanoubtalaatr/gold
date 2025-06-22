@@ -21,10 +21,6 @@ class VendorNotificationService
             $order->load(['user', 'goldPiece', 'branch.vendor']);
             
             if (!$order->branch || !$order->branch->vendor) {
-                Log::warning('Cannot notify vendor: branch or vendor not found', [
-                    'order_id' => $order->id,
-                    'order_type' => $orderType,
-                ]);
                 return;
             }
             $order->load('goldPiece');
@@ -52,12 +48,6 @@ class VendorNotificationService
            
 
         } catch (\Exception $e) {
-            Log::error('Failed to send vendor notification', [
-                'order_id' => $order->id,
-                'order_type' => $orderType,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
         }
     }
 

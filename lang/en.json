@@ -993,6 +993,24 @@
     "Or enter coordinates manually": "Or enter coordinates manually",
     "Latitude": "Latitude",
     "Longitude": "Longitude",
-    "Application resubmitted for approval. The admin has been notified.": "Application resubmitted for approval. The admin has been notified."
+    "Application resubmitted for approval. The admin has been notified.": "Application resubmitted for approval. The admin has been notified.",
+    "Gold Sell Price": "Gold Sell Price (in ryal)",
+    "not_defined": "Not defined",
+    "active": "Active",
+    "inactive": "Inactive",
+    "edit": "Edit",
+    "wallet_management": "Wallet Management",
+    "deactivate": "Deactivate",
+    "delete_canceled_orders": "Delete Canceled Orders",
+    "do_you_want_to_delete_canceled_orders": "Do you want to delete canceled orders?",
+    "the_canceled_orders_have_been_deleted_successfully": "The canceled orders have been deleted successfully",
+    "failed_to_delete_canceled_orders": "Failed to delete canceled orders",
+    "canceled_orders_deleted_successfully": "Canceled orders deleted successfully",
+    "failed_to_delete_canceled_orders": "Failed to delete canceled orders",
+    "delete_canceled_orders": "Delete Canceled Orders",
+    "do_you_want_to_delete_canceled_orders": "Do you want to delete canceled orders?",
+    "the_canceled_orders_have_been_deleted_successfully": "The canceled orders have been deleted successfully",
+    "failed_to_delete_canceled_orders": "Failed to delete canceled orders"
+    
 }
     

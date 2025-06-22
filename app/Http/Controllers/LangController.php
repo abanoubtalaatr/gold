@@ -19,13 +19,16 @@ class LangController extends Controller
      */
     public function change(Request $request): RedirectResponse
     {
+        
         $language = $request->input('lang', 'en');
         
         // Validate language
         if (!in_array($language, self::AVAILABLE_LANGUAGES)) {
             $language = 'en'; // fallback to English
         }
-        
+        $user = request()->user();
+        $user->prefer_language = $language;
+        $user->save();
         // Set application locale immediately
         App::setLocale($language);
         

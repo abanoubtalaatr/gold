@@ -24,8 +24,8 @@
                                         {{ city.name_ar }}</p>
                                     <p><strong class="text-gray-700">{{ $t('Status') }}:</strong>
                                         <span
-                                            :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', city.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                                            {{ city.status === 'active' ? $t('Active') : $t('Inactive') }}
+                                            :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', city.status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
+                                            {{ city.status ? $t('Active') : $t('Inactive') }}
                                         </span>
                                     </p>
                                     <p><strong class="text-gray-700">{{ $t('Created At') }}:</strong> {{

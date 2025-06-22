@@ -265,4 +265,12 @@ return [
     "order_not_approved" => "Order not approved",
     "start_and_end_date_required" => "Start and end date are required",
     "User must have at least one address to create a rental order" => "User must have at least one address to create a rental order",
+    "New Request" => "New Request",
+    "You have a new request" => "You have a new request",
+    "rental" => "rental",
+    "sale" => "sale",
+    'order_canceled_success' => 'Order canceled successfully',
+    'account_suspended_because_you_exceeded_the_maximum_number_of_canceled_orders' => 'Account suspended because you exceeded the maximum number of canceled orders',
+    'account_suspended_because_you_exceeded_the_maximum_number_of_canceled_orders_contact_support' => 'Account suspended because you exceeded the maximum number of canceled orders, please contact support',
+    
 ];

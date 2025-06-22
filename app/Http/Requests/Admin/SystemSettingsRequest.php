@@ -48,7 +48,10 @@ class SystemSettingsRequest extends FormRequest
             'contact_phone' => 'nullable|string',
             'contact_email' => 'nullable|email',
             'location_map' => 'nullable|string',
-       
+
+            // Order settings
+            'max_canceled_orders' => 'required|integer|min:0',
+            'vendor_debt_limit' => 'required|numeric|min:0',
         ];
     }
 }

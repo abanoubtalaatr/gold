@@ -88,7 +88,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
         Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
         Route::get('/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
-        Route::get('/poll', [NotificationController::class, 'poll'])->name('notifications.poll');
+        // Route::get('/poll', [NotificationController::class, 'poll'])->name('notifications.poll');
     });
 
     // Add vendor notifications count route
@@ -186,6 +186,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/vendors/{vendor}/toggle-status', [VendorController::class, 'toggleStatus'])->name('vendors.toggle-status');
 
     Route::resource('clients', ClientController::class);
+    Route::post('/clients/{client}/delete-canceled-orders', [ClientController::class, 'deleteCanceledOrders'])->name('clients.delete-canceled-orders');
     Route::get('/settlement-requests-vendor', [VendorSettlementController::class, 'index'])->name('admin.settlement-requests-vendor.index');
     Route::post('/settlement-requests-vendor/{settlement}/approve', [VendorSettlementController::class, 'approve'])->name('admin.settlement-requests-vendor.approve');
     Route::put('/settlement-requests-vendor/{settlement}/reject', [VendorSettlementController::class, 'reject'])->name('admin.settlement-requests-vendor.reject');

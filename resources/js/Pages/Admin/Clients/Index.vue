@@ -85,7 +85,7 @@
                                     </button>
                                 </span>
                                 <span v-if="searchForm.status" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    الحالة: {{ getStatusLabel(searchForm.status) }}
+                                      {{ $t('status') }}  : {{ getStatusLabel(searchForm.status) }}
                                     <button @click="clearStatusFilter" class="mr-1.5 inline-flex items-center justify-center w-4 h-4 text-green-400 hover:text-green-600">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -93,7 +93,7 @@
                                     </button>
                                 </span>
                                 <button @click="clearAllFilters" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200">
-                                    مسح جميع الفلاتر
+                                    {{ $t('clear_all_filters') }}
                                     <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
@@ -106,22 +106,22 @@
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            العميل
+                                            {{ $t('client') }}
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            رقم الجوال
+                                            {{ $t('mobile_number') }}
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الموقع
+                                            {{ $t('location') }}
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            IBAN
+                                            {{ $t('iban') }}
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الحالة
+                                            {{ $t('status') }}
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            الإجراءات
+                                            {{ $t('actions') }}
                                         </th>
                                     </tr>
                                 </thead>
@@ -153,12 +153,12 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-gray-900">
-                                                {{ client.city?.name || 'غير محدد' }}
+                                                {{ client.city?.name || $t('not_defined') }}
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded text-center">
-                                                {{ client.iban || 'غير محدد' }}
+                                                {{ client.iban || $t('not_defined') }}
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
@@ -172,7 +172,7 @@
                                                 }" class="w-2 h-2 ml-1.5" fill="currentColor" viewBox="0 0 8 8">
                                                     <circle cx="4" cy="4" r="3" />
                                                 </svg>
-                                                {{ client.is_active ? 'مفعل' : 'غير مفعل' }}
+                                                {{ client.is_active ? $t('active') : $t('inactive') }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -196,21 +196,21 @@
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                                             </svg>
-                                                            عرض التفاصيل
+                                                            {{ $t('view_details') }}
                                                         </Link>
                                                         <Link :href="route('clients.edit', client.id)"
                                                             class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150">
                                                             <svg class="w-4 h-4 ml-3 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                                             </svg>
-                                                            تعديل
+                                                            {{ $t('edit') }}
                                                         </Link>
                                                         <Link :href="route('admin.wallet.show', client.id)"
                                                             class="group flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150">
                                                             <svg class="w-4 h-4 ml-3 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                                                             </svg>
-                                                            إدارة المحفظة
+                                                            {{ $t('wallet_management') }}
                                                         </Link>
                                                         <div class="border-t border-gray-100"></div>
                                                         <button @click="toggleStatus(client)"
@@ -221,7 +221,12 @@
                                                             <svg v-else class="w-4 h-4 ml-3 text-green-400 group-hover:text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                             </svg>
-                                                            {{ client.is_active ? 'إلغاء التفعيل' : 'تفعيل' }}
+                                                            {{ client.is_active ? $t('deactivate') : $t('activate') }}
+                                                        </button>
+
+                                                        <button @click="deleteCanceledOrders(client)"
+                                                            class="group flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors duration-150">
+                                                            {{ $t('delete_canceled_orders') }}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -238,22 +243,22 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                             </svg>
                             <h3 class="mt-2 text-sm font-medium text-gray-900">
-                                {{ hasActiveFilters ? 'لا توجد نتائج' : 'لا يوجد عملاء' }}
+                                {{ hasActiveFilters ? $t('no_results') : $t('no_clients') }}
                             </h3>
                             <p class="mt-1 text-sm text-gray-500">
-                                {{ hasActiveFilters ? 'جرب تغيير معايير البحث أو الفلتر.' : 'ابدأ بإضافة عميل جديد.' }}
+                                {{ hasActiveFilters ? $t('try_changing_search_criteria_or_filters') : $t('start_by_adding_a_new_client') }}
                             </p>
                             <div class="mt-6">
                                 <button v-if="hasActiveFilters" @click="clearAllFilters"
                                     class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ml-3">
-                                    مسح الفلاتر
+                                    {{ $t('clear_filters') }}
                                 </button>
                                 <Link :href="route('clients.create')"
                                     class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                     <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                     </svg>
-                                    إضافة عميل جديد
+                                    {{ $t('add_new_client') }}
                                 </Link>
                             </div>
                         </div>
@@ -369,14 +374,48 @@ onUnmounted(() => {
     }
 });
 
-const toggleStatus = async (client) => {
+const deleteCanceledOrders = async (client) => {
     const result = await Swal.fire({
-        title: 'هل أنت متأكد؟',
-        text: 'هل تريد تغيير حالة هذا العميل؟',
+        title: $t('are_you_sure'),
+        text: $t('do_you_want_to_delete_canceled_orders'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'نعم، تأكيد',
-        cancelButtonText: 'إلغاء',
+        confirmButtonText: $t('yes_confirm'),
+        cancelButtonText: $t('cancel'),
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+    });
+
+    if (result.isConfirmed) {
+        router.delete(route('clients.delete-canceled-orders', client.id), {}, {
+            onSuccess: () => {
+                Swal.fire({
+                    title: $t('success'),
+                    text: $t('the_canceled_orders_have_been_deleted_successfully'),
+                    icon: 'success',
+                    confirmButtonText: $t('ok')
+                });
+            },
+            onError: () => {
+                Swal.fire({ 
+                    title: $t('error'),
+                    text: $t('failed_to_delete_canceled_orders'),
+                    icon: 'error',
+                    confirmButtonText: $t('ok')
+                });
+            }
+        });
+    }
+};
+
+const toggleStatus = async (client) => {
+    const result = await Swal.fire({
+        title: $t('are_you_sure'),
+        text: $t('do_you_want_to_change_the_status_of_this_client'),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: $t('yes_confirm'),
+        cancelButtonText: $t('cancel'),
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
     });
@@ -386,18 +425,18 @@ const toggleStatus = async (client) => {
             onSuccess: () => {
                 activeDropdown.value = null;
                 Swal.fire({
-                    title: 'تم!',
-                    text: 'تم تحديث حالة العميل بنجاح',
+                    title: $t('success'),
+                    text: $t('the_client_status_has_been_updated_successfully'),
                     icon: 'success',
-                    confirmButtonText: 'موافق'
+                    confirmButtonText: $t('ok')
                 });
             },
             onError: () => {
                 Swal.fire({
-                    title: 'خطأ!',
-                    text: 'فشل في تحديث حالة العميل',
+                    title: $t('error'),
+                    text: $t('failed_to_update_the_client_status'),
                     icon: 'error',
-                    confirmButtonText: 'موافق'
+                    confirmButtonText: $t('ok')
                 });
             }
         });

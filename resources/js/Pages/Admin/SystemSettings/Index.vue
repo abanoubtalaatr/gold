@@ -86,31 +86,55 @@
                             </div>
 
                             <div class="col-span-1 md:col-span-4">
-                                <InputLabel for="gold_purchase_additional_percentage"
-                                    :value="$t('Purchase Additional Percentage')"
+                                <InputLabel for="max_canceled_orders" :value="$t('Maximum Canceled Orders')"
                                     class="text-sm font-semibold text-gray-800" />
-                                <TextInput id="gold_purchase_additional_percentage"
-                                    v-model="settingsForm.gold_purchase_additional_percentage" type="number" step="0.01"
+                                <TextInput id="max_canceled_orders" v-model="settingsForm.max_canceled_orders"
+                                    type="number" step="0.01" min="0"
                                     class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 ease-in-out"
-                                    :class="{ 'border-red-500 focus:border-red-500': settingsForm.errors.gold_purchase_additional_percentage }" />
-                                <InputError :message="settingsForm.errors.gold_purchase_additional_percentage"
+                                    :class="{ 'border-red-500 focus:border-red-500': settingsForm.errors.max_canceled_orders }" />
+                                <InputError :message="settingsForm.errors.max_canceled_orders"
                                     class="mt-1 text-xs text-red-500 font-medium" />
                             </div>
 
                             <div class="col-span-1 md:col-span-4">
+                                <InputLabel for="vendor_debt_limit" :value="$t('Vendor Debt Limit')"
+                                    class="text-sm font-semibold text-gray-800" />
+                                <TextInput id="vendor_debt_limit" v-model="settingsForm.vendor_debt_limit"
+                                    type="number" step="0.01" min="0"
+                                    class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 ease-in-out"
+                                    :class="{ 'border-red-500 focus:border-red-500': settingsForm.errors.vendor_debt_limit }" />
+                                <InputError :message="settingsForm.errors.vendor_debt_limit"
+                                    class="mt-1 text-xs text-red-500 font-medium" />
+                            </div>
+<!-- 
+                            <div class="col-span-1 md:col-span-4">
+                                <InputLabel for="gold_purchase_additional_percentage"
+                                    :value="$t('Purchase Additional Percentage')"
+                                    class="text-sm font-semibold text-gray-800" /> 
+                                <TextInput id="gold_purchase_additional_percentage"
+                                    v-model="settingsForm.gold_purchase_additional_percentage" type="number" step="0.01"
+                                    class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 ease-in-out"
+                                    :class="{ 'border-red-500 focus:border-red-500': settingsForm.errors.gold_purchase_additional_percentage }" />
+                              
+                                    <InputError :message="settingsForm.errors.gold_purchase_additional_percentage"
+                                    class="mt-1 text-xs text-red-500 font-medium" />
+                            </div> -->
+
+                            <!-- <div class="col-span-1 md:col-span-4">
                                 <InputLabel for="gold_rental_price_percentage"
                                     :value="$t('Gold Rental Price Percentage')"
                                     class="text-sm font-semibold text-gray-800" />
-                                <TextInput id="gold_rental_price_percentage"
+                             
+                                    <TextInput id="gold_rental_price_percentage"
                                     v-model="settingsForm.gold_rental_price_percentage" type="number" step="0.01"
                                     min="0"
                                     class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 ease-in-out"
                                     :class="{ 'border-red-500 focus:border-red-500': settingsForm.errors.gold_rental_price_percentage }" />
                                 <InputError :message="settingsForm.errors.gold_rental_price_percentage"
                                     class="mt-1 text-xs text-red-500 font-medium" />
-                            </div>
+                            </div> -->
 
-                            <div class="col-span-1 md:col-span-4">
+                            <!-- <div class="col-span-1 md:col-span-4">
                                 <InputLabel for="gold_rental_insurance_percentage"
                                     :value="$t('Rental Insurance Percentage')"
                                     class="text-sm font-semibold text-gray-800" />
@@ -121,7 +145,7 @@
                                     :class="{ 'border-red-500 focus:border-red-500': settingsForm.errors.gold_rental_insurance_percentage }" />
                                 <InputError :message="settingsForm.errors.gold_rental_insurance_percentage"
                                     class="mt-1 text-xs text-red-500 font-medium" />
-                            </div>
+                            </div> -->
 
                             <!-- Order Settings -->
                             <div class="col-span-1 md:col-span-12 mt-4">
@@ -220,6 +244,8 @@ const settingsForm = useForm({
     contact_phone: props.settings?.contact_phone || '',
     contact_email: props.settings?.contact_email || '',
     location_map: props.settings?.location_map || '',
+    max_canceled_orders: props.settings?.max_canceled_orders || 0,
+    vendor_debt_limit: props.settings?.vendor_debt_limit || 0,
 });
 
 const sliderForm = useForm({

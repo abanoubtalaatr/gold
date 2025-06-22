@@ -139,4 +139,12 @@ class ClientController extends Controller
         return redirect()->route('clients.show', $client)
             ->with('success', 'Client updated successfully');
     }
+
+    public function deleteCanceledOrders(User $client)
+    {
+        $client->canceledOrders()->delete();
+
+        return redirect()->route('clients.show', $client)
+            ->with('success', 'Canceled orders deleted successfully');
+    }
 }

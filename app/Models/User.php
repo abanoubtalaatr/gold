@@ -67,7 +67,8 @@ class User extends Authenticatable implements JWTSubject
         'vendor_status',
         'rejection_reason',
         'logo',
-        'city_id'
+        'city_id',
+        'prefer_language',
 
     ];
 

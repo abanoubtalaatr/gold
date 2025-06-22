@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\ContactRequest;
-use App\Http\Requests\Api\V1\UpdateContactRequest;
-use App\Http\Resources\Api\ContactResource;
-use App\Http\Resources\Api\V1\ContactRsource;
-use App\Models\Contact;
 use App\Models\User;
-use App\Notifications\Admin\NewContactMessageAdmin;
-use App\Notifications\Vendor\NewContactMessage;
+use App\Models\Contact;
 use App\Traits\ApiResponseTrait;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+use App\Events\Vendor\VendorNotification;
+use App\Http\Resources\Api\ContactResource;
+use App\Http\Requests\Api\V1\ContactRequest;
+use App\Http\Resources\Api\V1\ContactRsource;
+use App\Notifications\Vendor\NewContactMessage;
+use App\Http\Requests\Api\V1\UpdateContactRequest;
+use App\Notifications\Admin\NewContactMessageAdmin;
 
 class ContactController extends Controller
 {
@@ -134,14 +132,19 @@ class ContactController extends Controller
         $vendor->notify(new NewContactMessage($contact));
 
 
-        // Always notify admins
-        $admins = User::whereHas('roles', function ($query) {
-            $query->where('name', 'admin')
-                ->orWhere('name', 'superadmin')
-                ->whereNull('vendor_id');
-        })->get();
-        foreach ($admins as $admin) {
-            $admin->notify(new NewContactMessageAdmin($contact));
-        }
+        $user = User::find($vendor->id);
+        $title = $user->prefer_language === 'ar' ? 'شكوى أو اقتراح' : __('mobile.Complaint or Suggestion');
+        $message = $user->prefer_language === 'ar' ? 'لديك شكوى أو اقتراح جديد' : __('mobile.You have a new complaint or suggestion');
+        event(new VendorNotification($title, $message, $vendor->id));
+
+        // // Always notify admins
+        // $admins = User::whereHas('roles', function ($query) {
+        //     $query->where('name', 'admin')
+        //         ->orWhere('name', 'superadmin')
+        //         ->whereNull('vendor_id');
+        // })->get();
+        // foreach ($admins as $admin) {
+        //     $admin->notify(new NewContactMessageAdmin($contact));
+        // }
     }
 }

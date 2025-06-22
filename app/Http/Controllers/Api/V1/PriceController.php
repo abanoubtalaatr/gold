@@ -662,10 +662,10 @@ class PriceController extends Controller
             $dailyRate = $systemSetting->gold_purchase_price??10;
             if($dailyRate < 0){
                 $dailyRate = abs($dailyRate/100); // Make the rate negative for purchase discount
-                $totalPrice = $totalPrice - ($totalPrice * $dailyRate); // Apply discount to total price
+                $totalPrice = $totalPrice - $dailyRate; // Apply discount to total price
             }else{
                 $dailyRate = abs($dailyRate/100); // Make the rate negative for purchase discount
-                $totalPrice = $totalPrice + ($totalPrice * $dailyRate); // Apply discount to total price
+                $totalPrice = $totalPrice + $dailyRate; // Apply discount to total price
             }
         }
 

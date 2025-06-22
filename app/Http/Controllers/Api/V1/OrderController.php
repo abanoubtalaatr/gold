@@ -8,6 +8,8 @@ use App\Models\GoldPiece;
 use App\Models\OrderSale;
 use App\Models\OrderRental;
 use Illuminate\Http\Request;
+use App\Models\CanceledOrder;
+use App\Models\SystemSetting;
 use App\Events\OrderRentalEvent;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\DB;
@@ -263,5 +265,28 @@ class OrderController extends Controller
     {
         $order->delete();
         return $this->successResponse(null, __("mobile.order_deleted_success"));
+    }
+
+    public function cancel(OrderSale $order)
+    {
+        $canceledOrder = CanceledOrder::where('user_id', Auth::id())->first();
+       
+        if (!$canceledOrder) {
+            $canceledOrder = CanceledOrder::create([
+                'user_id' => Auth::id(),
+                'count' => 1
+            ]);
+        }else{
+            $canceledOrder->increment('count');
+        }
+        $maxCanceledOrders = SystemSetting::first()->max_canceled_orders;
+
+   
+        if($canceledOrder->count >= $maxCanceledOrders){
+          Auth::logout();
+          return $this->errorResponse(__("mobile.account_suspended_because_you_exceeded_the_maximum_number_of_canceled_orders"), [], 422);
+        }
+    
+        return $this->successResponse(null, __("mobile.order_canceled_success"));
     }
 }

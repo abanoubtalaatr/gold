@@ -8,7 +8,9 @@ use App\Helpers\OTP;
 use App\Models\User;
 use App\Services\SMS\Msegat;
 use Illuminate\Http\Request;
+use App\Models\CanceledOrder;
 use App\Models\MobileConfirm;
+use App\Models\SystemSetting;
 use App\Traits\ApiResponseTrait;
 use App\Events\User\UserLoggedIn;
 use Illuminate\Http\JsonResponse;
@@ -99,6 +101,12 @@ class LoginController extends AppBaseController
 
             if ($user && $hasher->check($request->password, $user->getAuthPassword())) {
 
+                $canceledOrder = CanceledOrder::where('user_id', $user->id)->first();
+            
+                if($canceledOrder->count >= SystemSetting::first()->max_canceled_orders){
+                    return $this->errorResponse(__("mobile.account_suspended_because_you_exceeded_the_maximum_number_of_canceled_orders_contact_support"), [], 422);
+                }
+            
                 $user->deviceTokens()->delete();
                 $user->tokens()->delete();
                 $expires = Carbon::now()->addHours(5);

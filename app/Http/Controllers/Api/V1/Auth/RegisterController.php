@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Services\MesgatService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Wotz\VerificationCode\VerificationCode;
 use App\Http\Controllers\Api\AppBaseController;
@@ -140,49 +141,95 @@ class RegisterController extends AppBaseController
 
     public function checkMobileToken(Request $request)
     {
-
         try {
-
+            // Validate input
             $validator = Validator::make($request->all(), [
                 'dialling_code' => 'required',
                 'mobile' => 'required',
                 'code' => ['required', 'string'],
             ]);
-
+    
             if ($validator->fails()) {
-
-                return $this->sendError('mobile.wrong_data');
+                // Increment failed attempts
+                $this->incrementFailedAttempts($request->dialling_code, $request->mobile);
+                return $this->sendError(__('mobile.wrong_data'));
             }
-
+    
+            // Normalize mobile number
             $mobile = mobileHandler($request->mobile);
-
+    
+            // Check if account is suspended
+            $user = User::where('mobile', $mobile)->where('dialling_code', $request->dialling_code)->first();
+            if ($user && $user->suspended_until && $user->suspended_until->isFuture()) {
+                return $this->sendError(__('mobile.account_suspended_10_minutes'));
+            }
+    
+            // Check failed attempts
+            $attemptsKey = "mobile_verification_attempts:{$request->dialling_code}:{$mobile}";
+            $attempts = Cache::get($attemptsKey, 0);
+            if ($attempts > 3) {
+                // Suspend account for 10 minutes
+                if ($user) {
+                    $user->update(['suspended_until' => now()->addMinutes(10)]);
+                }
+                Cache::forget($attemptsKey); // Clear attempts after suspension
+                return $this->sendError(__('mobile.account_suspended_10_minutes'));
+            }
+    
+            // Check verification code
             $record = MobileConfirm::where('code', $request->code)
                 ->where('mobile', $mobile)
-                ->where('dialling_code', $request->dialling_code)->first();
-
+                ->where('dialling_code', $request->dialling_code)
+                ->first();
+    
             if ($record) {
-                if ($user = $record->user)
-                    $user->update(['mobile' => $mobile, 'mobile_verified_at' => now()]);
-
-
-                $user->deviceTokens()->delete();
-                $user->tokens()->delete();
-                $expires = Carbon::now()->addDays(2);
-
-                // $token = $user->createToken($user->type . '_' . $user->email, ['*'], $expires)->plainTextToken;
-               // event(new UserLoggedIn($user));
-               $token = Auth::guard('api')->login($user);
-
-                return $this->sendResponse(['user' => $user, 'token' => $token, 'expires' => $expires], __('Your mobile has been verified'));
+                // Reset failed attempts on success
+                Cache::forget($attemptsKey);
+    
+                // Update user
+                if ($user = $record->user) {
+                    $user->update([
+                        'mobile' => $mobile,
+                        'mobile_verified_at' => now(),
+                    ]);
+    
+                    // Clear existing tokens
+                    $user->deviceTokens()->delete();
+                    $user->tokens()->delete();
+    
+                    // Generate new token
+                    $expires = Carbon::now()->addDays(2);
+                    $token = Auth::guard('api')->login($user);
+    
+                    return $this->sendResponse(
+                        ['user' => $user, 'token' => $token, 'expires' => $expires],
+                        __('Your mobile has been verified')
+                    );
+                }
             }
-
+    
+            // Increment failed attempts on incorrect code
+            $this->incrementFailedAttempts($request->dialling_code, $request->mobile);
             return $this->sendError(__('mobile.you have provided wrong data'));
+    
         } catch (\Exception $e) {
-
             return $this->sendError(__('mobile.something_wrong'));
         }
     }
-
+    
+    /**
+     * Increment failed verification attempts in cache.
+     *
+     * @param string $dialling_code
+     * @param string $mobile
+     * @return void
+     */
+    protected function incrementFailedAttempts($dialling_code, $mobile)
+    {
+        $key = "mobile_verification_attempts:{$dialling_code}:{$mobile}";
+        $attempts = Cache::get($key, 0) + 1;
+        Cache::put($key, $attempts, now()->addMinutes(10)); // Store for 10 minutes
+    }
         /**
      * @group User Registration
      * @return bool|\Illuminate\Database\Eloquent\Model

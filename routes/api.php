@@ -18,18 +18,15 @@ use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\GoldPieceController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
-use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\Wallet\WalletController;
 use App\Http\Controllers\Api\V1\LiquidationRequestController;
-use App\Http\Controllers\Api\V1\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\V1\NotificationSettingController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\PhoneVerificationController;
 use App\Http\Controllers\Api\V1\GoldPiece\ConfirmSoldToVendorController;
 use App\Http\Controllers\Api\V1\GoldPiece\ConfirmSendPieceToVendorController;
-
 
 
 Route::get('settings', [SettingsApiController::class, 'index'])->name('settings');
@@ -152,7 +149,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::get('orders/{order}', [OrderController::class, 'show']);
     Route::post('orders/{order}/confirm-send-to-vendor', [ConfirmSendPieceToVendorController::class, 'index']);
     Route::post('order/{order}/confirm-sold-to-vendor', [ConfirmSoldToVendorController::class, 'index']);
-
+    Route::post('orders/{order}/cancel', [OrderController::class, 'cancel']);
     /*
     |--------------------------------------------------------------------------
     |  Notification...

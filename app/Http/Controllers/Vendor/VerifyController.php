@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Helpers\OTP;
-use App\Http\Controllers\Controller;
-use App\Mail\VendorOtpMail;
 use App\Models\User;
+use App\Mail\VendorOtpMail;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
+use App\Events\Admin\AdminNotification;
 
 class VerifyController extends Controller
 {
@@ -52,7 +53,25 @@ public function verify(Request $request)
     $user = User::where('email', $request->email)->first();
     // Log in the user
     Auth::login($user);
+    $title = 'New Vendor Registration';
+    $message = 'A new vendor has registered';
+    $admin = User::whereHas('roles', function($query){
+        $query->where('name', 'superadmin');
+    })->first();
 
+    if($admin){
+        $title = $admin->prefer_language === 'ar' ? ' جديد عميل '  : __('mobile.New Customer');
+        $message = $admin->prefer_language === 'ar' ? 'لديك عميل جديد '  : __('mobile.You have a new customer');
+        event(new AdminNotification($title, $message, $admin->id));
+    }
+
+    foreach(User::where('vendor_id', $admin->id)->get() as $admin){
+        $title = $admin->prefer_language === 'ar' ? ' جديد عميل '  : __('mobile.New Customer');
+        $message = $admin->prefer_language === 'ar' ? 'لديك عميل جديد '  : __('mobile.You have a new customer');
+        event(new AdminNotification($title, $message, $admin->id));
+    }
+
+    
     return redirect()->route('vendor.dashboard');
 }
 
