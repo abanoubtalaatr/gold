@@ -97,6 +97,17 @@
                             </div>
 
                             <div class="col-span-1 md:col-span-4">
+                                <InputLabel for="max_active_orders" :value="$t('Maximum Active Orders')"
+                                    class="text-sm font-semibold text-gray-800" />
+                                <TextInput id="max_active_orders" v-model="settingsForm.max_active_orders"
+                                    type="number" step="0.01" min="0"
+                                    class="mt-1 block w-full rounded-md border-2 border-gray-200 bg-gray-50 text-gray-900 focus:border-indigo-600 focus:ring-0 transition-all duration-200 ease-in-out"
+                                    :class="{ 'border-red-500 focus:border-red-500': settingsForm.errors.max_active_orders }" />
+                                <InputError :message="settingsForm.errors.max_active_orders"
+                                    class="mt-1 text-xs text-red-500 font-medium" />
+                            </div>
+
+                            <div class="col-span-1 md:col-span-4">
                                 <InputLabel for="vendor_debt_limit" :value="$t('Vendor Debt Limit')"
                                     class="text-sm font-semibold text-gray-800" />
                                 <TextInput id="vendor_debt_limit" v-model="settingsForm.vendor_debt_limit"
@@ -246,6 +257,7 @@ const settingsForm = useForm({
     location_map: props.settings?.location_map || '',
     max_canceled_orders: props.settings?.max_canceled_orders || 0,
     vendor_debt_limit: props.settings?.vendor_debt_limit || 0,
+    max_active_orders: props.settings?.max_active_orders || 0,
 });
 
 const sliderForm = useForm({

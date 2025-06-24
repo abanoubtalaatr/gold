@@ -16,9 +16,11 @@ use App\Models\OrderRental;
 use App\Models\RentalOrder;
 use Illuminate\Http\Request;
 use App\Models\RentalRequest;
+use App\Services\PaymobService;
 use App\Services\GoldPriceService;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -37,6 +39,7 @@ class DashboardController extends Controller
         if ($parent || auth()->user()->hasRole('vendor')) {
             return redirect()->route('vendor.dashboard');
         }
+        
         // Get filter parameters from request
         $period = $request->input('period', 'monthly');
         $start_date = $request->input('start_date');
@@ -239,6 +242,8 @@ class DashboardController extends Controller
             ],
         ]);
     }
+
+    
 
     /**
      * Get gold trading specific metrics

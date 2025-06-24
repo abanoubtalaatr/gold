@@ -52,6 +52,7 @@ class SystemSettingsRequest extends FormRequest
             // Order settings
             'max_canceled_orders' => 'required|integer|min:0',
             'vendor_debt_limit' => 'required|numeric|min:0',
+            'max_active_orders' => 'required|integer|min:0',
         ];
     }
 }

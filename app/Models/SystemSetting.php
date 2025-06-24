@@ -23,7 +23,8 @@ class SystemSetting extends Model
         'contact_email',
         'location_map',
         'max_canceled_orders',
-        'vendor_debt_limit'
+        'vendor_debt_limit',
+        'max_active_orders',
     ];
 
     protected $casts = [

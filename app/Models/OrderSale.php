@@ -57,6 +57,7 @@ class OrderSale extends Model
             self::STATUS_PIECE_SENT,
             self::STATUS_SOLD,
             self::STATUS_REJECTED,
+            self::STATUS_CANCELED,
         ];
     }
 

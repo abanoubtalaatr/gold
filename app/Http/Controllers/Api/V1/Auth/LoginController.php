@@ -98,13 +98,15 @@ class LoginController extends AppBaseController
             $user = User::where('mobile', $request->mobile)
                 ->where('dialling_code', $request->dialling_code)
                 ->first();
+                // dd($user);
 
             if ($user && $hasher->check($request->password, $user->getAuthPassword())) {
 
                 $canceledOrder = CanceledOrder::where('user_id', $user->id)->first();
-            
-                if($canceledOrder->count >= SystemSetting::first()->max_canceled_orders){
-                    return $this->errorResponse(__("mobile.account_suspended_because_you_exceeded_the_maximum_number_of_canceled_orders_contact_support"), [], 422);
+                if($canceledOrder){
+                    if($canceledOrder->count >= SystemSetting::first()->max_canceled_orders){
+                        return $this->errorResponse(__("mobile.account_suspended_because_you_exceeded_the_maximum_number_of_canceled_orders_contact_support"), [], 422);
+                    }
                 }
             
                 $user->deviceTokens()->delete();

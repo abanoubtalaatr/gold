@@ -1,20 +1,35 @@
 <template>
     <AuthenticatedLayout>
-        <!-- breadcrumb-->
+        <!-- Breadcrumb -->
         <div class="pagetitle">
             <h1>{{ $t('Vendor Dashboard') }}</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
                         <Link class="nav-link" :href="route('vendor.dashboard')">
-                        {{ $t('Home') }}
+                            {{ $t('Home') }}
                         </Link>
                     </li>
                 </ol>
             </nav>
         </div>
-        <!-- End breadcrumb-->
+        <!-- End Breadcrumb -->
+
         <section class="section dashboard">
+            <!-- Debt Payment Button -->
+            <div v-if="debt > 0" class="row mb-3">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body text-center py-3">
+                            <h5 class="card-title">{{ $t('Outstanding Debt') }}: {{ debt.toFixed(2) }} SAR</h5>
+                            <button class="btn btn-primary" @click="initiatePayment" :disabled="isProcessing">
+                                {{ isProcessing ? $t('Processing...') : $t('Pay Debt') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Filters Section -->
             <div class="row mb-3">
                 <div class="col-lg-12">
@@ -179,40 +194,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Rental Orders Card -->
-                        <div class="col-xxl-3 col-md-3">
-                            <div class="card info-card revenue-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $t('Rental Orders') }}</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-calendar2-check"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ rentalOrders }}</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Completed Rentals Card -->
-                        <div class="col-xxl-3 col-md-3">
-                            <div class="card info-card completed-rentals-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $t('rental_requests') }}</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-check-circle"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ rentalRequests }}</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -225,6 +206,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import axios from 'axios';
 
 const { t } = useI18n();
 
@@ -232,7 +214,9 @@ const props = defineProps({
     auth: {
         user: {
             name: String,
-            email: String
+            email: String,
+            phone_number: String,
+            id: Number,
         }
     },
     roles: Number,
@@ -255,14 +239,15 @@ const props = defineProps({
         default: () => ({
             average: 0,
             total: 0,
-            breakdown: [0, 0, 0, 0, 0] // [5-star, 4-star, 3-star, 2-star, 1-star]
+            breakdown: [0, 0, 0, 0, 0]
         })
     },
     filters: {
         period: String,
         from_date: String,
         to_date: String
-    }
+    },
+    debt: Number,
 });
 
 const filters = ref({
@@ -270,6 +255,8 @@ const filters = ref({
     from_date: props.filters?.from_date || null,
     to_date: props.filters?.to_date || null,
 });
+
+const isProcessing = ref(false);
 
 // Rating calculations
 const averageRating = computed(() => props.ratings.average || 0);
@@ -308,6 +295,18 @@ const resetFilters = () => {
         preserveScroll: true,
         replace: true,
     });
+};
+
+const initiatePayment = async () => {
+    isProcessing.value = true;
+    
+        const response = await axios.post(route('vendor.payment.initiate'), {
+            amount: props.debt,
+        });
+        console.log(response.data);
+        const checkoutUrl = response.data.checkout_url;
+        window.location.href = checkoutUrl; // Redirect to Paymob checkout
+   
 };
 </script>
 

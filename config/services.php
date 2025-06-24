@@ -42,5 +42,10 @@ return [
         'sender_name' => env('MSEGAT_SENDER_NAME'),
     ],
 
+    'paymob' => [
+        'api_key' => env('PAYMOB_API_KEY'),
+        'public_key' => env('PAYMOB_PUBLIC_KEY'),
+        'integration_id' => env('PAYMOB_INTEGRATION_ID'),
+    ],
 
 ];

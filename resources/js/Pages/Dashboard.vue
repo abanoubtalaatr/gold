@@ -155,7 +155,7 @@
                         <!-- End Sales Orders Card -->
 
                         <!-- Rental Orders Card -->
-                        <div class="col-xxl-3 col-md-3">
+                        <!-- <div class="col-xxl-3 col-md-3">
                             <div class="card info-card revenue-card">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $t('rental_orders') }}</h5>
@@ -170,7 +170,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- End Rental Orders Card -->
 
                         <!-- Total Branches Card -->
@@ -213,7 +213,7 @@
 
                         <!-- New Rental Statistics Cards -->
                         <!-- Completed Rentals Card -->
-                        <div class="col-xxl-3 col-md-3">
+                        <!-- <div class="col-xxl-3 col-md-3">
                             <div class="card info-card completed-rentals-card">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $t('completed_rentals') }}</h5>
@@ -228,11 +228,11 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- End Completed Rentals Card -->
 
                         <!-- Current Rentals Card -->
-                        <div class="col-xxl-3 col-md-3">
+                        <!-- <div class="col-xxl-3 col-md-3">
                             <div class="card info-card current-rentals-card">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $t('current_rentals') }}</h5>
@@ -247,11 +247,11 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- End Current Rentals Card -->
 
                         <!-- Upcoming Rentals Card -->
-                        <div class="col-xxl-3 col-md-3">
+                        <!-- <div class="col-xxl-3 col-md-3">
                             <div class="card info-card upcoming-rentals-card">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $t('upcoming_rentals') }}</h5>
@@ -266,11 +266,11 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- End Upcoming Rentals Card -->
 
                         <!-- Available Pieces Card -->
-                        <div class="col-xxl-3 col-md-3">
+                        <!-- <div class="col-xxl-3 col-md-3">
                             <div class="card info-card available-pieces-card">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $t('available_pieces') }}</h5>
@@ -285,11 +285,11 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- End Available Pieces Card -->
 
                         <!-- Purchased Pieces Card -->
-                        <div class="col-xxl-3 col-md-3">
+                        <!-- <div class="col-xxl-3 col-md-3">
                             <div class="card info-card purchased-pieces-card">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $t('purchased_pieces') }}</h5>
@@ -304,7 +304,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- End Purchased Pieces Card -->
                     </div>
                 </div>

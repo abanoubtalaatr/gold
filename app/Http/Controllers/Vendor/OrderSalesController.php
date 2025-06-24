@@ -70,6 +70,32 @@ class OrderSalesController extends Controller
 
     public function accept(Request $request, $orderId)
     {
+        $user = $request->user()->vendor_id ?? $request->user()->id;
+
+        $user = User::find($user);
+
+        if ($user->debt >= SystemSetting::first()->vendor_debt_limit) {
+            return back()->with('error', __('You should pay your debt first' . ' ' . $user->debt));
+        }
+
+        $maxActiveOrders = SystemSetting::first()->max_active_orders;
+
+        // Get active orders count, excluding sold, rejected, canceled, with unique gold pieces for pending_approval
+        $activeOrders = OrderSale::where('user_id', $user->id)
+            ->whereNotIn('status', [
+                OrderSale::STATUS_SOLD,
+                OrderSale::STATUS_REJECTED,
+                OrderSale::STATUS_CANCELED
+            ])
+            ->groupBy('gold_piece_id', 'status')
+            ->select('gold_piece_id', 'status') // Explicitly select grouped columns
+            ->havingRaw('status != ? OR COUNT(*) = 1', [OrderSale::STATUS_PENDING_APPROVAL])
+            ->count();
+        
+        if ($activeOrders >= $maxActiveOrders) {
+            return back()->with('error', __('You have reached the maximum number of active orders'));
+        }
+
         // try {
         $orderId = $orderId; // Store the original ID
         $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
@@ -145,7 +171,7 @@ class OrderSalesController extends Controller
         }
 
         event(new OrderSaleStatusChangedEvent($order));
-        
+
         $order->update(['status' => OrderSale::STATUS_PIECE_SENT]);
         // Notify gold piece owner using the new unified notification
         if ($order->goldPiece && $order->goldPiece->user) {
@@ -165,6 +191,18 @@ class OrderSalesController extends Controller
     {
         $orderId = $orderId; // Store the original ID
         $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
+        $vendor = Auth::user()->vendor_id ? Auth::user()->vendor_id : Auth::user()->id;
+        $vendor = User::find($vendor->id);
+
+        $systemSetting = SystemSetting::first();
+
+        $platformCommission = $systemSetting->platform_commission_percentage;
+
+        if ($platformCommission > 0) {
+            $platformCommission = ($order->total_price) *  $platformCommission / 100;
+            $vendor->update(['debt' => $vendor->debt + $platformCommission]);
+        }
+
         $this->authorizeVendor($order);
 
         if ($order->status !== OrderSale::STATUS_PIECE_SENT) {
@@ -182,41 +220,41 @@ class OrderSalesController extends Controller
 
         // Get commission details for success message
         $totalPrice = $order->total_price;
-        $settings = SystemSetting::first();
-        $merchantCommission = $settings->merchant_commission_percentage ?? 0;
-        $platformCommission = $settings->platform_commission_percentage ?? 0;
+        // $settings = SystemSetting::first();
+        // $merchantCommission = $settings->merchant_commission_percentage ?? 0;
+        // $platformCommission = $settings->platform_commission_percentage ?? 0;
 
-        $vendorAmount = ($totalPrice * $merchantCommission) / 100;
-        $platformAmount = ($totalPrice * $platformCommission) / 100;
+        // $vendorAmount = ($totalPrice * $merchantCommission) / 100;
+        $platformAmount = ($totalPrice)  * $platformCommission / 100;
 
-        $successMessage = __(
-            'Order marked as sold successfully! Vendor commission: :vendor_amount SAR (:vendor_percent%), Platform commission: :platform_amount SAR (:platform_percent%)',
-            [
-                'vendor_amount' => number_format($vendorAmount, 2),
-                'vendor_percent' => $merchantCommission,
-                'platform_amount' => number_format($platformAmount, 2),
-                'platform_percent' => $platformCommission
-            ]
-        );
+        // $successMessage = __(
+        //     'Order marked as sold successfully! Vendor commission: :vendor_amount SAR (:vendor_percent%), Platform commission: :platform_amount SAR (:platform_percent%)',
+        //     [
+        //         'vendor_amount' => number_format($vendorAmount, 2),
+        //         'vendor_percent' => $merchantCommission,
+        //         'platform_amount' => number_format($platformAmount, 2),
+        //         'platform_percent' => $platformCommission
+        //     ]
+        // );
 
-        $vendorWallet = Wallet::where('user_id', Auth::id())->first();
+        // $vendorWallet = Wallet::where('user_id', Auth::id())->first();
 
-        if (!$vendorWallet) {
-            $vendorWallet = Wallet::create([
-                'user_id' => $order->user_id,
-            ]);
-        }
+        // if (!$vendorWallet) {
+        //     $vendorWallet = Wallet::create([
+        //         'user_id' => $order->user_id,
+        //     ]);
+        // }
 
-        $vendorWallet->credit($vendorAmount, 'Vendor commission for order #' . $order->id);
-        $vendorWallet->update(['balance' => $vendorWallet->balance + $vendorAmount, 'pending_balance' => $vendorWallet->pending_balance + $vendorAmount]);
+        // $vendorWallet->credit($vendorAmount, 'Vendor commission for order #' . $order->id);
+        // $vendorWallet->update(['balance' => $vendorWallet->balance + $vendorAmount, 'pending_balance' => $vendorWallet->pending_balance + $vendorAmount]);
 
-        // create wallet transaction for the platform
+        // // create wallet transaction for the platform
         $platformWallet = Wallet::where('user_id', User::where('email', 'admin@admin.com')->first()->id)->first();
 
         $platformWallet->credit($platformAmount, 'Platform commission for order #' . $order->id);
-        $platformWallet->update(['balance' => $platformWallet->balance + $platformAmount, 'pending_balance' => $platformWallet->pending_balance + $platformAmount]);
+        // $platformWallet->update(['balance' => $platformWallet->balance + $platformAmount, 'pending_balance' => $platformWallet->pending_balance + $platformAmount]);
 
-        return back()->with('success', $successMessage);
+        return back()->with('success', __('Order marked as sold successfully'));
     }
 
     public function markAsTaken(Request $request, $orderId)
@@ -226,9 +264,9 @@ class OrderSalesController extends Controller
         $this->authorizeVendor($order);
 
         event(new OrderSaleStatusChangedEvent($order));
-        
+
         $order->update(['status' => 'vendor_already_take_the_piece']);
-        
+
         // Notify gold piece owner using the new unified notification
         if ($order->goldPiece && $order->goldPiece->user) {
             $order->goldPiece->user->notify(
@@ -256,7 +294,7 @@ class OrderSalesController extends Controller
         event(new OrderSaleStatusChangedEvent($order));
 
         $order->user->notify(new ChangeOrderStatusNotification($order, $request->status));
-        
+
         $order->update(['status' => $request->status]);
 
         return back()->with('success', __('Order status updated successfully'));

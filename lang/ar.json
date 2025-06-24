@@ -1801,5 +1801,8 @@
     "max_canceled_orders": "حذف الطلبات الملغية",
     "clear_all_filters": "مسح التصفيات",
     "no results found": "لا يوجد نتائج",
-    "try changing search criteria or filters.": "حاول تغيير المعايير أو التصفيات."
+    "try changing search criteria or filters.": "حاول تغيير المعايير أو التصفيات.",
+    "You should pay your debt first": "يجب عليك أولاً سداد الدين",
+    "Order marked as sold successfully": "تم تحديد الطلب كمباع بنجاح",
+    "Platform Commission": "عمولة المنصة"
 }

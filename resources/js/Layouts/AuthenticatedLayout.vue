@@ -441,7 +441,9 @@ const setupPusher = () => {
             cluster: 'eu',
         });
 
+        if (user.value) {
         channel = pusher.subscribe(`vendor-notifications.${user.value.id}`);
+        }
         channel.bind('vendor-notification', (data) => {
             // Update UI
             showVendorNotificationToast.value = true;
@@ -517,8 +519,10 @@ onUnmounted(() => {
 
     // Clean up Pusher
     if (channel) {
-        channel.unbind_all();
-        pusher.unsubscribe(`vendor-notifications.${user.value.id}`);
+        if (user.value) {
+            channel.unbind_all();
+            pusher.unsubscribe(`vendor-notifications.${user.value.id}`);
+        }
     }
     if (pusher) {
         pusher.disconnect();

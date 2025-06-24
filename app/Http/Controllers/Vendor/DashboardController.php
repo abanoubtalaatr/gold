@@ -2,23 +2,34 @@
 
 namespace App\Http\Controllers\Vendor;
 
+use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
-use App\Models\Rating;
 use Inertia\Inertia;
 use App\Models\Branch;
+use App\Models\Rating;
+use App\Models\GoldPiece;
 use App\Models\OrderSale;
 use App\Models\OrderRental;
-use App\Models\GoldPiece;
 use Illuminate\Http\Request;
+use App\Services\PaymobService;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {   
+        $vendor = $request->user()->vendor_id??$request->user()->id;
+        
+        $user = User::where('id', $vendor)->where('debt', '>', 0)->first();
+        if($user){
+            $debt = $user->debt;
+        }else{
+            $debt = 0;
+        }
+        
         // Get filter parameters from request
         $period = $request->input('period', 'all');
         $fromDate = $request->input('from_date');
@@ -163,9 +174,68 @@ class DashboardController extends Controller
                 'from_date' => $fromDate,
                 'to_date' => $toDate,
             ],
+            'debt' =>(float) $debt,
         ]);
     }
 
+    public function initiatePayment(Request $request)
+    {
+        $request->validate([
+            'amount' => ['required', 'numeric', 'min:0.01'],
+            
+        ]);
+
+        $vendor = $request->user()->vendor_id??$request->user()->id;
+
+        $user = User::findOrFail($vendor);
+
+        $data = [
+            'amount' => $request->amount * 100, // Convert to cents as Paymob expects
+            'payment_methods' => [], // Will be set in PaymobService
+            'items' => [
+                [
+                    'name' => 'Debt Payment',
+                    'amount' => $request->amount * 100, // Convert to cents
+                    'description' => 'Payment to clear vendor debt',
+                    'quantity' => 1,
+                ],
+            ],
+            'billing_data' => [
+                'apartment' => 'NA',
+                'first_name' => $user->name ?? 'Vendor',
+                'last_name' => 'NA',
+                'street' => 'NA',
+                'building' => 'NA',
+                'phone_number' => $user->phone_number ?? 'NA',
+                'country' => 'KSA',
+                'email' => $user->email ?? 'no-email@example.com',
+                'floor' => 'NA',
+                'state' => 'NA',
+                'postal_code' => 'NA',
+            ],
+            'customer' => [
+                'first_name' => $user->name ?? 'Vendor',
+                'last_name' => 'NA',
+                'email' => $user->email ?? 'no-email@example.com',
+                'phone_number' => $user->mobile ?? 'NA',
+            ],
+            'extras' => [
+                'vendor_id' => $user->vendor_id ?? $user->id,
+            ],
+            'notification_url' => route('vendor.paymob.callback')
+        ];
+
+        try {
+            $paymobService = new PaymobService();
+            $clientSecret = $paymobService->getCheckoutUrl($data);
+            $checkoutUrl = "https://ksa.paymob.com/unifiedcheckout/?publicKey=" . config('services.paymob.public_key') . "&clientSecret={$clientSecret}";
+
+            return response()->json(['checkout_url' => $checkoutUrl]);
+        } catch (\Exception $e) {
+            Log::error('Payment initiation failed: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to initiate payment'], 500);
+        }
+    }
     protected function applyPeriodFilter($query, $period)
     {
         $now = Carbon::now();

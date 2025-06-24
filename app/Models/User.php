@@ -69,7 +69,7 @@ class User extends Authenticatable implements JWTSubject
         'logo',
         'city_id',
         'prefer_language',
-
+        'debt',
     ];
 
     protected $appends = ['avatar'];
