@@ -74,7 +74,7 @@ class RegisterController extends AppBaseController
 
             if (MobileConfirm::create($cnfrm_data)) {
 
-                $msg = __('رمز التحقق: :code', ['code' => $data['code']]);
+                $msg = __('رمز التحقق: :code', ['code' => $cnfrm_data['code']]);
 
                 // (new MesgatService())->send_sms($mobile, $msg);
 

@@ -222,7 +222,7 @@ class DashboardController extends Controller
             'extras' => [
                 'vendor_id' => $user->vendor_id ?? $user->id,
             ],
-            'notification_url' => route('vendor.paymob.callback')
+            'notification_url' => 'https://admin.goldstation.fudex-tech.net/vendor/paymob/callback'
         ];
 
         try {
