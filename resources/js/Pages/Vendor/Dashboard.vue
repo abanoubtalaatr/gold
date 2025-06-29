@@ -17,19 +17,7 @@
 
         <section class="section dashboard">
             <!-- Debt Payment Button -->
-            <div v-if="debt > 0" class="row mb-3">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-body text-center py-3">
-                            <h5 class="card-title">{{ $t('Outstanding Debt') }}: {{ debt.toFixed(2) }} SAR</h5>
-                            <button class="btn btn-primary" @click="initiatePayment" :disabled="isProcessing">
-                                {{ isProcessing ? $t('Processing...') : $t('Pay Debt') }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            
             <!-- Filters Section -->
             <div class="row mb-3">
                 <div class="col-lg-12">

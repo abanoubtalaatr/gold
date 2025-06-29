@@ -1,5 +1,4 @@
 <template>
-
     <Head title="Vendor Orders" />
 
     <AuthenticatedLayout>
@@ -15,7 +14,6 @@
                     <div class="p-6 bg-white border-b border-gray-200">
                         <!-- Filters -->
                         <div class="flex flex-wrap items-center justify-between mb-6 gap-4">
-                            
                             <div class="flex items-center gap-4">
                                 <select v-model="form.branch_id"
                                     class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -49,33 +47,25 @@
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Order ID') }}</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('User') }}</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Gold Piece') }}</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Branch') }}</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Price') }}</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Status') }}</th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <tr v-for="order in saleOrders.data" :key="order.id">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.id }}
-                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.id }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             <div class="flex items-center">
                                                 <img v-if="order.user?.avatar" :src="order.user.avatar"
@@ -89,8 +79,7 @@
                                         <td class="px-6 py-4 text-sm text-gray-500">
                                             <strong @click="showDetails(order)"
                                                 class="text-yellow-600 hover:text-yellow-200 hover:underline cursor-pointer transition-colors duration-200">
-                                                {{ order.gold_piece && order.gold_piece.name ? order.gold_piece.name :
-                                                    '--' }}
+                                                {{ order.gold_piece && order.gold_piece.name ? order.gold_piece.name : '--' }}
                                             </strong>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -100,37 +89,28 @@
                                             {{ order.total_price }} {{ $t('SAR') }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span
-                                                :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(order.status)]">
+                                            <span :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getStatusClass(order.status)]">
                                                 {{ formatStatus(order.status) }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div class="flex items-center space-x-2">
-                                                <button v-if="order.status === 'pending_approval'"
-                                                    @click="openAcceptModal(order)"
+                                                <button v-if="order.status === 'pending_approval'" @click="openAcceptModal(order)"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors duration-200">
                                                     {{ $t('Accept') }}
                                                 </button>
-                                                <button v-if="order.status === 'pending_approval'"
-                                                    @click="openRejectModal(order)"
+                                                <button v-if="order.status === 'pending_approval'" @click="openRejectModal(order)"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors duration-200">
                                                     {{ $t('Reject') }}
                                                 </button>
-                                                <button v-if="order.status === 'approved' || order.status === 'piece_sent'"
-                                                    @click="markAsTaken(order.id)"
-                                                    class="px-3 py-1 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 transition-colors duration-200">
-                                                    {{ $t('Mark as Taken') }}
-                                                </button>
-                                                <button v-if="order.status === 'vendor_already_take_the_piece'"
-                                                    @click="markAsSent(order.id)"
-                                                    class="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-200">
-                                                    {{ $t('Mark as Sent') }}
-                                                </button>
-                                                <button v-if="order.status === 'piece_sent'"
-                                                    @click="markAsSold(order.id)"
+                                                <button v-if="order.status === 'approved' || order.status === 'sold'" @click="markAsSold(order.id)"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 transition-colors duration-200">
-                                                    {{ $t('Mark as Sold') }}
+                                                    {{ $t('confirm_sold_from_vendor') }}
+                                                </button>
+                                                <!-- Edit Price Button -->
+                                                <button v-if="order.status !== 'sold' && order.status !== 'rejected'" @click="openEditPriceModal(order)"
+                                                    class="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-200">
+                                                    {{ $t('Edit Price') }}
                                                 </button>
                                             </div>
                                         </td>
@@ -231,31 +211,22 @@
         <!-- Piece Details Modal -->
         <Modal :show="showDetailsModal" @close="closeDetailsModal">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
-                <div
-                    class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                     <div class="p-6">
                         <h2 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Gold Piece Details') }}</h2>
                         <div v-if="selectedOrder" class="mt-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <p><strong>{{ $t('Name') }}:</strong>
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.name ?
-                                            selectedOrder.gold_piece.name :
-                                            '--' }}
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.name ? selectedOrder.gold_piece.name : '--' }}
                                     </p>
-                                    
                                     <p v-if="selectedOrder.gold_piece && selectedOrder.gold_piece.description">
                                         <strong>{{ $t('Description') }}:</strong>
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.description ?
-                                            selectedOrder.gold_piece.description :
-                                            '--' }}
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.description ? selectedOrder.gold_piece.description : '--' }}
                                     </p>
-                                    
                                     <p>
                                         <strong>{{ $t('Carat') }}:</strong>
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.carat ?
-                                            selectedOrder.gold_piece.carat :
-                                            '--' }}
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.carat ? selectedOrder.gold_piece.carat : '--' }}
                                     </p>
                                     <p v-if="selectedOrder && selectedOrder.gold_piece && selectedOrder.gold_piece.is_including_lobes">
                                         <strong>{{ $t('Is Including Lobe') }}:</strong>
@@ -267,29 +238,21 @@
                                     </p>
                                     <p v-if="selectedOrder.gold_piece && selectedOrder.gold_piece.sale_price">
                                         <strong>{{ $t('Sale Price') }}:</strong>
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.sale_price ?
-                                            selectedOrder.gold_piece.sale_price :
-                                            '--' }}
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.sale_price ? selectedOrder.gold_piece.sale_price : '--' }}
                                     </p>
                                     <p>
                                         <strong>{{ $t('Weight') }}:</strong>
-
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.weight ?
-                                            selectedOrder.gold_piece.weight :
-                                            '--' }}
-                                        {{
-                                            $t('grams') }}</p>
-
+                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.weight ? selectedOrder.gold_piece.weight : '--' }} {{ $t('grams') }}
+                                    </p>
                                     <p>
-                                        <strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || '--' }}</p>
-                                   
+                                        <strong>{{ $t('User') }}:</strong> {{ selectedOrder.user?.name || '--' }}
+                                    </p>
                                 </div>
                                 <div>
                                     <p><strong>{{ $t('Images') }}:</strong></p>
                                     <div v-if="selectedOrder.gold_piece?.media?.length" class="flex flex-wrap gap-2">
                                         <img v-for="media in selectedOrder.gold_piece.media.filter(m => m.collection_name === 'images')" :key="media.id"
-                                            :src="media.original_url" class="h-20 w-20 object-cover rounded"
-                                            alt="Gold piece image" />
+                                            :src="media.original_url" class="h-20 w-20 object-cover rounded" alt="Gold piece image" />
                                     </div>
                                     <p v-else>{{ $t('No images available') }}</p>
                                     <p class="mt-4"><strong>{{ $t('QR Code') }}:</strong></p>
@@ -308,6 +271,41 @@
                 </div>
             </div>
         </Modal>
+
+        <!-- Edit Price Modal -->
+        <Modal :show="showEditPriceModal" @close="closeEditPriceModal">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 p-4">
+                <div class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg w-full">
+                    <div class="p-6">
+                        <h2 class="text-lg font-medium text-gray-900 mb-4">{{ $t('Edit Order Price') }}</h2>
+                        <p class="mb-4 text-sm text-gray-600">{{ $t('Update the price for the selected order.') }}</p>
+
+                        <form @submit.prevent="updatePrice">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ $t('Price (SAR)') }}</label>
+                                <input v-model="editPriceForm.total_price" type="number" step="0.01" min="0"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                    placeholder="Enter new price" />
+                                <p v-if="editPriceForm.errors.total_price" class="mt-1 text-sm text-red-600">
+                                    {{ editPriceForm.errors.total_price }}
+                                </p>
+                            </div>
+
+                            <div class="flex justify-end space-x-3 pt-4">
+                                <button type="button" @click="closeEditPriceModal"
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200">
+                                    {{ $t('Cancel') }}
+                                </button>
+                                <button type="submit" :disabled="editPriceForm.processing"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+                                    {{ editPriceForm.processing ? $t('Processing...') : $t('Update') }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </Modal>
     </AuthenticatedLayout>
 </template>
 
@@ -317,9 +315,6 @@ import { Head, useForm, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
 import Modal from '@/Components/Modal.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import InputError from '@/Components/InputError.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
 import debounce from 'lodash/debounce';
 import { useI18n } from 'vue-i18n';
 
@@ -350,13 +345,18 @@ const form = useForm({
 });
 
 const showAcceptModal = ref(false);
+const showRejectModal = ref(false);
+const showDetailsModal = ref(false);
+const showEditPriceModal = ref(false);
 const selectedOrder = ref(null);
+
 const acceptForm = useForm({
     branch_id: '',
 });
 
-const showRejectModal = ref(false);
-const showDetailsModal = ref(false);
+const editPriceForm = useForm({
+    total_price: '',
+});
 
 const debouncedSearch = debounce(() => {
     form.get(route('vendor.orders.sale.index'), {
@@ -380,7 +380,7 @@ const resetFilters = () => {
     router.get(route('vendor.orders.sale.index'), {}, {
         preserveState: false,
         preserveScroll: true,
-        replace: true
+        replace: true,
     });
 };
 
@@ -394,7 +394,7 @@ const getStatusClass = (status) => {
             return 'bg-orange-100 text-orange-800';
         case 'piece_sent':
             return 'bg-blue-100 text-blue-800';
-        case 'sold':
+        case 'confirm_sold_from_vendor':
             return 'bg-gray-100 text-gray-800';
         case 'rejected':
             return 'bg-red-100 text-red-800';
@@ -405,12 +405,13 @@ const getStatusClass = (status) => {
 
 const formatStatus = (status) => {
     const statusMap = {
-        'pending_approval': t('Pending Approval'),
-        'approved': t('Approved'),
-        'vendor_already_take_the_piece': t('Vendor Already Take The Piece'),
-        'piece_sent': t('Piece Sent'),
-        'sold': t('Sold'),
-        'rejected': t('Rejected'),
+        pending_approval: t('Pending Approval'),
+        approved: t('Approved'),
+        vendor_already_take_the_piece: t('Vendor Already Take The Piece'),
+        piece_sent: t('Piece Sent'),
+        sold: t('Sold'),
+        rejected: t('Rejected'),
+        confirm_sold_from_vendor: t('Confirm Sold From Vendor'),
     };
 
     return statusMap[status] || status
@@ -458,7 +459,7 @@ const rejectOrder = () => {
         },
         onError: (errors) => {
             console.error('Error rejecting order:', errors);
-        }
+        },
     });
 };
 
@@ -472,6 +473,30 @@ const closeDetailsModal = () => {
     selectedOrder.value = null;
 };
 
+const openEditPriceModal = (order) => {
+    selectedOrder.value = order;
+    editPriceForm.total_price = order.total_price;
+    showEditPriceModal.value = true;
+};
+
+const closeEditPriceModal = () => {
+    showEditPriceModal.value = false;
+    selectedOrder.value = null;
+    editPriceForm.reset();
+};
+
+const updatePrice = () => {
+    editPriceForm.post(route('vendor.orders.sales.update-price', selectedOrder.value.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeEditPriceModal();
+        },
+        onError: (errors) => {
+            console.error('Error updating price:', errors);
+        },
+    });
+};
+
 const markAsSent = (orderId) => {
     router.post(route('vendor.orders.sales.mark-sent', orderId), {}, {
         preserveScroll: true,
@@ -480,7 +505,7 @@ const markAsSent = (orderId) => {
         },
         onError: (errors) => {
             console.error('Error marking order as sent:', errors);
-        }
+        },
     });
 };
 
@@ -492,7 +517,7 @@ const markAsSold = (orderId) => {
         },
         onError: (errors) => {
             console.error('Error marking order as sold:', errors);
-        }
+        },
     });
 };
 
@@ -504,7 +529,7 @@ const markAsTaken = (orderId) => {
         },
         onError: (errors) => {
             console.error('Error marking order as taken:', errors);
-        }
+        },
     });
 };
 </script>

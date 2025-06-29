@@ -43,6 +43,7 @@ class OrderSale extends Model
     const STATUS_SOLD = 'sold'; // تم بيعها
     const STATUS_REJECTED = 'rejected'; // تم رفضها
     const STATUS_CANCELED = 'canceled'; // تم الإلغاء
+    const STATUS_CONFIRM_SOLD_FROM_VENDOR = 'confirm_sold_from_vendor'; // تم التأكيد من المتجر
 
     /**
      * Get all possible order statuses.
@@ -54,10 +55,9 @@ class OrderSale extends Model
         return [
             self::STATUS_PENDING_APPROVAL,
             self::STATUS_APPROVED,
-            self::STATUS_PIECE_SENT,
             self::STATUS_SOLD,
-            self::STATUS_REJECTED,
             self::STATUS_CANCELED,
+            self::STATUS_CONFIRM_SOLD_FROM_VENDOR,
         ];
     }
 

@@ -304,4 +304,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(CanceledOrder::class, 'user_id');
     }
 
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transactions::class);
+    }
+
 }

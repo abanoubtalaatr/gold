@@ -209,6 +209,14 @@
                 </Link>
             </li>
 
+         <!-- vendor transactions -->
+            <li class="nav-item" v-if="hasPermission('vendor read transactions')">
+                <Link class="nav-link" :href="route('vendor.transactions.index')"
+                    :class="{ collapsed: !$page.url.startsWith('/vendor/transactions') }">
+                <i class="bi bi-person-lines-fill"></i>
+                <span>{{ $t("Transactions") }}</span>
+                </Link>
+            </li>
             <!-- Vendor wallet -->
             <!-- <li class="nav-item" v-if="hasPermission('vendor read wallet')">
                 <Link class="nav-link" :href="route('vendor.wallet.index')"

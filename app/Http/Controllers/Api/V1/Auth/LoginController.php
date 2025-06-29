@@ -74,7 +74,7 @@ class LoginController extends AppBaseController
             'social_provider' => 'required|in:apple,google,facebook',
             'device_token' => 'nullable',
             'email' => 'required',
-            'name' => 'required',
+            'name' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -243,29 +243,32 @@ class LoginController extends AppBaseController
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            DB::beginTransaction();
+            // DB::beginTransaction();
 
-            try {
+            // try {
+            
                 $user = User::create([
-                    'name' => $request->name,
+                    'name' => $request->name ?? explode('@', $request->email)[0],
                     'email' => $request->email,
                     'is_active' => 1,
                     'social_provider' => $request->social_provider,
+                    'mobile_verified_at' => now(),
                 ]);
-            } catch (Exception $e) {
-                DB::rollBack();
+            // } catch (Exception $e) {
+            //     DB::rollBack();
 
-                throw new Exception(__('mobile.There was a problem connecting to :provider', ['provider' => $request->social_provider]));
-            }
+                // throw new Exception(__('mobile.There was a problem connecting to :provider', ['provider' => $request->social_provider]));
+            // }
 
-            DB::commit();
+            // DB::commit();
         }
+        
 
-        if (null !== $user->email && !$user->isVerified()) {
-            //implements ShouldQueue
-            $user->sendEmailVerificationNotification();
-            return $this->errorResponse('mobile.not_verified', ['email' => $user->email, 'message' => __('mobile.We have sent a confirmation email.')], 200);
-        }
+        // if (null !== $user->email && !$user->isVerified()) {
+        //     //implements ShouldQueue
+        //     $user->sendEmailVerificationNotification();
+        //     return $this->errorResponse('mobile.not_verified', ['email' => $user->email, 'message' => __('mobile.We have sent a confirmation email.')], 200);
+        // }
 
         if (!$user->isActive()) {
             return $this->errorResponse('mobile.not_active', ['email' => $user->email, 'message' => __('mobile.your account has been deactivated.')], 200);
@@ -287,15 +290,11 @@ class LoginController extends AppBaseController
 
         event(new UserLoggedIn($user));
 
-        return response()->json([
-            'data' => [
-                'user' => $user,
-                'token' => $token,
-                'expires' => $expires
-            ],
-            'success' => true,
-            'message' => __('mobile.You have logged in successfully.')
-        ], 200);
+        return $this->successResponse([
+            'user' => $user,
+            'token' => $token,
+            'expires' => $expires
+        ], __('mobile.You have logged in successfully.'));
     }
 
 

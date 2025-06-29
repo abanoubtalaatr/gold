@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Vendor;
 use App\Models\User;
 use Inertia\Inertia;
 use App\Models\Branch;
-use App\Models\Wallet;
 use App\Models\OrderSale;
 use Illuminate\Http\Request;
 use App\Models\SystemSetting;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\SalesWorkflowService;
+use App\Http\Services\TransactionsService;
 use App\Events\OrderSaleStatusChangedEvent;
 use App\Notifications\OrderSaleNotification;
 use App\Notifications\Client\ChangeOrderStatusNotification;
@@ -91,7 +91,7 @@ class OrderSalesController extends Controller
             ->select('gold_piece_id', 'status') // Explicitly select grouped columns
             ->havingRaw('status != ? OR COUNT(*) = 1', [OrderSale::STATUS_PENDING_APPROVAL])
             ->count();
-        
+
         if ($activeOrders >= $maxActiveOrders) {
             return back()->with('error', __('You have reached the maximum number of active orders'));
         }
@@ -160,151 +160,59 @@ class OrderSalesController extends Controller
         return back()->with('success', __('Order rejected successfully'));
     }
 
-    public function markAsSent(Request $request, $orderId)
-    {
-        $orderId = $orderId; // Store the original ID
-        $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
-        $this->authorizeVendor($order);
-
-        if ($order->status !== OrderSale::STATUS_APPROVED) {
-            return back()->with('error', __('Order must be approved before marking as sent.'));
-        }
-
-        event(new OrderSaleStatusChangedEvent($order));
-
-        $order->update(['status' => OrderSale::STATUS_PIECE_SENT]);
-        // Notify gold piece owner using the new unified notification
-        if ($order->goldPiece && $order->goldPiece->user) {
-            $order->goldPiece->user->notify(
-                new OrderSaleNotification(
-                    $order,
-                    'piece_sent',
-                    Auth::user()->name
-                )
-            );
-        }
-
-        return back()->with('success', __('Order marked as sent successfully'));
-    }
-
     public function markAsSold(Request $request, $orderId)
     {
         $orderId = $orderId; // Store the original ID
         $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
-        $vendor = Auth::user()->vendor_id ? Auth::user()->vendor_id : Auth::user()->id;
-        $vendor = User::find($vendor->id);
-
-        $systemSetting = SystemSetting::first();
-
-        $platformCommission = $systemSetting->platform_commission_percentage;
-
-        if ($platformCommission > 0) {
-            $platformCommission = ($order->total_price) *  $platformCommission / 100;
-            $vendor->update(['debt' => $vendor->debt + $platformCommission]);
-        }
 
         $this->authorizeVendor($order);
 
-        if ($order->status !== OrderSale::STATUS_PIECE_SENT) {
-            return back()->with('error', __('Order must be marked as sent before marking as sold.'));
-        }
-
         event(new OrderSaleStatusChangedEvent($order));
 
-        $order->update(['status' => OrderSale::STATUS_SOLD]);
+        $order->update(['status' => OrderSale::STATUS_CONFIRM_SOLD_FROM_VENDOR]);
 
         // Notify gold piece owner using the new unified notification
         if ($order->goldPiece && $order->goldPiece->user) {
-            $order->user->notify(new ChangeOrderStatusNotification($order, OrderSale::STATUS_SOLD));
+            $order->user->notify(new ChangeOrderStatusNotification($order, OrderSale::STATUS_CONFIRM_SOLD_FROM_VENDOR));
         }
 
-        // Get commission details for success message
-        $totalPrice = $order->total_price;
-        // $settings = SystemSetting::first();
-        // $merchantCommission = $settings->merchant_commission_percentage ?? 0;
-        // $platformCommission = $settings->platform_commission_percentage ?? 0;
-
-        // $vendorAmount = ($totalPrice * $merchantCommission) / 100;
-        $platformAmount = ($totalPrice)  * $platformCommission / 100;
-
-        // $successMessage = __(
-        //     'Order marked as sold successfully! Vendor commission: :vendor_amount SAR (:vendor_percent%), Platform commission: :platform_amount SAR (:platform_percent%)',
-        //     [
-        //         'vendor_amount' => number_format($vendorAmount, 2),
-        //         'vendor_percent' => $merchantCommission,
-        //         'platform_amount' => number_format($platformAmount, 2),
-        //         'platform_percent' => $platformCommission
-        //     ]
-        // );
-
-        // $vendorWallet = Wallet::where('user_id', Auth::id())->first();
-
-        // if (!$vendorWallet) {
-        //     $vendorWallet = Wallet::create([
-        //         'user_id' => $order->user_id,
-        //     ]);
-        // }
-
-        // $vendorWallet->credit($vendorAmount, 'Vendor commission for order #' . $order->id);
-        // $vendorWallet->update(['balance' => $vendorWallet->balance + $vendorAmount, 'pending_balance' => $vendorWallet->pending_balance + $vendorAmount]);
-
-        // // create wallet transaction for the platform
-        $platformWallet = Wallet::where('user_id', User::where('email', 'admin@admin.com')->first()->id)->first();
-
-        $platformWallet->credit($platformAmount, 'Platform commission for order #' . $order->id);
-        // $platformWallet->update(['balance' => $platformWallet->balance + $platformAmount, 'pending_balance' => $platformWallet->pending_balance + $platformAmount]);
+        (new TransactionsService())->addTransactionForVendorAndPlatform($order, 'sale', $order->total_price, $order->branch->vendor_id, 'credit');
 
         return back()->with('success', __('Order marked as sold successfully'));
     }
-
-    public function markAsTaken(Request $request, $orderId)
-    {
-        $orderId = $orderId; // Store the original ID
-        $order = OrderSale::with(['goldPiece', 'goldPiece.user', 'user', 'branch'])->findOrFail($orderId);
-        $this->authorizeVendor($order);
-
-        event(new OrderSaleStatusChangedEvent($order));
-
-        $order->update(['status' => 'vendor_already_take_the_piece']);
-
-        // Notify gold piece owner using the new unified notification
-        if ($order->goldPiece && $order->goldPiece->user) {
-            $order->goldPiece->user->notify(
-                new OrderSaleNotification(
-                    $order,
-                    'vendor_already_take_the_piece',
-                    Auth::user()->name
-                )
-            );
-        }
-
-        return back()->with('success', __('Order marked as taken successfully'));
-    }
-
-    public function updateStatus(Request $request, $orderId)
-    {
-        $order = OrderSale::findOrFail($orderId);
-        $this->authorizeVendor($order);
-
-        // Validate the incoming status to be one of the allowed statuses for OrderSale
-        $request->validate([
-            'status' => 'required|in:pending_approval,approved,piece_sent,sold,rejected,vendor_already_take_the_piece',
-        ]);
-
-        event(new OrderSaleStatusChangedEvent($order));
-
-        $order->user->notify(new ChangeOrderStatusNotification($order, $request->status));
-
-        $order->update(['status' => $request->status]);
-
-        return back()->with('success', __('Order status updated successfully'));
-    }
-
     protected function authorizeVendor($order)
     {
         $vendorBranches = Branch::where('vendor_id', Auth::id())->pluck('id');
         if (!$vendorBranches->contains($order->branch_id) && $order->status !== OrderSale::STATUS_PENDING_APPROVAL) {
             abort(403, 'Unauthorized action.');
         }
+    }
+
+    public function updatePrice(Request $request, $orderId)
+    {
+        $order = OrderSale::findOrFail($orderId);
+        $this->authorizeVendor($order);
+
+        $request->validate([
+            'total_price' => 'required|numeric|min:0',
+        ]);
+
+        $order->update([
+            'total_price' => $request->total_price,
+        ]);
+
+        // Optionally notify the user or gold piece owner
+        if ($order->user) {
+            $order->user->notify(
+                new OrderSaleNotification(
+                    $order,
+                    'price_updated',
+                    Auth::user()->name,
+                    ['new_price' => $request->total_price]
+                )
+            );
+        }
+
+        return back()->with('success', __('Order price updated successfully'));
     }
 }

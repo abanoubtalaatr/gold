@@ -40,6 +40,7 @@ use App\Http\Controllers\Vendor\OrderSalesController;
 use App\Http\Controllers\Vendor\SettlementController;
 use App\Http\Controllers\Vendor\StatisticsController;
 use App\Http\Controllers\Vendor\OrderRentalController;
+use App\Http\Controllers\Vendor\TransactionController;
 use App\Http\Controllers\Admin\SystemSettingsController;
 use App\Http\Controllers\Admin\UserSettlementController;
 use App\Http\Controllers\Vendor\Auth\RegisterController;
@@ -421,7 +422,9 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
         Route::post('/sale-orders/{orderId}/mark-sold', 'markAsSold')->name('orders.sales.mark-sold');
         Route::post('/sale-orders/{orderId}/mark-taken', 'markAsTaken')->name('orders.sales.mark-taken');
         Route::patch('/sale-orders/{orderId}/status', 'updateStatus')->name('orders.sales.updateStatus');
+        Route::post('sales-orders/{orderId}/update-price', 'updatePrice')->name('orders.sales.update-price');
     });
+    Route::resource('transactions', TransactionController::class);
     
     Route::get('/rental-requests', [RentalRequestController::class, 'index'])->name('rental-requests.index');
     Route::post('/rental-requests/{order}/accept', [RentalRequestController::class, 'accept'])->name('rental-requests.accept');

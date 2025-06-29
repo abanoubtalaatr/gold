@@ -1010,7 +1010,8 @@
     "delete_canceled_orders": "Delete Canceled Orders",
     "do_you_want_to_delete_canceled_orders": "Do you want to delete canceled orders?",
     "the_canceled_orders_have_been_deleted_successfully": "The canceled orders have been deleted successfully",
-    "failed_to_delete_canceled_orders": "Failed to delete canceled orders"
+    "failed_to_delete_canceled_orders": "Failed to delete canceled orders",
+    "confirm_sold_from_vendor":"confirm sold from vendor"
     
 }
     

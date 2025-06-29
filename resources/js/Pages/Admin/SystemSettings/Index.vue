@@ -226,6 +226,9 @@ import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import Swal from 'sweetalert2';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     settings: Object,
@@ -294,10 +297,10 @@ const submitSettings = () => {
         preserveScroll: true,
         onSuccess: () => {
             Swal.fire({
-                title: 'Success!',
-                text: 'Settings updated successfully',
+                title: t('Success!'),
+                text: t('Settings updated successfully'),
                 icon: 'success',
-                confirmButtonText: 'OK'
+                confirmButtonText: t('OK')
             }).then(() => {
                 window.location.reload();
             });
@@ -305,10 +308,10 @@ const submitSettings = () => {
         onError: (errors) => {
             console.error('Error updating settings:', errors);
             Swal.fire({
-                title: 'Error!',
-                text: 'Failed to update settings',
+                title: t('Error!'),
+                text: t('Failed to update settings'),
                 icon: 'error',
-                confirmButtonText: 'OK'
+                confirmButtonText: t('OK')
             });
         },
     });

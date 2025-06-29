@@ -59,6 +59,7 @@ class UserRolePermissionSeeder extends Seeder
                 'reports' => ['vendor create', 'vendor read', 'vendor update', 'vendor delete', 'vendor view'],
                 'wallet' => ['vendor read', 'vendor update'],
                 'complaints' => ['vendor read', 'vendor create'],
+                'transactions' => ['vendor read']
             ],
         ];
 
@@ -93,6 +94,7 @@ class UserRolePermissionSeeder extends Seeder
                 'vendor create reports', 'vendor read reports', 'vendor view reports', 'vendor update reports', 'vendor delete reports',
                 'vendor read wallet', 'vendor update wallet',
                 'vendor read complaints', 'vendor create complaints',
+                'vendor read transactions'
             ],
             'superadmin' => [
                 'create roles', 'read roles', 'view roles', 'update roles', 'delete roles',
