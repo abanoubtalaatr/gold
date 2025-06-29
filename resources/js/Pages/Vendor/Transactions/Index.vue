@@ -127,6 +127,7 @@ const applyFilters = () => {
         preserveScroll: true,
     });
 };
+const isProcessing = ref(false);
 const initiatePayment = async () => {
     isProcessing.value = true;
 
