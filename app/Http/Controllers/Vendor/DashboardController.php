@@ -222,7 +222,7 @@ class DashboardController extends Controller
             'extras' => [
                 'vendor_id' => $user->vendor_id ?? $user->id,
             ],
-            'notification_url' => 'https://webhook.site/c2ec5b1c-14ab-4827-add2-e550d9edf48b'
+            'notification_url' => 'https://admin.goldstation.fudex-tech.net/vendor/paymob/callback'
         ];
 
         try {

@@ -1826,5 +1826,6 @@
     "confirm_sold_from_vendor":"تم تاكيد البيع من قبل المحل",
     "Payment Completed Successfully":"تم اكتمال الدفع بنجاح",
     "Thank you for your payment. Your transaction has been processed.":"شكرا ",
-    "Back to Dashboard":"الرجوع الي الصفحه الرئيسية"
+    "Back to Dashboard":"الرجوع الي الصفحه الرئيسية",
+    "No transactions found.":"لايوجد معاملات"
 }
