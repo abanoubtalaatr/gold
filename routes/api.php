@@ -116,7 +116,6 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     | Gold Pieces....
     |--------------------------------------------------------------------------
     */
-
     
     Route::get('/my-gold-pieces', [GoldPieceController::class, 'myGoldPieces']);
     Route::post('/gold-pieces', [GoldPieceController::class, 'store']);
@@ -148,7 +147,7 @@ Route::group(['middleware' => ['mobile_verified', 'active', 'auth:api']], functi
     Route::delete('/orders/{order}/sale', [OrderController::class, 'deleteSale']);
     Route::get('orders/{order}', [OrderController::class, 'show']);
     Route::post('orders/{order}/confirm-send-to-vendor', [ConfirmSendPieceToVendorController::class, 'index']);
-    Route::post('order/{order}/confirm-sold-to-vendor', [ConfirmSoldToVendorController::class, 'index']);
+    Route::post('orders/{order}/confirm-sold-to-vendor', [ConfirmSoldToVendorController::class, 'update']);
     Route::post('orders/{order}/cancel', [OrderController::class, 'cancel']);
     /*
     |--------------------------------------------------------------------------

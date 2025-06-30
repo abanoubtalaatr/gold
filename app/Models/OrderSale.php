@@ -75,4 +75,8 @@ class OrderSale extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+    public function contacts()
+    {
+        return $this->hasMany(Contact::class,'sale_order_id');
+    }
 }

@@ -238,7 +238,7 @@
                                     </p>
                                     <p v-if="selectedOrder.gold_piece && selectedOrder.gold_piece.sale_price">
                                         <strong>{{ $t('Sale Price') }}:</strong>
-                                        {{ selectedOrder.gold_piece && selectedOrder.gold_piece.sale_price ? selectedOrder.gold_piece.sale_price : '--' }}
+                                        {{ selectedOrder.gold_piece && selectedOrder.total_price ? selectedOrder.total_price : '--' }}
                                     </p>
                                     <p>
                                         <strong>{{ $t('Weight') }}:</strong>

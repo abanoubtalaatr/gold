@@ -33,7 +33,7 @@ class GoldPieceResource extends JsonResource
             'weight' => $this->weight,
             'carat' => $this->carat,
             'rental_price_per_day' => $this->rental_price_per_day,
-            'sale_price' => $this->sale_price,
+            'sale_price' => $order?->total_price,
             'deposit_amount' => $this->deposit_amount,
             'type' => $this->type,
             'description' => $this->description,
