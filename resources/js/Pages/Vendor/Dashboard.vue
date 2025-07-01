@@ -64,57 +64,6 @@
                 <!-- Left side columns -->
                 <div class="col-lg-12">
                     <div class="row">
-                        <!-- Average Rating Card -->
-                        <div class="col-xxl-3 col-md-3">
-                            <div class="card info-card rating-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $t('Average Rating') }}</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-star-fill"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ averageRating.toFixed(1) }}</h6>
-                                            <span class="text-muted small pt-2 ps-1">/ 5</span>
-                                        </div>
-                                    </div>
-                                    <div class="mt-2">
-                                        <div class="rating-stars d-flex">
-                                            <template v-for="n in 5" :key="n">
-                                                <i class="bi"
-                                                   :class="n <= Math.round(averageRating) ? 'bi-star-fill text-warning' : 'bi-star text-warning'"></i>
-                                            </template>
-                                        </div>
-                                        <small class="text-muted">({{ totalRatings }} {{ $t('reviews') }})</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Rating Breakdown Card -->
-                        <div class="col-xxl-3 col-md-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $t('Rating Breakdown') }}</h5>
-                                    <div v-for="(count, index) in ratingDistribution" :key="index" class="mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <span class="me-2 text-nowrap" style="width: 50px;">
-                                                {{ 5-index }} <i class="bi bi-star-fill text-warning"></i>
-                                            </span>
-                                            <div class="progress flex-grow-1" style="height: 10px;">
-                                                <div class="progress-bar bg-warning"
-                                                     role="progressbar"
-                                                     :style="{ width: getPercentage(count) + '%' }"
-                                                     :aria-valuenow="getPercentage(count)">
-                                                </div>
-                                            </div>
-                                            <span class="ms-2 small">{{ count }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Roles Card -->
                         <div class="col-xxl-3 col-md-3">
                             <div class="card info-card customers-card">

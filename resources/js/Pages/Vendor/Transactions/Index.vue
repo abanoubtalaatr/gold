@@ -39,9 +39,9 @@
                                         <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Transaction ID') }}</th>
-                                        <th
+                                        <!-- <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            {{ $t('Description') }}</th>
+                                            {{ $t('Description') }}</th> -->
                                         <th
                                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             {{ $t('Amount') }}</th>
@@ -61,9 +61,9 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ transaction.id }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ transaction.description || '--' }}
-                                        </td>
+                                        </td> -->
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {{ transaction.amount }} {{ $t('SAR') }}
                                         </td>

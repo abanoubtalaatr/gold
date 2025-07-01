@@ -108,7 +108,7 @@
                                                     {{ $t('confirm_sold_from_vendor') }}
                                                 </button>
                                                 <!-- Edit Price Button -->
-                                                <button v-if="order.status !== 'sold' && order.status !== 'rejected'" @click="openEditPriceModal(order)"
+                                                <button v-if="order.status !== 'sold' && order.status !== 'rejected' && order.status !== 'confirm_sold_from_vendor'" @click="openEditPriceModal(order)"
                                                     class="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-200">
                                                     {{ $t('Edit Price') }}
                                                 </button>

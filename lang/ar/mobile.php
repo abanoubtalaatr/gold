@@ -235,5 +235,8 @@ return [
     'edit' => 'تعديل',
     'wallet_management' => 'إدارة المحفظة',
     'deactivate' => 'إلغاء التفعيل',
+    "piece_sold_to_vendor_successfully" => "تم بيع قطعة الذهب إلى المحل بنجاح",
+    'must_be_accept_first_to_can_change_the_status' => 'يجب أن يتم الموافقة أولاً لتغيير الحالة',
+    'ID' => 'الرقم',
     
 ];

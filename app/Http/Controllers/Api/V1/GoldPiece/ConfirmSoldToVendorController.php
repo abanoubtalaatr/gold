@@ -21,6 +21,12 @@ class ConfirmSoldToVendorController extends Controller
         if (!$order) {
             return $this->errorResponse(__("mobile.order_not_found"), 404);
         }
+        
+        // must be accept first to can change the status 
+        if ($order->status == OrderSale::STATUS_PENDING_APPROVAL) {
+            return $this->errorResponse(__("mobile.must_be_accept_first_to_can_change_the_status"), 400);
+        }
+
         if ($order->status == OrderSale::STATUS_CONFIRM_SOLD_FROM_VENDOR) {
             (new TransactionsService())->addTransactionForVendorAndPlatform($order, 'sale', $order->total_price, $order->branch->vendor_id, 'credit');
         }

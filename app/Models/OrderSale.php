@@ -55,7 +55,10 @@ class OrderSale extends Model
         return [
             self::STATUS_PENDING_APPROVAL,
             self::STATUS_APPROVED,
+            self::STATUS_PIECE_SENT,
+            self::STATUS_VENDOR_ALREADY_TAKE_THE_PIECE,
             self::STATUS_SOLD,
+            self::STATUS_REJECTED,
             self::STATUS_CANCELED,
             self::STATUS_CONFIRM_SOLD_FROM_VENDOR,
         ];

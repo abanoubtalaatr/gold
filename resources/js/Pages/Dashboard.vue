@@ -96,44 +96,6 @@
                         </div>
                         <!-- End Roles Card -->
 
-                        <!-- Reviews Card -->
-                        <div class="col-xxl-3 col-md-3">
-                            <div class="card info-card sales-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $t('total_reviews') }}</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-star"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ reviewsData.total_reviews }}</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End Reviews Card -->
-
-                        <!-- Average Rating Card -->
-                        <div class="col-xxl-3 col-md-3">
-                            <div class="card info-card customers-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $t('average_rating') }}</h5>
-                                    <div class="d-flex align-items-center">
-                                        <div
-                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-star-fill"></i>
-                                        </div>
-                                        <div class="ps-3">
-                                            <h6>{{ reviewsData.average_rating }}</h6>
-                                            <span class="text-muted small pt-2 ps-1">/ 5</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End Average Rating Card -->
 
                         <!-- Sales Orders Card -->
                         <div class="col-xxl-3 col-md-3">

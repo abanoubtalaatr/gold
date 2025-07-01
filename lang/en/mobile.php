@@ -272,5 +272,7 @@ return [
     'order_canceled_success' => 'Order canceled successfully',
     'account_suspended_because_you_exceeded_the_maximum_number_of_canceled_orders' => 'Account suspended because you exceeded the maximum number of canceled orders',
     'account_suspended_because_you_exceeded_the_maximum_number_of_canceled_orders_contact_support' => 'Account suspended because you exceeded the maximum number of canceled orders, please contact support',
-    
+    'piece_sold_to_vendor_successfully' => 'Piece sold to vendor successfully',
+    'must_be_accept_first_to_can_change_the_status' => 'Must be accept first to can change the status',
+    'ID' => 'ID',
 ];

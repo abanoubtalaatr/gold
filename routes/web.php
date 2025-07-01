@@ -462,9 +462,13 @@ Route::middleware(['auth', 'verified'])->prefix('vendor')->name('vendor.')->grou
 
 
 // Vendor Reports Routes
-Route::middleware(['auth', 'verified', 'role:vendor'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/vendor/reports', [ReportController::class, 'index'])
         ->name('vendor.reports.index');
+
+        Route::get('/vendor/reports/view', [ReportController::class, 'viewReport'])->name('vendor.reports.view');
+    Route::post('/vendor/reports/filter', [ReportController::class, 'filter'])
+        ->name('vendor.reports.filter');
 
     Route::post('/vendor/reports/generate', [ReportController::class, 'generate'])
         ->name('vendor.reports.generate');
